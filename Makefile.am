@@ -9,7 +9,6 @@ EXTRA_DIST = $(top_srcdir)/bootstrap \
 			 $(top_srcdir)/pl/perlobject.map \
 			 $(top_srcdir)/pl/README \
 			 $(top_srcdir)/pl/lib/Semantic/API.pm \
-			 $(top_srcdir)/pl/scripts/autocomplete.pl \
 			 $(top_srcdir)/pl/scripts/export_wordlist.pl \
 			 $(top_srcdir)/pl/scripts/federated.pl \
 			 $(top_srcdir)/pl/scripts/index.pl \

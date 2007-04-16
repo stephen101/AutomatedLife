@@ -12,7 +12,6 @@ AC_CHECK_PDF_READER
 RS_BOOST([1.33.1],[],[AC_MSG_ERROR([Package requires the Boost C++ libraries!])])
 RS_BOOST_PROGRAM_OPTIONS([],[AC_MSG_ERROR([Package requires the Boost Program Options library!])])
 RS_BOOST_FILESYSTEM([],[AC_MSG_ERROR([Package requires the Boost Filesystem library!])])
-RS_BOOST_SIGNALS([], [AC_MSG_ERROR([Package requires the Boost Signals library!])])
 AC_CHECK_MYSQL
 AC_CHECK_SQLITE
 AC_ARG_WITH(unicode,[AS_HELP_STRING([--with-unicode],[compile with unicode support])],SEMANTIC_UNICODE=1,SEMANTIC_UNICODE=0)
