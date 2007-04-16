@@ -1,0 +1,61 @@
+Semantic-Engine version 2.00
+============================
+
+Semantic Indexing Project
+
+The Semantic Engine has emerged from an attempt to improve on standard keyword
+searches. By analyzing the statistical patterns in natural language, 
+concept-based relationships can be established between distinct texts that may
+not share particular key words. By representing a text collection as a
+graph-theoretic network, similarities and relationships can easily be found in
+otherwise unstructured data.
+
+
+FOR MORE INFORMATION
+
+Please visit our website:
+
+http://www.knowledgesearch.org/
+
+Or join our mailing list:
+
+http://lists.knowledgesearch.org/mailman/listinfo/research
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   ** If you are using Mac OS X, you may need to use this
+   syntax to build the perl bindings properly
+   
+      MACOSX_DEPLOYMENT_TARGET=10.4 make
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Boost C++ Libraries -- http://www.boost.org
+
+AUTHORS
+
+Aaron Coburn <acoburn@middlebury.edu>
+Gabriel Schine <gschine@middlebury.edu>
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Aaron Coburn, Gabe Schine
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

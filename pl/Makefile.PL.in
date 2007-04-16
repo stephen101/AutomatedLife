@@ -1,0 +1,110 @@
+use ExtUtils::MakeMaker;
+use File::Spec;
+use strict;
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+my $sqlite = q(@SQLITE3_LIBS@);
+$sqlite =~ s/^([^\s]+)\/libsqlite3.a/-L$1 -lsqlite3/;
+my $libs = q(@MYSQL_LIBS@ @BOOST_LIBS@ @LIBICONV@ @MSWORD_READER_LIBS@ @PDF_READER_LIBS@ ) . $sqlite;
+my $includes = q(@MYSQL_CFLAGS@ @SQLITE3_CFLAGS@ @BOOST_CPPFLAGS@ @MSWORD_READER_CPPFLAGS@ @PDF_READER_CPPFLAGS@);
+
+# add something here to install the mysql database schema so the test scripts can run!
+
+WriteMakefile(
+    NAME              => 'Semantic::API',
+    VERSION_FROM      => 'lib/Semantic/API.pm', # finds $VERSION
+    PREREQ_PM         => { DBI => '1.40',
+							'DBD::mysql' => '2.90' }, # e.g., Module::Name => 1.1
+    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
+      (ABSTRACT_FROM  => 'lib/Semantic/API.pm', # retrieve abstract from module
+       AUTHOR         => 'Aaron Coburn <aaron.coburn@knowledgesearch.org>') : ()),
+    CC                => 'g++',
+    LD                => 'g++',
+    XSOPT             => '-C++',
+    TYPEMAPS          => ['perlobject.map'],
+    LIBS              =>  $libs, # e.g., '-lm'
+    DEFINE            => '-I../include -I. ' . $includes, # e.g., '-DHAVE_SOMETHING'
+	# Insert -I. if you add *.h files later:
+    INC               => '', # e.g., '-I/usr/include/other'
+	# Un-comment this if you add C files to link with later:
+    # OBJECT            => '', # link all the C files too
+);
+
+my $have_mysql = "@MYSQL_LIBS@";
+if( $have_mysql ){
+	use DBI;
+	my $drh = DBI->install_driver("mysql");
+	my $rc;
+	my $user;
+	my $pass;
+	my $database = "semantic_test";
+	my $skip_file = File::Spec->catfile("t",".skip.mysql.tests");
+	eval {
+		$rc = $drh->func("dropdb", "$database", 'localhost', 'root', '', 'admin');
+	};
+	eval {
+		$rc = $drh->func("createdb", "$database", 'localhost', 'root', '', 'admin');
+	};
+	
+	if( $@){
+		print "Error connecting to MySQL driver: $@\n";
+		exit(0);
+	}
+	if( !$rc ) {
+		my $value = prompt("Would you like to enable the MySQL tests?","Y/n");
+		if( $value =~ m/^y/i){
+			$user = prompt("Please provide the username of a MySQL user with permission to create databases: ","root");
+			$pass = prompt("Please provide the password for the user '$user': ","");
+			$rc = $drh->func("dropdb", "$database", 'localhost', $user, $pass, 'admin');
+			$rc = $drh->func("createdb", "$database", 'localhost', $user, $pass, 'admin');
+		} else {
+			open FH, ">$skip_file";
+			close FH;
+		}
+	}
+	my $src_dir = File::Spec->catfile("..","sql","mysql5");
+	if( $rc ){
+		$user = "root" unless $user;
+		$pass = "-p $pass" if $pass;
+		my $error;
+		my $sql = File::Spec->catfile($src_dir,"tables.sql");
+		my $rv = system("mysql -u $user $pass $database < $sql");
+		$error = "couldn't import tables: $!" if $rv;
+		
+		$sql = File::Spec->catfile($src_dir,"triggers.sql");
+		$rv = system("mysql -u $user $pass $database < $sql");
+		$error = "couldn't add triggers: $!" if $rv;
+		
+		$sql = File::Spec->catfile($src_dir,"procedures.sql");
+		$rv = system("mysql -u $user $pass $database < $sql");
+		$error = "couldn't add procedures: $!" if $rv;
+		if( $error ){
+			warn "There was an error setting up the mysql environment.\n";
+			warn "MySQL tests will be skipped\n";
+			open FH, ">$skip_file";
+			close FH;
+		} else {
+			my $dbh = DBI->connect("dbi:mysql:$database",$user,$pass);
+			$dbh->do("GRANT ALL ON $database.* TO $ENV{USER}\@localhost");
+			$dbh->disconnect;
+	
+			print "A new MySQL database, called 'semantic_test', was created. You may wish to delete it later.\n";
+		
+		}
+	}
+	my $create_stub = File::Spec->catfile("scripts","stub_create_mysql.pl");
+	my $tables = File::Spec->catfile("..","sql","mysql5","tables.sql");
+	my $triggers = File::Spec->catfile("..","sql","mysql5","triggers.sql");
+	my $procedures = File::Spec->catfile("..","sql","mysql5","procedures.sql");
+	my $create_script = File::Spec->catfile("scripts","create_mysql_db.pl");
+	open OUT, ">", $create_script;
+	foreach my $f ( $create_stub, $tables, $triggers, $procedures ){
+		open IN, $f;
+		while( <IN> ){
+			print OUT $_;
+		}
+		close IN;
+	}
+	close OUT;
+	chmod 0755, $create_script;
+}

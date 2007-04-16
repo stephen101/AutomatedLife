@@ -1,0 +1,11 @@
+Revision history for Perl extension Semantic::API.
+
+0.01  Mon Mar 20 13:30:01 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Semantic::API --skip-ppport
+
+2.00 September 7, 2006                       Aaron Coburn
+    - Finished implementing a real XS interface to the C++ API
+	- Documented in POD
+	- Updated test suite
+	- Updated sample scripts

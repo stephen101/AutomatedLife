@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+            "http://www.docbook.org/xml/4.4/docbookx.dtd">
+<chapter id="examples">
+    <title>Examples</title>
+    <para>
+        This chapter contains a number of examples using the <application>Semantic Engine</application>
+        for showcasing its functionality beyond simple indexing and searching. 
+    </para>
+    
+    <!-- USING WORDLISTS -->
+    <section>
+        <title>Using Wordlists</title>
+        <para>
+            If you have performed a couple searches on an index, you may have noticed that the terms
+            returned look a little weird. For example the term <emphasis>conspiracy</emphasis> may be returned
+            as <emphasis>conspiraci</emphasis> or <emphasis>genlty</emphasis> as <emphasis>gentl</emphasis>. This occurs
+            because words in the <application>Semantic Engine</application> are stemmed. This means that if you search
+            for any of the words <emphasis>knit</emphasis>, <emphasis>knits</emphasis>, <emphasis>knitting</emphasis> or
+            <emphasis>knitted</emphasis> they will all resolve to the same term: <emphasis>knit</emphasis>. This is done
+            so that searching for singular nouns, for example, does not exclude the plurals of the same noun. 
+        </para>
+        <para>
+            Naturally, this is relatively unsightly for a human reader. A wordlist is stored with the index which
+            maps the stemmed versions of words back to their un-stemmed version. Since multiple words will stem to the
+            same stemmed word, the most frequent un-stemmed word will be in the wordlist. Retrieving the wordlist is a 
+            simple process and is shown below.
+        </para>
+        <para>
+            Assuming you have already created a <code>SEGraph</code> or <code>SESubgraph</code> object named <code>graph</code>,
+            the following code will allow you to retrieve the wordlist and lookup terms.
+        </para>
+        <programlisting>
+        <![CDATA[
+#include <semantic/search.hpp>            // for unserialize_wordlist
+
+std::map<std::string, std::string> myWordlist;
+myWordlist = unserialize_wordlist(graph.get_meta_value("wordlist"));
+std::string myDisplayWord = myWordlist[someStemmedWord];
+        ]]>
+        </programlisting>
+        <para>
+            <emphasis>NOTE:</emphasis> stemmed words are always stored in lowercase in the index.
+        </para>
+    </section>
+    
+    <!-- KEYWORD SEARCHING -->
+    <section>
+        <title>Searching by Keyword</title>
+        <para>
+            Searching by keyword is as easy as calling the <code>keyword(std::string)</code> method on the
+            <code>semantic::search</code> object. Refer to <xref linkend="basic_search"/> for how to set up
+            the <code>semantic::search</code> object. Then just replace the line
+        </para>
+        <programlisting>
+search_helper.semantic("my query string");
+        </programlisting>
+        <para>
+            with
+        </para>
+        <programlisting>
+search_helper.keyword("my query string");
+        </programlisting>
+        <para>
+            This will fetch only those documents that contain at least one of the search terms. No expanded
+            recall will be performed, and hence no list of "top terms" will be returned, either.
+        </para>
+    </section>
+    
+    <!-- FILTERING CONTENT DURING INDEXING -->
+    <section>
+        <title>Filtering Content During Indexing</title>
+        <para>
+            As was seen in <xref linkend="indexing"/>, it is easy to throw files at the indexer class. It is often
+            important to perform some cleaning, scrubbing, alteration, pruning or refinement of the textual
+            data passed to the indexer. Some things you might want to do are: only choose words that are at least
+            three letters long, cap word length at <code>15</code> letters, add a blacklist (stoplist), ignore
+            words that are riddled with numbers, and so on. 
+        </para>
+        <para>
+            The code section below installs some basic word filters into the <code>semantic::text_indexer</code> as 
+            seen in <xref linkend="indexing"/>:
+        </para>
+        <programlisting><![CDATA[
+// blacklist_filter(std::set<std::string>) will ignore any words that appear in the
+// set. use it with a stoplist to make for better search results.
+indexer.add_word_filter(blacklist_filter(blacklist));
+            
+// too_many_numbers_filter(int n) will ignore "words" that have more than n
+// digits in them.
+indexer.add_word_filter(too_many_numbers_filter(6));
+            
+// minimum_length_filter(int n) will ignore words shorter than n characters
+indexer.add_word_filter(minimum_length_filter(3));
+            
+// maximum_word_length_filter(int n) will ignore words longer than n characters
+indexer.add_word_filter(maximum_word_length_filter(15));
+            
+// maximum_phrase_length_filter(int n) will ignore phrases (like "The Empire State Building")
+// if they are longer than n words. 
+indexer.add_word_filter(maximum_phrase_length_filter(4));
+            ]]></programlisting>
+        
+        <para>
+            See <filename>semantic/filter.hpp</filename> for more information. 
+        </para>
+    </section>
+    
+    <!-- INDEXING ON DIFFERENT PARTS OF SPEECH -->
+    
+    <!-- PRUNING AND REFINING SEARCHES -->
+    <section>
+        <title>Pruning/Refining Searches</title>
+        <para>
+            It is possible (and often desirable) to prune or refine search results. The <application>Semantic Engine</application>
+            by default will give the broadest search results back (depending on the choice of <emphasis>Subgraph Policy</emphasis>). 
+            Especially for analysis, the graphs that the <application>Semantic Engine</application> returns will be too highly
+            connected to perform efficient analysis. So, a number of pruning helper methods exist. Some example are below, and more
+            can be found in <filename>semantic/pruning.hpp</filename>.
+        </para>
+        <section>
+            <title>Using Pruning Random Walk Subgraphs</title>
+            <para>
+                Pruning Random Walk is a special <emphasis>Subgraph Policy</emphasis> which aims to prune out irrelevant
+                indexing data before the actual subgraph creation begins. We have found this to dramatically increase
+                the relevance of returned results, while also dramatically decreasing the search time. The pruning
+                random walk subgraph policy can be found in: <filename>semantic/subgraph/pruning_random_walk.hpp</filename>.
+            </para>
+            <para>
+                The policy is tuned by accessing the following methods on the graph object: <code>set_depth(int)</code>, 
+                <code>set_trials(int)</code>, <code>keep_only_top_edges(float)</code> and <code>set_seed(unsigned long)</code>.
+            </para>
+            <para>
+                <emphasis>set_depth(int)</emphasis> sets the maximum search depth on the graph. The random walk algorithms
+                perform a walk down to a certain depth from the "start node", which is usually a search term or document. 
+                A good number seems to be <code>4</code>. 
+            </para>
+            <para>
+                <emphasis>set_trials(int)</emphasis> sets the number of "walk trials". The random walk algorithms work
+                by choosing a weighted-random (meaning that higher-weighted edges have more of a chance of getting hit) edge
+                and walking to that vertex. This is repeated to a specified depth (using <code>set_depth()</code>) and 
+                overall performed a set number of times (called trials). <code>100</code> is a good starting number for
+                <code>set_trials()</code>.
+            </para>
+            <para>
+                <emphasis>keep_only_top_edges(float)</emphasis> defines what level of pruning should be performed before
+                the random walks. A value of <code>1.0</code> will perform no pruning whatsoever, whereas a value of <code>0.5</code>
+                will keep the top weighted <code>50%</code> of the edges on each vertex. This means that if there is one edge that is
+                weighted more heavily than all the other edges combined, it is the only edge that will be considered for random walking. 
+                Here, smaller values will restrict the results while larger ones will expand the results. It can be thought of as a measure
+                of keeping results very relevant to the search query or branching them out a bit.
+            </para>
+            <para>
+                <emphasis>set_seed(unsigned long)</emphasis> allows you to seed the random number generator used by the random
+                walk algorithms. For example, if you consistently want the exact same search results back every time you search
+                for the same words, you should seed it to a pre-specified number. By default it is seeded to the current time
+                on your computer. 
+            </para>
+        </section>
+        <section>
+            <title>Pruning After Searching/Indexing</title>
+            <para>It is possible to do pruning operations on the graph after creating one by performing a search
+            or indexing a number of files. Here are some example pruning algorithms and how to apply them to an
+            existing graph object, <code>graph</code>.</para>
+            <programlisting>
+                <![CDATA[
+// This method will do the same pruning operation as the Pruning Random Walk. Don't expect
+// a search with this pruning applied to be the same as performing the pruning from *within*
+// the Pruning Random Walk policy.
+keep_top_n_percent_of_graph_edges_weighted(graph, 0.2, boost::make_assoc_property_map(my_weight_map));
+
+// This method will make sure that the graph has symmetry: that an edge in one direction
+// exists in the other, and that the WeightMap reflects this information.
+ensure_graph_symmetry(graph, boost::make_assoc_property_map(my_weight_map));
+            ]]>
+            </programlisting>
+            <para>
+                Further examples can be found in <filename>semantic/pruning.hpp</filename>.
+            </para>
+        </section>
+        
+    </section>
+    
+    <!-- FIND SIMILAR -->
+    <section>
+        <title>Finding Similar Documents</title>
+        <para>
+            Say you have a document or two and you want to find documents similar to those. Well it's easy.
+            You can use the <code>semantic::search</code> class (as was seen in the example in <xref linkend="basic_search"/>)
+            but use the <code>similar()</code> method instead of the <code>semantic()</code> or <code>keyword()</code> methods.
+        </para>
+        <para>
+            The index is a little different, as the following two examples illustrate:
+        </para>
+        <programlisting>
+            <![CDATA[
+// if we previously indexed '/my/document.txt'
+results = search_helper.similar("/my/document.txt");
+
+// if we have a vector or set of document names in my_container
+results = search_helper.similar(my_container.begin(), my_container.end());
+            ]]>
+        </programlisting>
+    </section>
+    
+    <!-- 2D or 3D LAYOUT USING LINLOG -->
+    <section>
+        <title>2D or 3D Layout Using LinLog</title>
+        <para>
+            This section shows how the <application>Semantic Engine</application> can be used to do visual layouts of
+            indexing data. The LinLog algorithm was developed by Andreas Noack and was re-written to apply it to our
+            graphs. The following code block shows how to get a list of 2D or 3D coordinates from a graph (could be from
+            search results or an entire index). 
+        </para>
+        <programlisting>
+            <![CDATA[
+#include <semantic/analysis/linlog.hpp>
+
+typedef semantic::analysis::linlog_traits<MyGraph, 
+    boost::associative_property_map<MyWeightMapType> > traits;
+
+// let's initialize the necessary data for layout calculation
+traits::vertex_position_map positions;
+            
+// ok now we're ready to perform the actual calculations, running 200 iterations.
+// the more iterations you run, the more the layout will settle.
+semantic::analysis::linlog_layout_2d(graph, boost::make_assoc_property_map(my_weight_map), 200, positions);
+// or, call linlog_layout_3d for 3D!
+
+// draw the nodes somewhere, or something
+BGL_FORALL_VERTICES(u, graph, MyGraph) {
+    std::cout << "vertex " << u << " is at " << positions[u] << std::endl;
+}
+            ]]>
+        </programlisting>
+    </section>
+    
+    <!-- EXPORTING TO GRAPHVIZ -->
+    <section>
+        <title>Exporting to GraphViz</title>
+        <para>
+            We will explore how to export an <code>SEGraph</code> to <application>GraphViz</application>. Turns
+            out it's exceedingly easy as <emphasis>BOOST</emphasis> supplies a <application>GraphViz</application>
+            export/import facility.
+        </para>
+        <para>
+            The interface we are going to use is this one, supplied by <emphasis>BOOST</emphasis>:
+        </para>
+        <programlisting>
+            <![CDATA[
+template < typename VertexListGraph, typename VertexPropertyWriter, typename EdgePropertyWriter >
+void
+write_graphviz(std::ostream& out, const VertexListGraph& g, 
+    VertexPropertyWriter vpw, EdgePropertyWriter epw);
+            ]]>
+        </programlisting>
+        <para>
+            We are going to have to write the <code>VertexPropertyWriter</code> and the <code>EdgePropertyWriter</code>:
+        </para>
+        <programlisting>
+            <![CDATA[
+struct OurEdgePropertyWriter {
+    OurEdgePropertyWriter(MyGraph &g_) : g(g_) {}
+    template <class Edge>
+    void operator() (std::ostream &out, Edge e) {
+        out << "[weight=" << g[e].strength << "]";
+    }
+    
+    MyGraph &g;
+};
+
+struct OurVertexPropertyWriter {
+    OurVertexPropertyWriter(MyGraph &g_) : g(g_) {}
+    template <class Vertex>
+    void operator() (std::ostream &out, Vertex u) {
+        out << "[label=" << g[u].content << "]";
+    }
+
+    MyGraph &g;
+};
+            ]]>
+        </programlisting>
+        <para>
+            Putting these parts together, using a graph previously created by your method of choice:
+        </para>
+        <programlisting>
+            <![CDATA[
+#include <fstream>
+#include <boost/graph/graphviz.hpp>
+            
+std::ofstream out_file("my_file.dot");
+
+boost::write_graphviz(out_file, graph, OurVertexPropertyWriter(graph), ourEdgePropertyWriter(graph));
+            ]]>
+        </programlisting>
+        <para>
+            See <filename>boost/graph/graphviz.hpp</filename> for more information.
+        </para>
+    </section>
+    
+    <!-- USING BOOST GRAPH ANALYSIS -->
+    
+    <!-- AGGLOMERATIVE CLUSTERING METHODS -->
+    <section>
+        <title>Agglomerative Clustering</title>
+        <para>
+            Agglomerative Clustering uses the following technique:
+            <orderedlist>
+                <listitem>
+                    Choose the two nodes closest together, combine them into one cluster.
+                </listitem>
+                <listitem>
+                    Recalculate distances between this new cluster and existing nodes/clusters.
+                </listitem>
+                <listitem>
+                    Rinse and repeat.
+                </listitem>
+            </orderedlist>
+        </para>
+        <para>
+            The <application>Semantic Engine</application> provides methods for the construction of
+            Minimum/Maximum Spanning Trees and Dendrograms, which live in the <code>semantic</code>
+            namespace. These two components are necessary for agglomerative clustering.
+        </para>
+        <programlisting>
+            <![CDATA[
+template <class Graph, class WeightMap, class OutputIterator>
+inline void minimum_weight_spanning_tree(Graph &g, WeightMap w, OutputIterator out);
+            
+template <class Graph, class EdgeIt, class WeightMap, class OutputIterator>
+inline void minimum_weight_spanning_tree(Graph &g, EdgeIt edge_start, EdgeIt edge_end, WeightMap w, OutputIterator out);
+            
+template <class Graph, class WeightMap, class OutputIterator>
+inline void maximum_weight_spanning_tree(Graph &g, WeightMap w, OutputIterator out);
+            
+template <class Graph, class EdgeIt, class WeightMap, class OutputIterator>
+inline void maximum_weight_spanning_tree(Graph &g, EdgeIt edge_start, EdgeIt edge_end, WeightMap w, OutputIterator out);
+            ]]>
+        </programlisting>
+        <para>... and ...</para>
+        <programlisting>
+            <![CDATA[
+template <
+    class Graph, 
+    class MST, 
+    class WeightMap, 
+    class Dendrogram, 
+    class DistanceCalculator>
+void dendrogram_from_distance_mst(Graph &g, MST &mst, WeightMap w, Dendrogram &out, DistanceCalculator dist = DistanceCalculator());
+            
+template <
+    class Graph, 
+    class MST, 
+    class WeightMap, 
+    class Dendrogram, 
+    class DistanceCalculator>
+void dendrogram_from_similarity_mst(Graph &g, MST &mst, WeightMap w, Dendrogram &out, DistanceCalculator dist = DistanceCalculator());
+            ]]>
+        </programlisting>
+        <section>
+            <title>Using Edge Weights</title>
+            <para>
+                Stronger edge weights mean a stronger connection between two nodes. So this is not a &quot;distance&quot; measure,
+                but more a similarity measure. So we are going to find a <code>maximum_spanning_tree</code> and use the
+                <code>dendrogram_from_similarity_mst()</code> method as shown.
+            </para>
+            <programlisting>
+                <![CDATA[
+#include <semantic/analysis/agglomerative_clustering/mst.hpp>
+#include <semantic/analysis/agglomerative_clustering/dendrogram.hpp>
+
+std::vector<semantic::se_graph_traits<MyGraph>::edge_descriptor> my_mst;
+
+semantic::maximum_weight_spanning_tree(
+    graph, 
+    boost::make_assoc_property_map(my_weight_map), 
+    back_inserter(my_mst));
+
+semantic::dendrogram<MyGraph> my_dendrogram;
+semantic::dendrogram_from_similarity_mst(
+    graph,
+    my_mst,
+    boost::make_assoc_property_map(my_weight_map),
+    my_dendrogram,
+    semantic::SingleLinkDistaneCalculator());
+                
+my_dendrogram.set_num_cluster(5);
+std::map<
+    semantic::se_graph_traits<MyGraph>::vertex_descriptor,
+    semantic::se_graph_traits<MyGraph>::vertices_size_type> my_clusters;
+
+my_dendrogram.get_clusters(inserter(my_clusters, my_clusters.begin()));
+
+// or you can get vertices in the same cluster as one you already
+// have:
+semantic::se_graph_traits<MyGraph>::vertex_descriptor u = graph.vertices().first;
+std::vector<semantic::se_graph_traits<MyGraph>::vertex_descriptor> my_list;
+
+my_dendrogram.get_vertices_in_cluster_with(u, back_inserter(my_list));
+                ]]>
+            </programlisting>
+        </section>
+        <section>
+            <title>Using Euclidian Distance</title>
+            <para>
+                You will see that it is not necessary to use the weight map as the only measure of
+                distance/similarity between nodes. As an example we use the euclidian distance generated
+                by a layout algorithm. We have a <code>std::map</code> of vertices matched to a <code>point</code>
+                showing their location in space. 
+            </para>
+            <para>
+                This approach will be slightly different as the &quot;edges&quot; that we are going to use are
+                in a sense imaginary, since they might not exist in the actual graph. We want to use the distance
+                between two vertices as a measure of how <emphasis>different</emphasis> they are (the farther apart,
+                the greater the distance, the greater the dissimilarity). 
+            </para>
+            <para>
+                Since these &quot;edges&quot; don't actually exist, we will have to supply the algorithms with an 
+                edge list, which we will acquire by building a distance map of every vertex to every other vertex.
+            </para>
+            <programlisting>
+                <![CDATA[
+typedef se_graph_traits<MyGraph>::vertex_pair_edge pair_edge; // a std::pair of vertex_descriptors
+std::map<pair_edge, double> distance_map;
+BGL_FORALL_VERTICES(u, graph, MyGraph) {
+    BGL_FORALL_VERTICES(v, graph, MyGraph) {
+        if (u == v) continue;
+        // calculate the distance between u and v. since this is only going to be used
+        // in comparison to other distances, we need not do the sqrt(), which is slow.
+        pair_edge e1(u, v), e2(v, u);        // do both directions
+        if (!distance_map.count(e1) || !distance_map.count(e2)) {
+            distance_map[e1] = distance_map[e2] = position_map[u].dist2(position_map[v]);
+        }
+    }
+}
+                ]]>
+            </programlisting>
+            <para>
+                Now we have <code>distance_map</code> and we need to create from it a <code>minimum_weight_spanning_tree</code>.
+            </para>
+            <programlisting>
+                <![CDATA[
+std::vector<pair_edge> my_mst;
+semantic::minimum_weight_spanning_tree(graph, extract_keys(distance_map.begin()), extract_keys(distance_map.end()),
+    boost::make_assoc_property_map(distance_map), back_inserter(my_mst));
+                ]]>
+            </programlisting>
+            <para>
+                The <code>extract_keys()</code> macro can be found in <filename>semantic/utility.hpp</filename> and is used here
+                to create an iterator of edges from the <code>std::pair</code> data type of the <code>distance_map</code>. Now
+                we just create our dendrogram, like above.
+            </para>
+            <programlisting>
+                <![CDATA[
+semantic::dendrogram<MyGraph> my_dendrogram;
+semantic::dendrogram_from_distance_mst(graph, my_mst, boost::make_assoc_property_map(distance_map),
+    my_dendrogram, semantic::SingleLinkDistanceCalculator());
+                ]]>
+            </programlisting>
+        </section>
+    </section>
+</chapter>

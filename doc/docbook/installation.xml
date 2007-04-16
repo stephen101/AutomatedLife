@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+            "http://www.docbook.org/xml/4.4/docbookx.dtd">
+
+<chapter>
+    <title>Installation</title>
+    <section>
+        <title>Dependencies</title>
+        <section>
+            <title>Pre-compiled Binaries</title>
+            <para>
+                The pre-compiled binaries available for all operating systems are compiled
+                as statically-linked binaries. This means that the software has
+                <emphasis>no dependencies</emphasis>. Just install and have fun!
+            </para>
+        </section>
+        <section>
+            <title>From Source</title>
+            <para>
+                In order to compile the <application>Semantic Engine</application> from source, you
+                will need the following software:
+                
+                <segmentedlist><title>Software Dependencies</title>
+                    <?dbhtml list-presentation="table"?>
+                    <segtitle>Name</segtitle>
+                    <segtitle>Version</segtitle>
+                    <segtitle>Available From</segtitle>
+                    <segtitle>Comments</segtitle>
+                    <seglistitem>
+                        <seg>BOOST C++ Libraries</seg>
+                        <seg>1.33.1</seg>
+                        <seg><ulink url="http://www.boost.org/">http://www.boost.org/</ulink></seg>
+                    </seglistitem>
+                    <seglistitem>
+                        <seg>SQLite</seg>
+                        <seg>3.3.7</seg>
+                        <seg><ulink url="http://www.sqlite.org/">http://www.sqlite.org/</ulink></seg>
+                        <seg>optional - required for SQLite storage support</seg>
+                    </seglistitem>
+                    <seglistitem>
+                        <seg>MySQL</seg>
+                        <seg>5.0.16</seg>
+                        <seg><ulink url="http://www.mysql.com/">http://www.mysql.com/</ulink></seg>
+                        <seg>optional - required for MySQL storage support</seg>
+                    </seglistitem>
+ <!-- I am excluding Qt from the list due to other requirements for the GUI applications, such as the
+ word reader, pdf reader, etc, which are not publicly available libraries but homegrown and ugly. -->
+ <!--                   <seglistitem>
+                        <seg>Qt C++ Framework</seg>
+                        <seg>4.1</seg>
+                        <seg><ulink url="http://www.trolltech.com/products/qt/">http://www.trolltech.com/products/qt/</ulink></seg>
+                        <seg>optional - required only for compilation of GUI applications</seg>
+                    </seglistitem> -->
+                </segmentedlist>
+            </para>
+            <para>
+                The <application>Semantic Engine</application> requires at least one type of storage engine from the
+                list above. Currently only <application>SQLite 3</application> and <application>MySQL 5</application>
+                are available. 
+            </para>
+            
+            <section>
+                <title>Windows (any)</title>
+                <para>
+                    Installation on the Windows operating system can be done through the Cygwin environment
+                    (<ulink url="http://www.cygwin.com/">http://www.cygwin.com/</ulink>). Cygwin provides
+                    a UNIX-style command line, along with software packages, in a Windows terminal window.
+                    You will need to install <application>GNU make</application>, and the software outlined
+                    in the dependencies section above. 
+                </para>
+                
+                <para>
+                    You can then follow the same directions as for UNIX/Linux below (<xref linkend="install_unix"/>). 
+                </para>
+				
+				<para>
+					Installation on Windows can also be accomplished using either Microsoft Visual Studio or
+					MinGW. In these cases, however, more care must be taken in setting up the environment.
+					Qt should first be installed. Then install Boost according to the directions below.
+				</para>
+				<para>
+					Qt installs easily with a Windows installer program and will install MinGW if needed. 
+					If you have a commercial license for Qt and wish to use Visual Studio, use the distribution
+					provided by Trolltech; otherwise, plan to use MinGW. If you want to compile Qt yourself, 
+					use this command to see all available options:
+					<screen>prompt&gt; configure -help</screen>
+					If you are compiling with MinGW use this command:
+					<screen>prompt&gt; configure -platform mingw</screen>
+					<screen>prompt&gt; make</screen>
+					For Visual Studio (if you have the commercial version of Qt) use the Visual Studio 
+					command prompt and execute this command:
+					<screen>prompt&gt; configure -platform win32-msvc</screen>
+					<screen>prompt&gt; nmake</screen>
+				</para>
+				<para>
+					Next, install Boost from <ulink url="http://www.boost.org">http://www.boost.org</ulink>.
+					This <ulink url="http://www.boost.org/more/getting_started.html">URL</ulink> will help you
+					get started. You may need to build <application>bjam</application> manually, in which case, 
+					use these commands:
+					<screen>prompt&gt; cd tools\build\jam_src</screen>
+					<screen>prompt&gt; build.bat</screen>
+					<screen>prompt&gt; copy bjam.exe ..\..\..</screen>
+					<screen>prompt&gt; cd ..\..\..</screen>
+				</para>
+				<para>
+					Build Boost with the appropriate compiler for your environment. The Boost documentation
+					has a complete list of compiler options. If you are using Visual Studio 2005, compile Boost
+					with this flag:
+					<screen>prompt&gt; bjam "-sTOOLS=vc-8_0"
+						
+					If you are using MinGW, use this flag:
+					<screen>prompt&gt; bjam "-sTOOLS=mingw" install</screen>
+				</para>
+				<para>
+					Finally, install the optional storage engine(s). For MySQL and SQLite you need only the
+					header files and the precompiled DLL in an accessible location, i.e. C:\SQLite\include and 
+					C:\SQLite\lib
+				</para>
+				<para>
+					To compile the program itself, you may need to modify some of the Semantic Engine 
+					code as you specify program installation locations. The Semantic Engine assumes the following
+					installation locations:
+					<screen>Boost: C:\Boost</screen>
+					<screen>Qt: C:\Qt</screen>
+					<screen>Perl: C:\Perl</screen>
+					<screen>SQLite3: C:\SQLite</screen>
+					<screen>MySQL: C:\MySQL</screen>
+				</para> 
+            </section>
+            
+            <section id="install_unix">
+                <title>UNIX/Linux/Mac OS X</title>
+                <para>
+                    <orderedlist>
+                        <listitem>
+                            <para>Get the source: the latest source code can be downloaded from <ulink url="http://www.knowledgesearch.org/download/">www.knowledgesearch.org</ulink>.</para>
+                        </listitem>
+                        <listitem>
+                            <para>Extract the source tree:</para>
+                            <screen>prompt&gt; tar zxf semantic-engine.xxx.tar.gz</screen>
+                            <screen>prompt&gt; cd semantic-engine.xxx</screen>
+                        </listitem>
+                        <listitem>
+                            <para>Compile and install the tools:</para>
+                            <screen>prompt&gt; ./configure --help</screen>
+                            <screen>prompt&gt; ./configure &lt;options&gt;</screen>
+                            <screen>prompt&gt; make</screen>
+                            <screen>prompt&gt; sudo make install</screen>
+                        </listitem>
+						<listitem>
+							<para>(Optionally) Compile and install the Perl bindings:</para>
+							<screen>prompt&gt; cd pl</screen>
+							<screen>prompt&gt; perl Makefile.PL &lt;options&gt;</screen>
+							<screen>prompt&gt; make</screen>
+							<screen>prompt&gt; make test</screen>
+							<screen>prompt&gt; sudo make install</screen>
+						</listitem>
+                    </orderedlist>
+                </para>
+            </section>
+        </section>
+        
+    </section>
+</chapter>

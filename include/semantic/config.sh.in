@@ -1,0 +1,55 @@
+
+# This file contains the compilation options (libraries and includes) as set
+# at configure time for the Semantic Engine suite of C++ headers.
+#
+# This file is intended to be included for the shell variables made available
+# to make compilation of programs using the Semantic Engine in conjunction with
+# third-party libraries (such as MySQL or SQLite) easier.
+
+# SQLite Options
+HAVE_SQLITE3=@HAVE_SQLITE3@
+SQLITE3_LIBS="@SQLITE3_LIBS@"
+SQLITE3_CFLAGS="@SQLITE3_CFLAGS@"
+
+# MySQL Options
+HAVE_MYSQL=@HAVE_MYSQL@
+MYSQL_LIBS="@MYSQL_LIBS@"
+MYSQL_CFLAGS="@MYSQL_CFLAGS@"
+
+# BOOST Options (these are REQUIRED to use the Semantic Engine)
+BOOST_CPPFLAGS="@BOOST_CPPFLAGS@"
+BOOST_LIBS="@BOOST_LIBS@"
+
+# and finally, create an all-encompassing variable (or two) for us
+SEMANTIC_CFLAGS=-ffast-math $BOOST_CPPFLAGS
+SEMANTIC_LIBS=$BOOST_LIBS
+if $HAVE_SQLITE3; then
+	SEMANTIC_CFLAGS=$SEMANTIC_CFLAGS $SQLITE3_CFLAGS
+	SEMANTIC_LIBS=$SEMANTIC_LIBS $SQLITE3_LIBS
+fi
+if $HAVE_MYSQL; then
+	SEMANTIC_CFLAGS=$SEMANTIC_CFLAGS $MYSQL_CFLAGS
+	SEMANTIC_LIBS=$SEMANTIC_LIBS $MYSQL_LIBS
+fi
+
+SEMANTIC_STORAGE_ENGINES=@SEMANTIC_STORAGE_ENGINES@
+
+# MSWord-Reader Options
+SEMANTIC_HAVE_MSWORD_READER=@HAVE_MSWORD_READER@
+MSWORD_READER_LIBS="@MSWORD_READER_LIBS@"
+MSWORD_READER_CPPFLAGS="@MSWORD_READER_CPPFLAGS@"
+
+# PDF-Reader Options
+SEMANTIC_HAVE_PDF_READER=@HAVE_PDF_READERR@
+PDF_READER_LIBS="@PDF_READER_LIBS@"
+PDF_READER_CPPFLAGS="@PDF_READER_CPPFLAGS@"
+
+
+# Iconv interface
+ICONV_CONST="@ICONV_CONST@"
+
+# Some AutoConf stuff
+AUTOCONF_INSTALL_LOCATION="@prefix@"
+LEXICON_INSTALL_LOCATION="@prefix@/share/@PACKAGE@/lexicon.txt"
+STOPLIST_INSTALL_LOCATION="@prefix@/share/@PACKAGE@/stoplist_en.txt"
+	

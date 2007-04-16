@@ -1,0 +1,49 @@
+AC_INIT(include/semantic/semantic.hpp)
+AC_CONFIG_MACRO_DIR(m4)
+AM_INIT_AUTOMAKE(Semantic-Engine, 2.03)
+AC_PREFIX_DEFAULT(/usr/local)
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AM_ICONV
+AC_CHECK_MSWORD_READER
+AC_CHECK_PDF_READER
+RS_BOOST([1.33.1],[],[AC_MSG_ERROR([Package requires the Boost C++ libraries!])])
+RS_BOOST_PROGRAM_OPTIONS([],[AC_MSG_ERROR([Package requires the Boost Program Options library!])])
+RS_BOOST_FILESYSTEM([],[AC_MSG_ERROR([Package requires the Boost Filesystem library!])])
+RS_BOOST_SIGNALS([], [AC_MSG_ERROR([Package requires the Boost Signals library!])])
+AC_CHECK_MYSQL
+AC_CHECK_SQLITE
+AC_ARG_WITH(unicode,[AS_HELP_STRING([--with-unicode],[compile with unicode support])],SEMANTIC_UNICODE=1,SEMANTIC_UNICODE=0)
+SEMANTIC_UNICODE=0
+AC_SUBST(SEMANTIC_UNICODE)
+AC_SUBST(prefix)
+
+SEMANTIC_STORAGE_ENGINES=
+if test "x$HAVE_MYSQL" = "x1"; then
+	SEMANTIC_STORAGE_ENGINES="mysql5 $SEMANTIC_STORAGE_ENGINES"
+fi
+
+if test "x$HAVE_SQLITE3" = "x1"; then
+	SEMANTIC_STORAGE_ENGINES="sqlite3 $SEMANTIC_STORAGE_ENGINES"
+fi
+
+AC_SUBST(SEMANTIC_STORAGE_ENGINES)
+AC_CONFIG_FILES(Makefile \
+	  	  share/Makefile \
+	  	  examples/Makefile \
+	  	  tools/Makefile \
+	  	  include/Makefile \
+	  	  pl/Makefile.PL \
+	  	  include/semantic/config.hpp \
+	  	  include/semantic/config.sh)
+
+if [ test -f "qt/semantic_engine/search.pro.in" ]; then
+	AC_CONFIG_FILES(
+			  qt/semantic_engine/search.pro )
+fi
+
+AC_OUTPUT
+
+

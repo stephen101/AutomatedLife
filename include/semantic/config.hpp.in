@@ -1,0 +1,84 @@
+/*
+	SQLite 3
+	
+	At configure time:
+	
+	SQLITE3_LIBS 		= @SQLITE3_LIBS@
+	SQLITE3_CFLAGS 		= @SQLITE3_CFLAGS@
+*/
+
+#define SEMANTIC_HAVE_SQLITE3 @HAVE_SQLITE3@
+
+
+/*
+	MySQL
+	
+	At configure time:
+	
+	MYSQL_LIBS			= @MYSQL_LIBS@
+	MYSQL_CFLAGS		= @MYSQL_CFLAGS@
+*/
+
+#define SEMANTIC_HAVE_MYSQL @HAVE_MYSQL@
+
+/*
+	BOOST
+	
+	At configure time:
+	
+	BOOST_CPPFLAGS		= @BOOST_CPPFLAGS@
+	BOOST_LIBS			= @BOOST_LIBS@
+*/
+
+#define SEMANTIC_STORAGE_ENGINES "@SEMANTIC_STORAGE_ENGINES@"
+
+
+/*
+	MSWord-Reader
+	
+	At configure time:
+	
+	MSWORD_READER_CPPFLAGS 	= @MSWORD_READER_CPPFLAGS@
+	MSWORD_READER_LIBS		= @MSWORD_READER_LIBS@
+*/
+
+#define SEMANTIC_HAVE_MSWORD_READER @HAVE_MSWORD_READER@
+
+
+/*
+	PDF-Reader
+	
+	At configure time:
+	
+	PDF_READER_CPPFLAGS 	= @PDF_READER_CPPFLAGS@
+	PDF_READER_LIBS		= @PDF_READER_LIBS@
+*/
+
+#define SEMANTIC_HAVE_PDF_READER @HAVE_PDF_READER@
+
+/*
+	Iconv
+	
+	Determines iconv interface
+	
+*/
+
+#define ICONV_CONST @ICONV_CONST@
+
+/* 
+	Unicode (std::wstring) support for the stemmer
+*/
+
+#define SEMANTIC_UNICODE @SEMANTIC_UNICODE@
+
+
+	
+/*
+    The configure (autoconf) install prefix
+*/
+
+#define AUTOCONF_INSTALL_PREFIX "@prefix@"
+
+#define LEXICON_INSTALL_LOCATION "@prefix@/share/@PACKAGE@/lexicon.txt"
+#define STOPLIST_INSTALL_LOCATION "@prefix@/share/@PACKAGE@/stoplist_en.txt"
+

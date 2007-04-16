@@ -1,0 +1,32 @@
+#! /bin/bash
+# libtool-1.9f: 
+# LIBTOOLIZE='libtoolize --copy --ltdl libltdl --automake' 
+# libtool-1.5.18: 
+# LIBTOOLIZE='libtoolize --copy --ltdl --automake' 
+ACLOCAL='aclocal -I m4' 
+#AUTOHEADER='autoheader -f' 
+AUTOCONF='autoconf' 
+AUTOMAKE='automake --add-missing --copy'  
+#CONFIGURE='CXX=g++-4.0.1 ./configure --with-Qt-dir=/var/qt-3.3.4' 
+CONFIGURE='./configure --with-boost=/usr/local --with-sqlite3 --with-mysql'
+#MAKE_CLEAN='make -s clean' 
+#MAKE_ALL='make -s all' 
+#MAKE_INSTALL='make -s install'
+#MAKE_DOXYGEN='make doxygen' 
+#MAKE_DIST='make dist'
+#MAKE_DISTCHECK='make distcheck'
+
+for i in "$LIBTOOLIZE" "$ACLOCAL" "$AUTOHEADER" \
+"$AUTOCONF" "$AUTOMAKE" "$CONFIGURE" \
+"$MAKE_CLEAN" "$MAKE_ALL" "$MAKE_INSTALL" \
+"$MAKE_DOXYGEN" "$MAKE_DIST" "$MAKE_DISTCHECK"; 
+do
+     if ! test -z "$i"; then
+          echo                 
+          echo "########### $i #############"        
+          eval $i         
+     fi 
+done;
+
+echo;
+exit;

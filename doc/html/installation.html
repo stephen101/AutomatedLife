@@ -1,0 +1,26 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;1.&nbsp;Installation</title><meta name="generator" content="DocBook XSL Stylesheets V1.70.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d0e1"></a>Chapter&nbsp;1.&nbsp;Installation</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e4">Dependencies</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e7">Pre-compiled Binaries</a></span></dt><dt><span class="section"><a href="#d0e15">From Source</a></span></dt></dl></dd></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e4"></a>Dependencies</h2></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e7"></a>Pre-compiled Binaries</h3></div></div></div><p>
+                The pre-compiled binaries available for all operating systems are compiled
+                as statically-linked binaries. This means that the software has
+                <span class="emphasis"><em>no dependencies</em></span>. Just install and have fun!
+            </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e15"></a>From Source</h3></div></div></div><p>
+                In order to compile the <span class="application">Semantic Engine</span> from source, you
+                will need the following software:
+                
+                </p><div class="segmentedlist"><div class="title"><strong><span class="title">Software Dependencies</span></strong></div><table border="0"><thead><tr class="segtitle"><th>Name</th><th>Version</th><th>Available From</th><th>Comments</th></tr></thead><tbody><tr class="seglistitem"><td class="seg">BOOST C++ Libraries</td><td class="seg">1.33.1</td><td class="seg"><a href="http://www.boost.org/" target="_top">http://www.boost.org/</a></td></tr><tr class="seglistitem"><td class="seg">SQLite</td><td class="seg">3.3.7</td><td class="seg"><a href="http://www.sqlite.org/" target="_top">http://www.sqlite.org/</a></td><td class="seg">optional - required for SQLite storage support</td></tr><tr class="seglistitem"><td class="seg">MySQL</td><td class="seg">5.0.16</td><td class="seg"><a href="http://www.mysql.com/" target="_top">http://www.mysql.com/</a></td><td class="seg">optional - required for MySQL storage support</td></tr></tbody></table></div><p>
+            </p><p>
+                The <span class="application">Semantic Engine</span> requires at least one type of storage engine from the
+                list above. Currently only <span class="application">SQLite 3</span> and <span class="application">MySQL 5</span>
+                are available. 
+            </p><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e77"></a>Windows (any)</h4></div></div></div><p>
+                    Installation on the Windows operating system can be done through the Cygwin environment
+                    (<a href="http://www.cygwin.com/" target="_top">http://www.cygwin.com/</a>). Cygwin provides
+                    a UNIX-style command line, along with software packages, in a Windows terminal window.
+                    You will need to install <span class="application">GNU make</span>, and the software outlined
+                    in the dependencies section above. 
+                </p><p>
+                    You can then follow the same directions as for UNIX/Linux below (<a href="#install_unix" title="UNIX/Linux/Mac OS X">the section called &#8220;UNIX/Linux/Mac OS X&#8221;</a>). 
+                </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="install_unix"></a>UNIX/Linux/Mac OS X</h4></div></div></div><p>
+                    </p><div class="orderedlist"><ol type="1"><li><p>Get the source: the latest source code can be downloaded from <a href="http://www.knowledgesearch.org/download/" target="_top">www.knowledgesearch.org</a>.</p></li><li><p>Extract the source tree:</p><pre class="screen">prompt&gt; tar zxf semantic-engine.xxx.tar.gz</pre><pre class="screen">prompt&gt; cd semantic-engine.xxx</pre></li><li><p>Compile and install the tools:</p><pre class="screen">prompt&gt; ./configure --help</pre><pre class="screen">prompt&gt; ./configure &lt;options&gt;</pre><pre class="screen">prompt&gt; make</pre><pre class="screen">prompt&gt; sudo make install</pre></li><li><p>(Optionally) Compile and install the Perl bindings:</p><pre class="screen">prompt&gt; cd pl</pre><pre class="screen">prompt&gt; perl Makefile.PL &lt;options&gt;</pre><pre class="screen">prompt&gt; make</pre><pre class="screen">prompt&gt; make test</pre><pre class="screen">prompt&gt; sudo make install</pre></li></ol></div><p>
+                </p></div></div></div></div></body></html>

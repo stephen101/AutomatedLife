@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <meta>
+        <filters directoryPatterns="" filePatterns=""
+            positiveFilePatterns=""/>
+    </meta>
+    <projectTree name="se.xpr">
+        <file name="examples.xml"/>
+        <file name="index.xml"/>
+        <file name="installation.xml"/>
+        <file name="introduction.xml"/>
+        <file name="usage.xml"/>
+        <file name="xinclude.dtd"/>
+    </projectTree>
+</project>

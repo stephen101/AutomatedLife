@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/nse.png</file>
+    <file>icons/save.png</file>
+    <file>icons/find.png</file>
+    <file>icons/clear.png</file>
+	<file>icons/wrench.png</file>
+</qresource>
+</RCC>

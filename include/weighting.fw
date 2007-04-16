@@ -1,0 +1,229 @@
+@p maximum_input_line_length = 500
+@p maximum_output_line_length = 500
+
+@A@<Weighting Algorithms@>
+
+The @/Weighting Algorithms@/ available to the @/Semantic Engine@/ play a very
+important role, from how a subgraph is extracted from storage to how a ranking
+operation affects the vertices.
+
+Using the following data, a @/Weighting Algorithm@/ must derive a single weight
+for an edge (usually in the form of a @{double@}):
+
+* the total number of nodes of given types in the stored graph (the @{node_count@}),
+
+* the "strength" of the edge (ex, how many times the term appears in the document)
+
+* the in and out-degrees of the edge (ex, how many edges are coming out of our source
+or target vertices)
+
+The algorithm may use any other information available through the @{SESubgraph@} class.
+
+@B@<Two Ways of Invoking the Algorithms@>
+
+There are two ways of invoking the algorithms, which are there for two different purposes.
+A @/Subgraph Algorithm@/ might need to know the weights of edges before they are actually
+put into the @/BOOST@/ @{adjacency_list@}. Then, once the graph is complete, a user
+may want to know the weights of all the edges in the graph (or a subset of them).
+
+@C@<Method 1: Edges not in Graph@>
+
+Method one has an interface defined as:
+
+@$@<weight edges not in graph interface@>@M==@{
+template<class Vertex, class NeighborList, class Graph, class WeightMap>
+void apply_weights(Vertex u, const NeighborList &nlist, Graph &g, WeightMap w)
+@}
+
+In the above, @{NeighborList@} is a @{std::vector@} of
+@{std::pair<edge_properties_type, vertex_properties_type>@}, defining the edge properties
+vertex properties of the target node of the edge for each edge. For this reason, the output
+placed in the @{WeightMap@} (which is a @/BOOST@/ property map) is keyed by the ID (@{se_graph_traits<Graph>::vertex_id_type@})
+of the target node of the edge.
+
+@C@<Method 2: Edges are in Graph@>
+
+Method two is defined as:
+
+@$@<weight edges in graph interface@>@M==@{
+template<class Vertex, class Graph, class WeightMap>
+void apply_weights(Vertex u, Graph &g, WeightMap w)
+@}
+
+This interface is similar to Method 1, but it gets its edge information directly from the
+graph using @/BOOST@/ graph library calls. The @{WeightMap@} is keyed by edge
+(@{se_graph_traits<Graph>::edge_descriptor@}).
+
+@B@<The Algorithms@>
+
+@C@<TF: Term Frequency@>
+
+Term frequency uses the number of times a term appears in a document to describe the weight
+of the edge connecting the two.
+
+@$@<TF in graph@>==@{put(w, *ei, g[*ei].strength);@}
+@$@<TF not in graph@>==@{put(w, g.get_vertex_id((*ei).second), (*ei).first.strength);@}
+
+@C@<IDF: Inverse Document Frequency@>
+
+Inverse document frequency takes a different approach. It intends to penalize any node
+(and thus the edges going @/to@/ it) that is too well connected in the graph. The
+actual formula is @{w = log(1 + count/degree)@} where @{count@} is the total number of
+nodes and @{degree@} is the degree of the target node. Since the @/Semantic Engine@/
+uses a bipartite graph and stores node types with nodes, the @{count@} is the number
+of nodes of the same type as the @/source@/ node type, and the @{degree@} is the
+degree of the target node, but only those edges pointing at nodes of the same type
+as the source node.
+
+@$@<IDF in graph@>==@{put(w, *ei, log(1+count/(g[*ei].to_degree)));@}
+@$@<IDF not in graph@>==@{put(w, g.get_vertex_id((*ei).second), log(1+count/((*ei).first.to_degree)));@}
+
+Since we need to get the node counts from the graph, we need this code:
+
+@$@<IDF get node counts@>==@{
+typename se_graph_traits<typename Graph::storage_policy_selector>::vertices_size_type count
+            = g.get_vertex_count_of_type(g[u].type_major);@}
+
+@C@<LG: Local/Global combination@>
+
+LG weighting stands for "Local and Global" weighting. This is just a utility class
+that takes two other @/Weighting Algorithms@/ and multiplies them together.
+
+@C@<None: No Weighting@>
+
+The @/Semantic Engine@/ also offers a "No Weighting" class, which just sets any weight asked
+for to "1".
+
+@$@<None in graph@>==@{put(w, *ei, 1);@}
+@$@<None not in graph@>==@{put(w, g.get_vertex_id((*ei).second), 1);@}
+
+@B@<The Code Files@>
+
+@O@<semantic/weighting/tf.hpp@>@{
+@<basic weighting header file@>@(
+    @"_TF_WEIGHTING_HPP_@"@,
+    @"TFWeighting@"@,
+    @<TF in graph@>@,
+    @<TF not in graph@>@,
+    @"@"@)
+@}
+
+@O@<semantic/weighting/idf.hpp@>@{
+@<basic weighting header file@>@(
+    @"_IDF_WEIGHTING_HPP_@"@,
+    @"IDFWeighting@"@,
+    @<IDF in graph@>@,
+    @<IDF not in graph@>@,
+    @<IDF get node counts@>@)
+@}
+
+@O@<semantic/weighting/none.hpp@>@{
+@<basic weighting header file@>@(
+    @"_NO_WEIGHTING_HPP_@"@,
+    @"NoWeighting@"@,
+    @<None in graph@>@,
+    @<None not in graph@>@,
+    @"@"@)
+@}
+
+@$@<basic weighting header file@>@(@5@)@M==@{
+#ifndef @1
+#define @1
+
+#include <math.h>
+
+namespace semantic {
+
+    class @2 {
+        public:
+            typedef double weight_type;
+
+            @<weight edges not in graph interface@>{
+                typedef typename NeighborList::const_iterator iterator;
+                @5
+                iterator ei;
+                for(ei = nlist.begin(); ei != nlist.end(); ++ei) { @4 }
+            }
+
+            @<weight edges in graph interface@>{
+                typedef typename se_graph_traits<Graph>::out_edge_iterator iterator;
+                typedef typename se_graph_traits<Graph>::edge_descriptor edge;
+                function_requires< WritablePropertyMapConcept<WeightMap, edge> >();
+                @5
+                iterator ei, ei_end;
+                for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) { @3 }
+            }
+    };
+} // namespace semantic
+
+#endif // @1
+@}
+
+LG weighting gets its own file definition due to complexity.
+
+@O@<semantic/weighting/lg.hpp@>@{
+#ifndef _LG_WEIGHTING_HPP_
+#define _LG_WEIGHTING_HPP_
+
+#include <map>
+#include <semantic/utility.hpp>
+#include <boost/graph/properties.hpp>
+
+namespace semantic {
+
+    template <class Local, class Global, typename WeightType>
+    class LGWeighting {
+        public:
+            typedef typename Local::weight_type local_weight_type;
+            typedef typename Global::weight_type global_weight_type;
+            typedef WeightType weight_type;
+
+            @<weight edges not in graph interface@>{
+                typedef typename NeighborList::const_iterator iterator;
+
+                // start by calculating the local and global weights, respectively
+                typedef typename property_traits<WeightMap>::key_type key_type;
+                typedef std::map<key_type, typename Local::weight_type> my_lmap;
+                typedef std::map<key_type, typename Global::weight_type> my_gmap;
+                my_lmap lw; boost::associative_property_map<my_lmap> lmap(lw);
+                my_gmap gw; boost::associative_property_map<my_gmap> gmap(gw);
+
+                local.apply_weights(u, nlist, g, lmap);
+                global.apply_weights(u, nlist, g, gmap);
+
+                iterator ei;
+                for(ei = nlist.begin(); ei != nlist.end(); ++ei) {
+                    typename se_graph_traits<typename Graph::storage_policy_type>::vertex_id_type id = g.get_vertex_id((*ei).second);
+                    put(w, id, get(lmap, id) * get(gmap, id));
+                }
+            }
+
+            @<weight edges in graph interface@>{
+                typedef typename se_graph_traits<Graph>::out_edge_iterator iterator;
+                typedef typename se_graph_traits<Graph>::edge_descriptor edge;
+
+                function_requires< WritablePropertyMapConcept<WeightMap, edge> >();
+
+                // start by calculating the local and global weights, respectively
+                typedef typename property_traits<WeightMap>::key_type key_type;
+                typedef std::map<edge, typename Local::weight_type> my_lmap;
+                typedef std::map<edge, typename Global::weight_type> my_gmap;
+                my_lmap lw; boost::associative_property_map<my_lmap> lmap(lw);
+                my_gmap gw; boost::associative_property_map<my_gmap> gmap(gw);
+
+                local.apply_weights(u, g, lmap);
+                global.apply_weights(u, g, gmap);
+
+                iterator ei, ei_end;
+                for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) put(w, *ei, lw[*ei] * gw[*ei]);
+            }
+
+        private:
+            Local local;
+            Global global;
+    };
+
+} // namespace semantic
+
+#endif
+@}

@@ -1,0 +1,120 @@
+@A@<Ranking: Spreading Activation@>
+@p maximum_input_line_length = 500
+@p maximum_output_line_length = 500
+Spreading activation is a ranking operation that can be performed on a number of nodes.
+In order to perform this operation, we need the following:
+
+* A graph
+
+* A list of start nodes and associated start energies
+
+* "energy_hit" counters for the graph and any edges in the graph
+
+The @{spreading_activation@} function takes four arguments:
+
+* @{Graph &g@} is a @{boost::adjacency_list@} of some sort.
+
+* @{NodeMap &n@} is an @/Associative Container@/ such as @{std::map<se_graph_traits<Graph>::vertex_id_type, double>@},
+which maps a vertex (by id) in the @{Graph@} with a starting energy.
+
+* @{WeightMap@} is a BOOST property map, keyed by edge, defining the weight of each edge. It need not be normalized.
+
+* @{RankMap@} is the output map, again a BOOST property map, keyed by vertex.
+
+@$@<spreading activation function@>==@{
+template <class Graph, class NodeMap, class WeightMap, class RankMap>
+void spreading_activation(Graph &g, NodeMap &n, WeightMap w, RankMap r)
+{
+    typedef typename se_graph_traits<Graph>::vertex_iterator viterator;
+    typedef typename se_graph_traits<Graph>::out_edge_iterator eiterator;
+    typedef typename se_graph_traits<Graph>::vertex_id_type id_type;
+    typedef typename se_graph_traits<Graph>::edge_descriptor edge_desc;
+    
+    @<initialize starting energies@>
+    
+    // create the seen set
+    std::set<edge_desc> seen;
+    // and our map of vertices
+    std::map<id_type, typename se_graph_traits<Graph>::vertex_descriptor> vertex_map;
+    
+    // get those vertex descriptors from the graph
+    g.vertices_by_id(extract_first_iterator(n.begin()), extract_first_iterator(n.end()), inserter(vertex_map, vertex_map.end()));
+
+    @<spider starting nodes@>
+}@}
+
+The spidering algorithm looks like so:
+
+@$@<spider node@>==@{
+template <class Graph, class WeightMap, class RankMap>
+void activation_spider(
+        Graph &g, 
+        typename se_graph_traits<Graph>::vertex_descriptor u, 
+        WeightMap w, RankMap r, 
+        int energy_hits, 
+        typename property_traits<RankMap>::value_type energy, 
+        std::set<typename se_graph_traits<Graph>::edge_descriptor> &seen)
+{
+    if (energy_hits == 0) return; // don't even go there! *snap* -- only if we won't be modifying anything
+    @<get total out edge weight for node@>
+    @<add current energy to current node@>
+    @<iterate out edges and spider them@>
+}@}
+
+The rest is just writing the individual parts.
+
+@$@<initialize starting energies@>==@{@-
+BGL_FORALL_VERTICES_T(v, g, Graph) put(r, v, 0);@}
+
+@$@<spider starting nodes@>==@{
+for(typename NodeMap::iterator i = n.begin(); i != n.end(); ++i) {
+    // id is i->first, starting energy is i->second
+    id_type id = (*i).first;
+    detail::activation_spider(g, vertex_map[id], w, r, get_property(g, graph_energy_hits), (*i).second, seen);
+}@}
+
+@$@<get total out edge weight for node@>==@{
+typename property_traits<RankMap>::value_type total = 0;
+BGL_FORALL_OUTEDGES_T(u, e, g, Graph) total += get(w, e);@}
+
+When adding energy, we need to take into account energy_hits -- the number of times we "hit" this edge while
+building the subgraph. This is an abstract concept, and how the value is set is defined in the subgraph policy.
+
+@$@<add current energy to current node@>==@{@-
+put(r, u, get(r, u) + energy * energy_hits);@}
+
+@$@<iterate out edges and spider them@>==@{
+typename se_graph_traits<Graph>::out_edge_iterator ei, ei_end;
+for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+    if (!seen.count(*ei)) {
+        seen.insert(*ei);
+        // we haven't seen this vertex yet, spider it!
+        activation_spider(g, target(*ei, g), w, r, g[*ei].energy_hits, energy * (get(w, *ei) / total), seen);
+    }
+}@}
+
+@O@<spreading_activation.hpp@>==@{
+#ifndef _SPREADING_ACTIVATION_HPP_
+#define _SPREADING_ACTIVATION_HPP_
+
+@<includes@>
+
+namespace semantic {
+    namespace detail {
+        @<spider node@>
+    } // namespace detail
+    
+    @<spreading activation function@>
+} // namespace semantic
+
+#endif /* _SPREADING_ACTIVATION_HPP_ */
+@}
+
+@$@<includes@>==@{
+#include <semantic/semantic.hpp>
+#include <semantic/utility.hpp>
+
+#include <map>
+#include <set>
+#include <iterator>
+@}

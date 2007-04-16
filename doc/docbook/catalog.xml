@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog
+   PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN"
+   "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd"> 
+<catalog  xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">  
+    <group  prefer="public"  xml:base="file:///usr/share/xml/" >  
+
+    <public 
+        publicId="-//OASIS//DTD DocBook XML V4.4//EN"  
+        uri="http://www.docbook.org/xml/4.4/docbookx.dtd"/>
+
+    <system
+        systemId="xinclude.dtd"
+        uri="/Users/gabe/Code/Semantic2/trunk/doc/docbook/xinclude.dtd"/>
+
+    </group>
+</catalog>

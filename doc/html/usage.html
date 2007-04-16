@@ -1,0 +1,139 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;1.&nbsp;Usage/Quick Start</title><meta name="generator" content="DocBook XSL Stylesheets V1.70.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d0e1"></a>Chapter&nbsp;1.&nbsp;Usage/Quick Start</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e4">Getting Started</a></span></dt><dd><dl><dt><span class="section"><a href="#indexing">Indexing Some Files</a></span></dt><dt><span class="section"><a href="#basic_search">Performing a Basic Search</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e183">Going Further</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e4"></a>Getting Started</h2></div></div></div><p>
+            The <span class="application">Semantic Engine</span> is a header-only library. There is nothing
+            to compile. Everything is <code class="code">inline</code>d. In order to use the library, all you need
+            to do is <code class="code">#include</code> the necessary files and start using the library. 
+        </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="indexing"></a>Indexing Some Files</h3></div></div></div><p>
+                In this section we will write a short program to index some files. These files will be
+                textual in nature, and the index will be stored in an <span class="application">SQLite 3</span>
+                database.
+            </p><div class="procedure"><a name="d0e26"></a><p class="title"><b>Procedure&nbsp;1.1.&nbsp;
+                    Example Program: Index Files
+                </b></p><ol type="1"><li><p>
+                        First, we must include the necessary <span class="application">Semantic Engine</span>
+                        files to do our indexing.
+                    </p><pre class="programlisting">
+#include &lt;semantic/semantic.hpp&gt;
+#include &lt;semantic/indexing.hpp&gt;
+#include &lt;semantic/storage/sqlite3.hpp&gt;
+                    </pre></li><li><p>
+                        The next step is to construct a graph object, name the collection and point it
+                        to an <span class="application">SQLite 3</span> database file (which need not exist yet).
+                    </p><p>
+                        We will omit the <code class="code">int main()</code> function for brevity. 
+                    </p><pre class="programlisting">
+typedef semantic::SEGraph&lt;semantic::SQLite3StoragePolicy&gt; MyGraph;
+
+MyGraph graph("test collection");
+graph.set_file("my_index.db");
+                        
+                    </pre></li><li><p>
+                        Next we will create the text indexing helper object, which will allow us to
+                        easily parse a block of text, apply some natural language processing on it, 
+                        stem words and construct the graph. By default, all this happens automatically.
+                    </p><pre class="programlisting">
+typedef semantic::text_indexer&lt;MyGraph&gt; MyIndexer;
+
+MyIndexer indexer(graph, "/usr/local/share/semantic/tagger/lexicon.txt.gz");
+                    </pre><p>
+                        The <code class="filename">lexicon.txt.gz</code> file should have been installed with the
+                        <span class="application">Semantic Engine</span> library. You may supply your own
+                        lexicon (in another language, for example) or use the convenient
+                        <code class="code">LEXICON_INSTALL_LOCATION</code> which is defined in <code class="filename">semantic/config.hpp</code>.
+                    </p></li><li><p>
+                        Now comes the fun part. Let's index some files! Our loop here iterates through
+                        an imaginary <code class="code">std::vector</code> of strings pointing to text files on our
+                        hard drive. 
+                    </p><pre class="programlisting">
+g.set_mirror_changes_to_storage(true);
+
+for(std::vector&lt;;std::string&gt;::iterator it = my_filenames.begin();
+            it != my_filesnames.end(); ++it) {
+    indexer.index(*it);
+}
+                        
+g.set_mirror_changes_to_storage(false);
+g.commit_changes_to_storage();
+                        
+                    </pre><p>
+                        Now you might be asking, what do the functions <code class="code">set_mirror_changes_to_storage()</code>
+                        and <code class="code">commit_changes_to_storage()</code> do? The answer is simple: the <code class="code">SEGraph</code>
+                        object holds the index in memory. There are times when analysis is performed on the graph object
+                        and you don't want operations on the graph to be reflected in your on-disk index. By default
+                        the value of <code class="code">set_mirror_changes_to_storage()</code> is <code class="code">false</code>. By setting
+                        it to <code class="code">true</code> the graph will begin keeping track of changes you make. When 
+                        <code class="code">commit_changes_to_storage()</code> is called, those changes will be written to disk. Depending
+                        on the amount of text indexed, this process can take a while (as a general rule, about 5 minutes
+                        per 15,000 paragraphs of text). 
+                    </p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="basic_search"></a>Performing a Basic Search</h3></div></div></div><p>Now let's perform a basic search on our index. This requires the use of the <code class="code">SESubgraph</code> 
+                class instead of <code class="code">SEGraph</code> (now in a sense we're still using <code class="code">SEGraph</code> as it is a 
+                superclass of <code class="code">SESubgraph</code>). A search in the <span class="application">Semantic Engine</span> is nothing
+                more than extracting a subgraph of the main graph. Since indices become rather large rather quickly, it is
+                a big time-saver to work with subgraphs.
+            </p><div class="procedure"><a name="d0e120"></a><p class="title"><b>Procedure&nbsp;1.2.&nbsp;Example Program: Basic Search</b></p><ol type="1"><li><p>
+                        Like in our previous example, let's start with the includes.
+                    </p><pre class="programlisting">
+#include &lt;semantic/subgraph.hpp&gt;
+#include &lt;semantic/search.hpp&gt;
+
+// as per normal, we need a storage policy -- this will allow us access to our index
+#incldue &lt;semantic/storage/sqlite3.hpp&gt;
+                        
+// subgraphs are built by using a subgraph policy
+#include &lt;semantic/subgraph/pruning_random_walk.hpp&gt;
+                        
+// and a weighting policy is necessary for some subgraph policies, as well
+// as for ranking operations
+#include &lt;semantic/weighting/lg.hpp&gt;
+#include &lt;semantic/weighting/tf.hpp&gt;
+#include &lt;semantic/weighting/idf.hpp&gt;
+                        
+                    </pre><p>
+                        The three weighting policy files we will use to combine into one weighting policy. 
+                        <code class="filename">lg.hpp</code> defines <span class="emphasis"><em>Local/Global</em></span> weighting, <code class="filename">tf.hpp</code>
+                        defines <span class="emphasis"><em>Term Frequency</em></span> and <code class="filename">idf.hpp</code> defines
+                        <span class="emphasis"><em>Inverse Document Frequency</em></span>. We will combine these to create TF/IDF weighting. 
+                    </p></li><li><p>
+                        It's on to creating a new <code class="code">SESubgraph</code> object and performing a search. The search will
+                        be from a textual query, and will populate the subgraph with nodes and edges.
+                    </p><p>
+                        Again, we will omit the <code class="code">int main()</code> function.
+                    </p><pre class="programlisting">
+typedef semantic::SESubgraph&lt;
+    semantic::SQLite3StoragePolicy, 
+    semantic::PruningRandomWalkSubgraph, 
+    semantic::LGWeighting&lt;semantic::TFWeighting, semantic::IDFWeighting&gt;
+    &gt; MySubgraph;
+typedef semantic::search&lt;MySubgraph&gt; MySearchHelper;
+                        
+MySubgraph graph("test collection");
+graph.set_file("my_index.db");
+
+MySearchHelper search_helper(graph);
+
+std::vector&lt;std::pair&lt;std::string, double&gt; &gt;
+    my_documents, my_terms;
+
+boost::tie(my_documents, my_terms) = search_helper.semantic("my query string");
+                                
+                    </pre><p>
+                        In case you are wondering, <code class="code">boost::tie()</code> allows you to set the first parameter
+                        to the value of the first element of a <code class="code">std::pair</code> and the second to the second.
+                        <code class="code">search_helper.semantic()</code> returns a <code class="code">std::pair</code> of the above
+                        <code class="code">std::vector</code>s. The results returned by our helper will be sorted. 
+                    </p></li><li><p>
+                        Now, let's just print out our results and we're done!
+                    </p><pre class="programlisting">
+std::cout &lt;&lt; "Top 10 terms: ";
+for(unsigned int i = 0; i &lt; 10 &amp;amp;&amp;amp; i &lt; my_terms.size(); i++)
+    std::cout &lt;&lt; my_terms[i].first &lt;&lt; " ";
+std::cout &lt;&lt; std::endl;
+std::cout &lt;&lt; "Results:" &lt;&lt; std::endl;
+for(unsigned int i = 0; i &lt; my_documents.size(); i++)
+    std::cout &lt;&lt; "Rank: " &lt;&lt; my_documents[i].second &lt;&lt; ", Document: " &lt;&lt; my_documents[i].first &lt;&lt; std::endl;
+                        
+                    </pre></li></ol></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e183"></a>Going Further</h2></div></div></div><p>
+            The <span class="application">Semantic Engine</span> is capable of far more than mere indexing and searching.
+            Further information can be found in ??? and ???.
+        </p></div></div></body></html>
