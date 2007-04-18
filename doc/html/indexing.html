@@ -46,7 +46,7 @@ H5 { font-family: sans-serif; font-size: small }
 <BR>
 
 <TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
-<DIV STYLE="font-family: sans-serif" ALIGN=center><FONT SIZE=7>Semantic Engine</FONT></DIV>
+<DIV STYLE="font-family: sans-serif" ALIGN=center><FONT SIZE=7>Semantic Engine C++ API</FONT></DIV>
 </TD></TR></TABLE><BR>
 <TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
 <DIV STYLE="font-family: sans-serif" ALIGN=center><FONT SIZE=5>Indexing Classes</FONT></DIV>
@@ -603,7 +603,7 @@ previous_tag&nbsp;=&nbsp;best_tag;<BR>
 <P><HR SIZE=2 NOSHADE><P><A NAME="sec_1.5"></A>
 <H2>1.5. The File: tagger.hpp</H2>
 <FONT COLOR=#CC0033>
-<P><A NAME="16"></A><B>16. File:</B> tagger.hpp={<FONT COLOR=#000033><TT><BR>
+<P><A NAME="16"></A><B>16. File:</B> semantic/tagger.hpp={<FONT COLOR=#000033><TT><BR>
 #ifndef&nbsp;__SEMANTIC_TAGGER_HPP__<BR>
 #define&nbsp;__SEMANTIC_TAGGER_HPP__<BR>
 <BR>
@@ -1555,7 +1555,7 @@ English lexicon installed with the Semantic Engine toolkit.
 
 <P></TD></TR></TABLE>
 <FONT COLOR=#CC0033>
-<P><A NAME="17"></A>17. <A HREF="#20">Parser Constructor</A>={<FONT COLOR=#000033><TT><BR>
+<P><A NAME="17"></A>17. <A HREF="#22">Parser Constructor</A>={<FONT COLOR=#000033><TT><BR>
 text_parser(&nbsp;const&nbsp;std::string&nbsp;&amp;lexicon_location=""&nbsp;)<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;parser(lexicon_location)&nbsp;{<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;enable_stemming&nbsp;=&nbsp;true;<BR>
@@ -1567,7 +1567,7 @@ text_parser(&nbsp;std::istream&amp;&nbsp;lexicon_stream&nbsp;)<BR>
 </TT>
 </FONT>}<BR>
 </FONT>
-<FONT SIZE=1>This macro is invoked in definition <A HREF="#20">20</A>.</FONT><BR>
+<FONT SIZE=1>This macro is invoked in definition <A HREF="#22">22</A>.</FONT><BR>
 <P><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
 
 
@@ -1578,14 +1578,14 @@ This defaults to 'nouns', but other options include: 'noun_phrases',
 
 <P></TD></TR></TABLE>
 <FONT COLOR=#CC0033>
-<P><A NAME="18"></A>18. <A HREF="#20">Set Parsing Method</A>={<FONT COLOR=#000033><TT><BR>
+<P><A NAME="18"></A>18. <A HREF="#22">Set Parsing Method</A>={<FONT COLOR=#000033><TT><BR>
 void&nbsp;set_parsing_method(&nbsp;const&nbsp;std::string&amp;&nbsp;pattern){<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;POS_pattern&nbsp;=&nbsp;pattern;<BR>
 }<BR>
 </TT>
 </FONT>}<BR>
 </FONT>
-<FONT SIZE=1>This macro is invoked in definition <A HREF="#20">20</A>.</FONT><BR>
+<FONT SIZE=1>This macro is invoked in definition <A HREF="#22">22</A>.</FONT><BR>
 <P><HR SIZE=2 NOSHADE><P><A NAME="sec_2.2"></A>
 <H2>2.2. Word Filters</H2>
 <P><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
@@ -1600,7 +1600,7 @@ of items that will be removed from the <FONT COLOR=#000033><TT>map&lt;string,int
 
 <P></TD></TR></TABLE>
 <FONT COLOR=#CC0033>
-<P><A NAME="19"></A>19. <A HREF="#20">Word Filters</A>={<FONT COLOR=#000033><TT><BR>
+<P><A NAME="19"></A>19. <A HREF="#22">Word Filters</A>={<FONT COLOR=#000033><TT><BR>
 <BR>
 for(&nbsp;std::vector&lt;WordPtr&gt;::iterator&nbsp;ptr&nbsp;=&nbsp;word_filters.begin();<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ptr&nbsp;!=&nbsp;word_filters.end();&nbsp;++ptr&nbsp;){<BR>
@@ -1624,13 +1624,61 @@ for(&nbsp;std::vector&lt;WordPtr&gt;::iterator&nbsp;ptr&nbsp;=&nbsp;word_filters
 </TT>
 </FONT>}<BR>
 </FONT>
-<FONT SIZE=1>This macro is invoked in definition <A HREF="#20">20</A>.</FONT><BR>
+<FONT SIZE=1>This macro is invoked in definition <A HREF="#22">22</A>.</FONT><BR>
+<P><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
+
+
+<P>Word filters can be added simply by passing them to the <FONT COLOR=#000033><TT>add_word_filter()</TT></FONT>
+method. A pointer is added to the word_filters <FONT COLOR=#000033><TT>vector&lt;WordPtr&gt;</TT></FONT> and the
+filter is applied during parsing.
+
+<P></TD></TR></TABLE>
+<FONT COLOR=#CC0033>
+<P><A NAME="20"></A>20. <A HREF="#22">Add Word Filter</A>={<FONT COLOR=#000033><TT><BR>
+template&nbsp;&lt;class&nbsp;Filter&gt;<BR>
+void&nbsp;add_word_filter(Filter&nbsp;f)&nbsp;{<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;word_filters.push_back(&nbsp;WordPtr(&nbsp;new&nbsp;Filter(f)&nbsp;)&nbsp;);<BR>
+}<BR>
+</TT>
+</FONT>}<BR>
+</FONT>
+<FONT SIZE=1>This macro is invoked in definition <A HREF="#22">22</A>.</FONT><BR>
 <P><HR SIZE=2 NOSHADE><P><A NAME="sec_2.3"></A>
 <H2>2.3. Stemming and Termlists</H2>
+<P><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
+
+
+<P>Word stemming can be turned on or off. It is enabled by default and it
+controls whether the terms returned by the parser are fully stemmed or
+not.
+
+<P></TD></TR></TABLE>
+<FONT COLOR=#CC0033>
+<P><A NAME="21"></A>21. <A HREF="#22">Set Stemming</A>={<FONT COLOR=#000033><TT><BR>
+void&nbsp;set_stemming(bool&nbsp;val){<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;enable_stemming&nbsp;=&nbsp;val;<BR>
+}<BR>
+</TT>
+</FONT>}<BR>
+</FONT>
+<FONT SIZE=1>This macro is invoked in definition <A HREF="#22">22</A>.</FONT><BR>
+<P><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0><TR><TD WIDTH=400>
+
+
+<P>The stemmer employs the Porter stemmer
+
+<P>If terms are stemmed, the parser provides a facility for retrieving
+the unstemmed version of each stemmed word. By passing a
+<FONT COLOR=#000033><TT>map&lt;string,map&lt;string,int&gt;&gt;</TT></FONT> as a second parameter to the parser,
+the data structure will grow as the parsing proceeds. The data is
+keyed to the stemmed terms, each of which point to a <FONT COLOR=#000033><TT>map&lt;string,int&gt;</TT></FONT>
+of each original term and occurrence count.
+
+<P></TD></TR></TABLE>
 <P><HR SIZE=2 NOSHADE><P><A NAME="sec_2.4"></A>
 <H2>2.4. The File: parsing.hpp</H2>
 <FONT COLOR=#CC0033>
-<P><A NAME="20"></A><B>20. File:</B> parsing.hpp={<FONT COLOR=#000033><TT><BR>
+<P><A NAME="22"></A><B>22. File:</B> semantic/parsing.hpp={<FONT COLOR=#000033><TT><BR>
 #ifndef&nbsp;__SEMANTIC_PARSING_HPP__<BR>
 #define&nbsp;__SEMANTIC_PARSING_HPP__<BR>
 <BR>
@@ -1645,11 +1693,7 @@ for(&nbsp;std::vector&lt;WordPtr&gt;::iterator&nbsp;ptr&nbsp;=&nbsp;word_filters
 #include&nbsp;&lt;cctype&gt;<BR>
 #include&nbsp;&lt;iostream&gt;<BR>
 <BR>
-<BR>
 namespace&nbsp;semantic&nbsp;{<BR>
-<BR>
-<BR>
-<BR>
 <BR>
 /*&nbsp;*******************************************************<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TEXT&nbsp;PARSER<BR>
@@ -1756,15 +1800,11 @@ namespace&nbsp;semantic&nbsp;{<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;add_word_filter&nbsp;(&nbsp;class&nbsp;word_filter&nbsp;)&nbsp;--&nbsp;add&nbsp;a&nbsp;word-based&nbsp;filter<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;the&nbsp;parser<BR>
 &nbsp;&nbsp;&nbsp;************************************************************************&nbsp;*/<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;template&nbsp;&lt;class&nbsp;Filter&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void&nbsp;add_word_filter(Filter&nbsp;f)&nbsp;{<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word_filters.push_back(&nbsp;WordPtr(&nbsp;new&nbsp;Filter(f)&nbsp;)&nbsp;);<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>
+<A HREF="#20">Add Word Filter</A><TT><BR>
 <BR>
-<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;void&nbsp;set_stemming(bool&nbsp;val){<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enable_stemming&nbsp;=&nbsp;val;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>
+<A HREF="#21">Set Stemming</A><TT><BR>
 <BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private:<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;typedef&nbsp;boost::shared_ptr&lt;word_filter&gt;&nbsp;WordPtr;<BR>
@@ -1785,27 +1825,27 @@ namespace&nbsp;semantic&nbsp;{<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const&nbsp;std::map&lt;std::string,int&gt;&amp;&nbsp;terms,<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;std::string,UnstemmedCount&gt;&amp;&nbsp;unstemmed&nbsp;){<BR>
 <BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stemming::english_stem&nbsp;Stemmer;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;std::string,int&gt;&nbsp;stemmed;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;std::string,int&gt;::const_iterator&nbsp;pos;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(&nbsp;pos&nbsp;=&nbsp;terms.begin();&nbsp;pos&nbsp;!=&nbsp;terms.end();&nbsp;++pos&nbsp;){<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string&nbsp;word(&nbsp;pos-&gt;first&nbsp;);<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string&nbsp;original(word);<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;enable_stemming&nbsp;){<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stemmer(word);<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;word.length()&nbsp;&gt;&nbsp;0&nbsp;){<BR>
-<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Make&nbsp;lower&nbsp;case<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string&nbsp;lower(word);<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::transform(word.begin(),word.end(),lower.begin(),tolower);<BR>
-<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stemmed[lower]&nbsp;+=&nbsp;pos-&gt;second;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unstemmed[lower][original]++;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unstemmed[lower]["__count"]++;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stemming::english_stem&nbsp;Stemmer;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;std::string,int&gt;&nbsp;stemmed;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::map&lt;std::string,int&gt;::const_iterator&nbsp;pos;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(&nbsp;pos&nbsp;=&nbsp;terms.begin();&nbsp;pos&nbsp;!=&nbsp;terms.end();&nbsp;++pos&nbsp;){<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string&nbsp;word(&nbsp;pos-&gt;first&nbsp;);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string&nbsp;original(word);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;enable_stemming&nbsp;){<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Stemmer(word);<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;stemmed;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;word.length()&nbsp;&gt;&nbsp;0&nbsp;){<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Make&nbsp;lower&nbsp;case<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::string&nbsp;lower(word);<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std::transform(word.begin(),word.end(),lower.begin(),tolower);<BR>
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stemmed[lower]&nbsp;+=&nbsp;pos-&gt;second;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unstemmed[lower][original]++;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unstemmed[lower]["__count"]++;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;stemmed;<BR>
 <BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<BR>
 <BR>
@@ -1830,7 +1870,7 @@ namespace&nbsp;semantic&nbsp;{<BR>
 <P><HR SIZE=2 NOSHADE><P><A NAME="sec_3.1"></A>
 <H2>3.1. The File: indexing.hpp</H2>
 <FONT COLOR=#CC0033>
-<P><A NAME="21"></A><B>21. File:</B> indexing.hpp={<FONT COLOR=#000033><TT>#ifndef&nbsp;__SEMANTIC_INDEXING_HPP__<BR>
+<P><A NAME="23"></A><B>23. File:</B> semantic/indexing.hpp={<FONT COLOR=#000033><TT>#ifndef&nbsp;__SEMANTIC_INDEXING_HPP__<BR>
 #define&nbsp;__SEMANTIC_INDEXING_HPP__<BR>
 <BR>
 /*<BR>

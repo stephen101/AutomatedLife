@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Semantic::API - Perl extension for a graph-based search</title>
+
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#synopsis__indexing">SYNOPSIS - Indexing</a></li>
+	<li><a href="#synopsis__searching">SYNOPSIS - Searching</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#indexing">Indexing</a></li>
+		<li><a href="#searching">Searching</a></li>
+		<li><a href="#utilities">Utilities</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Semantic::API - Perl extension for a graph-based search</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The Semantic Engine has emerged from an attempt to improve on standard keyword
+searches. By analyzing the statistical patterns in natural language, 
+concept-based relationships can be established between distinct texts that may
+not share particular key words. By representing a text collection as a
+graph-theoretic network, similarities and relationships can easily be found in
+otherwise unstructured data.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis__indexing">SYNOPSIS - Indexing</a></h1>
+<pre>
+  use Semantic::API;</pre>
+<pre>
+  my $semantic = Semantic::API::Index-&gt;new( 
+                            collection =&gt; 'my_collection',
+                            storage =&gt; 'mysql',
+                            database =&gt; 'my_database',
+                            host =&gt; 'localhost',
+                            username =&gt; 'my_user',
+                            password =&gt; '***',
+                            min_term_frequency =&gt; 2,
+                            max_document_frequency =&gt; '0.2' );
+  -- OR --
+  my $semantic = Semantic::API::Index-&gt;new( 
+                            collection =&gt; 'my_collection',
+                            storage =&gt; 'sqlite',
+                            database =&gt; 'my_database' );</pre>
+<pre>
+  $semantic-&gt;add_word_filters( 
+                            too_many_numbers     =&gt; 10,
+                            minimum_length       =&gt; 3,
+                            maximum_word_length  =&gt; 15,
+                            maximum_phrase_length=&gt; 3,
+                            blacklist            =&gt; \@blacklist,
+                            whitelist            =&gt; \@whitelist);</pre>
+<pre>
+  $semantic-&gt;index_file( $filename ); # read this file and index it!
+  ...
+  $semantic-&gt;set_default_encoding( &quot;utf8&quot;); # use this encoding for any incoming text
+  $semantic-&gt;index( $id, $text );
+  ...
+  $semantic-&gt;index( $id, $text, $weight ); # give this item a different weight</pre>
+<pre>
+  $semantic-&gt;finish(); # commit everything to the database</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis__searching">SYNOPSIS - Searching</a></h1>
+<pre>
+  use Semantic::API;</pre>
+<pre>
+  my $semantic = Semantic::API::Search-&gt;new( collection =&gt; 'my_collection',
+                                             storage =&gt; 'mysql',
+                                             database =&gt; 'my_database',
+                                             username =&gt; 'my_user',
+                                             password =&gt; '***',
+                                             host =&gt; 'localhost' );</pre>
+<pre>
+  -- OR --
+  my $semantic = Semantic::API::Search-&gt;new( collection =&gt; 'my_collection',
+                                             storage =&gt; 'sqlite',
+                                             database =&gt; 'my_database' );</pre>
+<pre>
+  my ($results, $terms ) = $semantic-&gt;semantic_search( 'query' );
+  -- OR --
+  my ($results, $terms ) = $semantic-&gt;keyword_search( 'query' );</pre>
+<pre>
+  my @term_list   = sort { $terms-&gt;{$b}   &lt;=&gt; $terms-&gt;{$a}   } keys %$terms;
+  my @result_list = sort { $results-&gt;{$b} &lt;=&gt; $results-&gt;{$a} } keys %$results;</pre>
+<pre>
+  foreach( @result_list ){
+      ...
+  }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_new">new( %PARAMETERS )</a></strong><br />
+</dt>
+<dd>
+Parameters: takes a named parameter list (see Synopsis above) specifying the 
+storage policy, a collection name, and some database parameters:
+</dd>
+<dd>
+<pre>
+    storage    =&gt; 'mysql' or 'sqlite'
+    collection =&gt; 'collection name'
+    database   =&gt; 'database name'
+    username   =&gt; 'mysql username' (optional)
+    password   =&gt; 'mysql password' (optional)
+    host       =&gt; 'mysql host' (optional)
+    min_term_frequency =&gt; 'minimum occurrence of a term' (optional)
+    max_document_frequency =&gt; 'maximum percent of collection in
+                               which a term occurs' (optional)</pre>
+</dd>
+<dd>
+<p>Additional parameters are listed below.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="indexing">Indexing</a></h2>
+<p>Additional optional parameters:</p>
+<pre>
+    lexicon =&gt; 'path/to/lexicon.gz'
+    default_encoding =&gt; 'iso-8859-1'
+    parsing_method =&gt; 'nouns'</pre>
+<dl>
+<dt><strong><a name="item_add_word_filters">add_word_filters( %FILTERS )</a></strong><br />
+</dt>
+<dd>
+Various filters can be added to trim the list of words that are indexed. 
+All nouns are, by default, added to the index, but some other words will
+sometimes slip through. Filters available for use include:
+</dd>
+<dd>
+<pre>
+    minimum_length        =&gt; $num  # omit words with fewer characters than $num
+    maximum_word_length   =&gt; $num  # omit words with more characters than $num
+    maximum_phrase_length =&gt; $num  # omit phrases with more words than $num
+    too_many_numbers      =&gt; $num  # omit words containing more numbers than $num
+    blacklist             =&gt; \@array # omit words in this array
+    whitelist             =&gt; \@array # keep only words in this array</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_set_parsing_method">set_parsing_method( $METHOD )</a></strong><br />
+</dt>
+<dd>
+This controls what classes of words are extracted from a document. 
+Default is 'nouns'; other values include: 'proper_nouns', 'noun_phrases',
+'adjectives', 'verbs'
+</dd>
+<p></p>
+<dt><strong><a name="item_set_default_encoding">set_default_encoding( $ENCODING )</a></strong><br />
+</dt>
+<dd>
+This sets the encoding to use when indexing text. The default encoding
+is set to ISO-8859-1 (latin1). Everything will be converted to utf8.
+</dd>
+<p></p>
+<dt><strong><a name="item_index">index( $ID, $TEXT, [$WEIGHT=1] )</a></strong><br />
+</dt>
+<dd>
+This method will read the text, extract nouns, apply any filters and add
+the data to the semantic index.
+</dd>
+<p></p>
+<dt><strong><a name="item_index_file">index_file( $FILENAME, [$WEIGHT=1] )</a></strong><br />
+</dt>
+<dd>
+See `index` above
+</dd>
+<p></p>
+<dt><strong><a name="item_reindex">reindex( $ID, $TEXT, [$WEIGHT=1] )</a></strong><br />
+</dt>
+<dd>
+If the text for this document has changed, the old one will be removed
+and the new document will be added to the index.
+</dd>
+<p></p>
+<dt><strong><a name="item_reindex_file">reindex_file( $FILENAME, [$WEIGHT=1] )</a></strong><br />
+</dt>
+<dd>
+See `reindex` above
+</dd>
+<p></p>
+<dt><strong><a name="item_unindex">unindex( $ID )</a></strong><br />
+</dt>
+<dd>
+Remove this document (or term) from the index
+</dd>
+<p></p>
+<dt><strong><a name="item_finish"><code>finish()</code></a></strong><br />
+</dt>
+<dd>
+VERY IMPORTANT! This will save the entire index to the storage medium. 
+If you do not call this function, nothing will be saved.
+</dd>
+<p></p>
+<dt><strong><a name="item_merge">merge( $FIRST =&gt; $SECOND )</a></strong><br />
+</dt>
+<dd>
+Merge the two documents or terms. The $FIRST item will be merged into 
+the $SECOND. (All reference to the $FIRST item will be removed.)
+</dd>
+<p></p>
+<dt></dt>
+</dl>
+<p>
+</p>
+<h2><a name="searching">Searching</a></h2>
+<p>Additional optional parameters (with default values):</p>
+<pre>
+    depth          =&gt; 4    # depth of graph traversal
+    trials         =&gt; 100  # number of trials for random walk
+    keep_top_edges =&gt; 0.3  # percent of edges kept before traversal
+                           # set this to `1' to do no pruning</pre>
+<dl>
+<dt><strong><a name="item_semantic_search">semantic_search( $QUERY )</a></strong><br />
+</dt>
+<dd>
+Parameters: query is the raw search query from a user.
+</dd>
+<p></p>
+<dt><strong><a name="item_keyword_search">keyword_search( $QUERY )</a></strong><br />
+</dt>
+<dd>
+Parameters: same as above, however the search results are returned using a 
+simple keyword search, versus a Semantic search.
+</dd>
+<p></p>
+<dt><strong><a name="item_find_similar">find_similar( @DOCUMENT_IDS )</a></strong><br />
+</dt>
+<dd>
+Parameters: same as above, however the search begins on the given document 
+<code>node(s)</code> rather than a term node.
+</dd>
+<p></p>
+<dt><strong><a name="item_summarize">summarize( @DOCUMENT_IDS )</a></strong><br />
+</dt>
+<dd>
+Returns a summary of the given document(s). If more than one document
+is provided, it will find the best summary for the document set.
+</dd>
+<p></p>
+<dt><strong><a name="item_get_document_text">get_document_text( $DOCUMENT_ID )</a></strong><br />
+</dt>
+<dd>
+Returns the text of the given document
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="utilities">Utilities</a></h2>
+<p>These are exported by Semantic::API by request only</p>
+<dl>
+<dt><strong><a name="item_have_sqlite">Semantic::API::have_sqlite()</a></strong><br />
+</dt>
+<dd>
+Returns true if SQLite support is enabled
+</dd>
+<p></p>
+<dt><strong><a name="item_have_mysql">Semantic::API::have_mysql()</a></strong><br />
+</dt>
+<dd>
+Returns true if MySQL support is enabled
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>For more information, please visit <a href="http://www.knowledgesearch.org">http://www.knowledgesearch.org</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<pre>
+    Aaron Coburn, &lt;acoburn@middlebury.edu&gt;
+    Gabe Schine, &lt;gschine@middlebury.edu&gt;
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2006 by Aaron Coburn and Gabe Schine
+
+</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+</p>
+
+</body>
+
+</html>
