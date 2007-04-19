@@ -1,7 +1,18 @@
-@t table_of_contents
 @p maximum_input_line_length = 500
 @p maximum_output_line_length = 500
+@t vskip 40 mm
+@t title titlefont centre "Semantic Engine Core C++ API"
+@t title normalfont centre "By Gabriel Schine"
 
+This file describes the @/Semantic Engine@/ core API. All the main
+functionality of the @/Semantic Engine@/ is described here,
+supplemented by the documentation in @{subgraph.hpp@}, which
+describes the sub-graph capabilities of the @/Semantic Engine@/.
+
+@t vskip 10 mm
+@t table_of_contents
+
+@! ******************************************************************
 @A@<Semantic Engine Core API@>
 
 This file describes the @/Semantic Engine@/ core API. All the main
@@ -67,7 +78,7 @@ template <
     > class SEGraph : public SEBase
 {
     typedef SEGraph<StoragePolicySelector, SEBase> self_type;
-    typedef storage_traits<StoragePolicySelector> storage_traits;
+    typedef se_storage_traits<StoragePolicySelector> storage_traits;
     typedef se_graph_traits<StoragePolicySelector> se_traits;
 
     public:
@@ -267,11 +278,11 @@ a new vertex was just added.
 @$@<non-member functions@>+=@{
 template <class StoragePolicySelector, class SEBase>
 inline typename se_graph_traits<StoragePolicySelector>::vertex_descriptor
-add_vertex(const typename storage_traits<StoragePolicySelector>::vertex_properties_type &p, SEGraph<StoragePolicySelector, SEBase> &g)
+add_vertex(const typename se_storage_traits<StoragePolicySelector>::vertex_properties_type &p, SEGraph<StoragePolicySelector, SEBase> &g)
 {
     typedef typename se_graph_traits<StoragePolicySelector>::base_graph_type base_type;
     typedef typename graph_traits<base_type>::vertex_descriptor Vertex;
-    typedef typename storage_traits<StoragePolicySelector>::vertex_properties_type vertex_properties_type;
+    typedef typename se_storage_traits<StoragePolicySelector>::vertex_properties_type vertex_properties_type;
 
     base_type& base_g = static_cast<base_type&>(g);
 
@@ -318,7 +329,7 @@ inline std::pair<typename se_graph_traits<StoragePolicySelector>::edge_descripto
 add_edge(
     typename se_graph_traits<StoragePolicySelector>::vertex_descriptor u,
     typename se_graph_traits<StoragePolicySelector>::vertex_descriptor v,
-    const typename storage_traits<StoragePolicySelector>::edge_properties_type &p,
+    const typename se_storage_traits<StoragePolicySelector>::edge_properties_type &p,
     SEGraph<StoragePolicySelector, SEBase> &g)
 {
     typedef se_graph_traits<StoragePolicySelector> graph_traits;
@@ -370,7 +381,7 @@ inline std::pair<typename se_graph_traits<StoragePolicySelector>::edge_descripto
 add_or_strengthen_edge(
     typename se_graph_traits<StoragePolicySelector>::vertex_descriptor u,
     typename se_graph_traits<StoragePolicySelector>::vertex_descriptor v,
-    const typename storage_traits<StoragePolicySelector>::edge_properties_type &p,
+    const typename se_storage_traits<StoragePolicySelector>::edge_properties_type &p,
     SEGraph<StoragePolicySelector, SEBase> &g)
 {
     typedef se_graph_traits<StoragePolicySelector> graph_traits;
@@ -666,7 +677,7 @@ remove_vertex(
     typedef typename graph_traits::base_graph_type base_type;
 
     base_type& base_g = static_cast<base_type&>(g);
-    typename storage_traits<StoragePolicySelector>::vertex_properties_type vp = g[u];
+    typename se_storage_traits<StoragePolicySelector>::vertex_properties_type vp = g[u];
 
     g.will_remove_vertex(u, vp);
     boost::remove_vertex(u, base_g);

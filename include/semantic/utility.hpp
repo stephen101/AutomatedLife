@@ -43,7 +43,7 @@ namespace semantic {
             strm << *i;
             ++i;
         }
-        
+    
         return strm.str();
     }
     
@@ -59,7 +59,7 @@ namespace semantic {
             strm << *i;
             ++i;
         }
-        
+    
         return strm.str();
     }
     
@@ -73,7 +73,7 @@ namespace semantic {
         if (c > m) m = c;
     }
     
-    
+
     class empty_class {};
     namespace detail {
         // utility class to extract the first part of a pair
@@ -87,7 +87,7 @@ namespace semantic {
         struct extract_second {
             typedef typename P::second_type result_type;
             const typename P::second_type & operator()(P &p) const { return p.second; }
-        };        
+        };
     } // namespace detail
     
     template <class I>
@@ -107,9 +107,9 @@ namespace semantic {
 
 namespace maps {
     // ordered map -- will always use STLs std::map or std::multimap
-    template <    typename Key, 
-                typename Data, 
-                class Compare = std::less<Key>, 
+    template <    typename Key,
+                typename Data,
+                class Compare = std::less<Key>,
                 class Alloc = std::allocator<std::pair<const Key, Data> > >
     class ordered : public std::map<Key, Data, Compare, Alloc> {};
 
@@ -121,13 +121,13 @@ namespace maps {
     class ordered_multi : public std::multimap<Key, Data, Compare, Alloc> {};
 
     // unordered map -- will use TR1 when available
-    template <    typename Key, 
-                typename Data, 
-                class Hash = boost::hash<Key>, 
-                class Pred = std::equal_to<Key>, 
+    template <    typename Key,
+                typename Data,
+                class Hash = boost::hash<Key>,
+                class Pred = std::equal_to<Key>,
                 class Alloc = std::allocator<std::pair<const Key, Data> >,
                 bool cache_hash_code = false >
-    class unordered : 
+    class unordered :
         #ifdef HAVE_TR1_UNORDERED_MAP
             public std::tr1::unordered_map<Key, Data, Hash, Pred, Alloc, cache_hash_code> {};
         #else

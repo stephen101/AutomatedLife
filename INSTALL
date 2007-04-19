@@ -1,5 +1,15 @@
 For more detailed instructions, please see doc/html/installation.html
 
+Dependencies
+
+The Semantic Engine requires the Boost C++ libraries available at
+http://www.boost.org. 
+
+One or more storage engines are also required, MySQL and SQLite3
+are currently supported.
+
+Qt 4.1 or higher is required to build the desktop tools.
+
 To install the Semantic-Engine:
 
 $ ./configure <options>

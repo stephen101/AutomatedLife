@@ -11,7 +11,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( have_sqlite have_mysql );
 
-our $VERSION = '2.00';
+our $VERSION = '2.04';
 
 require XSLoader;
 XSLoader::load('Semantic::API', $VERSION);

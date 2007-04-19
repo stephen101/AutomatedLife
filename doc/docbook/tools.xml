@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+            "http://www.docbook.org/xml/4.4/docbookx.dtd">
+
+<chapter>
+    <title>Tools</title>
+    <section>
+        <title>Indexing</title>
+        <para>
+			The Semantic Indexer can be used to index a collection of documents and then 
+			store them in a database (storage) engine.
+		</para>
+			<screen>
+Usage: semantic_indexer [options] &lt;directory to index&gt;
+
+Options: 
+  --help                                   Produce this help message
+ 
+  --version                                Print version information
+  
+  -v [ --verbose ]                         Verbose output
+  
+  -c [ --collection ] arg (=My Collection) The name of the collection to index
+  
+  -e [ --encoding ] arg (=iso-8859-1)      Set the default encoding
+
+  --term_type arg (=nouns)                 Set the term type to be extracted
+
+  --document_minimum arg (=1)              Set the minimum number of times a
+                                           term must appear in a document to
+                                           be included in the index
+
+  --collection_minimum arg (=3)            Set the minimum number of times a
+                                           term must appear across the
+                                           collection to be included in the
+                                           index
+  
+  --collection_maximum arg (=0.2)          Set the maximum document-frequency
+                                           (between 0 and 1) for a term to be
+                                           included in the index
+  
+  --disable_stemmer                        Turn off the stemming of terms
+  
+  -f [ --file ] arg                        Write the term index data to a file
+  
+  -s [ --sqlite ] arg                      The SQLite 3 database file to use.
+                                           the file will be created if needed
+  
+  -m [ --mysql ] arg                       The MySQL database name
+  -u [ --mysql_username ] arg (=aaron)     The MySQL database username
+  -p [ --mysql_password ] arg              The MySQL database password
+  -h [ --mysql_hostname ] arg (=localhost) The MySQL database host
+</screen>
+        
+    </section>
+    <section>
+        <title>Searching</title>
+        <para>
+            Once a collection of documents is indexed, the Semantic Search tool can be used to query 
+			the collection. Automatic clustering and summarization of the search results are also 
+			available.
+        </para>
+		<screen>
+Usage: semantic_search [options] "query"
+
+Options: 
+  --help                                   produce this help message
+
+  --version                                print version information
+
+  -c [ --collection ] arg (=My Collection) The collection to search
+
+  --summaries                              Print summaries for each document
+
+  --spread arg (=0.3)                      a value from 0 to 1, specifying how
+                                           broad the search. 1 = most broad
+
+  --cluster                                output results in clusters instead
+                                           of a list
+
+  --num_clusters arg (=4)                  the number of clusters
+
+  -s [ --sqlite ] arg                      the SQLite 3 database file to use
+
+  -m [ --mysql ] arg                       the MySQL database name
+  -u [ --mysql_username ] arg (=aaron)     the MySQL database username
+  -p [ --mysql_password ] arg              the MySQL database password
+  -h [ --mysql_hostname ] arg (=localhost) the MySQL database host
+</screen>
+
+
+    </section>
+</chapter>

@@ -1,5 +1,17 @@
 @p maximum_input_line_length = 500
 @p maximum_output_line_length = 500
+@t vskip 40 mm
+@t title titlefont centre "Semantic Engine C++ API"
+@t title smalltitlefont centre "Utility Functions"
+@t title normalfont centre "By Gabriel Schine"
+
+This file describes the utility functions and classes
+used in the Semantic Engine.
+
+@t vskip 10 mm
+@t table_of_contents
+
+@! ******************************************************************
 
 @A@<Utility Functions and Classes@>
 
@@ -64,7 +76,7 @@ inline std::string join(Iterator i, Iterator i_end, std::string glue) {
         strm << *i;
         ++i;
     }
-    
+
     return strm.str();
 }
 @}
@@ -85,7 +97,7 @@ inline std::string unique_join(Iterator i, Iterator i_end, std::string glue) {
         strm << *i;
         ++i;
     }
-    
+
     return strm.str();
 }
 @}
@@ -96,7 +108,7 @@ The following two transform iterators take an iterator of @{std::pair@}
 elements and create a new iterator that will either hand back
 the first or second part of the pair. They can be created by
 calling the functions @{extract_keys()@} or @{extract_values()@},
-or the equivalent @{extract_first_iterator()@} and 
+or the equivalent @{extract_first_iterator()@} and
 @{extract_second_iterator()@}.
 
 @$@<utility classes@>+=@{
@@ -112,7 +124,7 @@ namespace detail {
     struct extract_second {
         typedef typename P::second_type result_type;
         const typename P::second_type & operator()(P &p) const { return p.second; }
-    };        
+    };
 } // namespace detail
 
 template <class I>
@@ -175,9 +187,9 @@ namespace will always be used.
 @$@<maps namespace@>==@{
 namespace maps {
     // ordered map -- will always use STLs std::map or std::multimap
-    template <    typename Key, 
-                typename Data, 
-                class Compare = std::less<Key>, 
+    template <    typename Key,
+                typename Data,
+                class Compare = std::less<Key>,
                 class Alloc = std::allocator<std::pair<const Key, Data> > >
     class ordered : public std::map<Key, Data, Compare, Alloc> {};
 
@@ -189,13 +201,13 @@ namespace maps {
     class ordered_multi : public std::multimap<Key, Data, Compare, Alloc> {};
 
     // unordered map -- will use TR1 when available
-    template <    typename Key, 
-                typename Data, 
-                class Hash = boost::hash<Key>, 
-                class Pred = std::equal_to<Key>, 
+    template <    typename Key,
+                typename Data,
+                class Hash = boost::hash<Key>,
+                class Pred = std::equal_to<Key>,
                 class Alloc = std::allocator<std::pair<const Key, Data> >,
                 bool cache_hash_code = false >
-    class unordered : 
+    class unordered :
         #ifdef HAVE_TR1_UNORDERED_MAP
             public std::tr1::unordered_map<Key, Data, Hash, Pred, Alloc, cache_hash_code> {};
         #else
@@ -214,7 +226,7 @@ namespace maps {
 
 namespace semantic {
     @<utility functions@>
-    
+
     @<utility classes@>
 } // namespace semantic
 

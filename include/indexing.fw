@@ -1,7 +1,7 @@
 @p maximum_input_line_length = 100
 @p maximum_output_line_length = 100
 @t vskip 40 mm
-@t title titlefont centre "Semantic Engine"
+@t title titlefont centre "Semantic Engine C++ API"
 @t title smalltitlefont centre "Indexing Classes"
 @t title normalfont centre "By Aaron Coburn"
 

@@ -1,6 +1,17 @@
 @p maximum_input_line_length = 500
 @p maximum_output_line_length = 500
+@t vskip 40 mm
+@t title titlefont centre "Semantic Engine C++ API"
+@t title smalltitlefont centre "Weighting Algorithms"
+@t title normalfont centre "By Gabriel Schine"
 
+This file describes the algorithms for determining the
+weight (or similarity) between nodes in the Semantic Engine.
+
+@t vskip 10 mm
+@t table_of_contents
+
+@! ******************************************************************
 @A@<Weighting Algorithms@>
 
 The @/Weighting Algorithms@/ available to the @/Semantic Engine@/ play a very

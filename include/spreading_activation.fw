@@ -1,6 +1,19 @@
-@A@<Ranking: Spreading Activation@>
 @p maximum_input_line_length = 500
 @p maximum_output_line_length = 500
+@t vskip 40 mm
+@t title titlefont centre "Semantic Engine C++ API"
+@t title smalltitlefont centre "Ranking: Spreading Activation"
+@t title normalfont centre "By Gabriel Schine"
+
+This file describes the ranking operations used by the
+Semantic Engine.
+
+@t vskip 10 mm
+@t table_of_contents
+
+@! ******************************************************************
+
+@A@<Ranking: Spreading Activation@>
 Spreading activation is a ranking operation that can be performed on a number of nodes.
 In order to perform this operation, we need the following:
 
@@ -29,14 +42,14 @@ void spreading_activation(Graph &g, NodeMap &n, WeightMap w, RankMap r)
     typedef typename se_graph_traits<Graph>::out_edge_iterator eiterator;
     typedef typename se_graph_traits<Graph>::vertex_id_type id_type;
     typedef typename se_graph_traits<Graph>::edge_descriptor edge_desc;
-    
+
     @<initialize starting energies@>
-    
+
     // create the seen set
     std::set<edge_desc> seen;
     // and our map of vertices
     std::map<id_type, typename se_graph_traits<Graph>::vertex_descriptor> vertex_map;
-    
+
     // get those vertex descriptors from the graph
     g.vertices_by_id(extract_first_iterator(n.begin()), extract_first_iterator(n.end()), inserter(vertex_map, vertex_map.end()));
 
@@ -48,11 +61,11 @@ The spidering algorithm looks like so:
 @$@<spider node@>==@{
 template <class Graph, class WeightMap, class RankMap>
 void activation_spider(
-        Graph &g, 
-        typename se_graph_traits<Graph>::vertex_descriptor u, 
-        WeightMap w, RankMap r, 
-        int energy_hits, 
-        typename property_traits<RankMap>::value_type energy, 
+        Graph &g,
+        typename se_graph_traits<Graph>::vertex_descriptor u,
+        WeightMap w, RankMap r,
+        int energy_hits,
+        typename property_traits<RankMap>::value_type energy,
         std::set<typename se_graph_traits<Graph>::edge_descriptor> &seen)
 {
     if (energy_hits == 0) return; // don't even go there! *snap* -- only if we won't be modifying anything
@@ -93,7 +106,7 @@ for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
     }
 }@}
 
-@O@<spreading_activation.hpp@>==@{
+@O@<semantic/ranking/spreading_activation.hpp@>==@{
 #ifndef _SPREADING_ACTIVATION_HPP_
 #define _SPREADING_ACTIVATION_HPP_
 
@@ -103,7 +116,7 @@ namespace semantic {
     namespace detail {
         @<spider node@>
     } // namespace detail
-    
+
     @<spreading activation function@>
 } // namespace semantic
 

@@ -19,7 +19,8 @@ namespace semantic {
                 
                 iterator ei;
                 for(ei = nlist.begin(); ei != nlist.end(); ++ei) { 
-                                                                       put(w, g.get_vertex_id((*ei).second), (*ei).first.strength); }
+                      put(w, g.get_vertex_id((*ei).second), (*ei).first.strength); 
+				}
             }
 
             
@@ -32,7 +33,8 @@ namespace semantic {
                 
                 iterator ei, ei_end;
                 for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) { 
-                                                                                        put(w, *ei, g[*ei].strength); }
+                    put(w, *ei, g[*ei].strength); 
+				}
             }
     };
 } // namespace semantic

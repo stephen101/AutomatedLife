@@ -16,11 +16,11 @@ namespace semantic {
         
         template <class Graph, class WeightMap, class RankMap>
         void activation_spider(
-                Graph &g, 
-                typename se_graph_traits<Graph>::vertex_descriptor u, 
-                WeightMap w, RankMap r, 
-                int energy_hits, 
-                typename property_traits<RankMap>::value_type energy, 
+                Graph &g,
+                typename se_graph_traits<Graph>::vertex_descriptor u,
+                WeightMap w, RankMap r,
+                int energy_hits,
+                typename property_traits<RankMap>::value_type energy,
                 std::set<typename se_graph_traits<Graph>::edge_descriptor> &seen)
         {
             if (energy_hits == 0) return; // don't even go there! *snap* -- only if we won't be modifying anything
@@ -39,7 +39,7 @@ namespace semantic {
             }
         }
     } // namespace detail
-    
+
     
     template <class Graph, class NodeMap, class WeightMap, class RankMap>
     void spreading_activation(Graph &g, NodeMap &n, WeightMap w, RankMap r)
@@ -48,14 +48,14 @@ namespace semantic {
         typedef typename se_graph_traits<Graph>::out_edge_iterator eiterator;
         typedef typename se_graph_traits<Graph>::vertex_id_type id_type;
         typedef typename se_graph_traits<Graph>::edge_descriptor edge_desc;
-        
+    
         BGL_FORALL_VERTICES_T(v, g, Graph) put(r, v, 0);
-        
+    
         // create the seen set
         std::set<edge_desc> seen;
         // and our map of vertices
         std::map<id_type, typename se_graph_traits<Graph>::vertex_descriptor> vertex_map;
-        
+    
         // get those vertex descriptors from the graph
         g.vertices_by_id(extract_first_iterator(n.begin()), extract_first_iterator(n.end()), inserter(vertex_map, vertex_map.end()));
     

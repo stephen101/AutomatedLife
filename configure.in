@@ -1,6 +1,6 @@
 AC_INIT(include/semantic/semantic.hpp)
 AC_CONFIG_MACRO_DIR(m4)
-AM_INIT_AUTOMAKE(Semantic-Engine, 2.03)
+AM_INIT_AUTOMAKE(Semantic-Engine, 2.04)
 AC_PREFIX_DEFAULT(/usr/local)
 AC_PROG_CC
 AC_PROG_CXX

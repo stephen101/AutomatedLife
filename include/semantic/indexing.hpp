@@ -286,7 +286,7 @@ namespace semantic {
                 std::map<std::string, std::pair<std::string,int> > new_wordlist;
                 typedef std::multimap< int, std::string, std::greater<int> > RevMap;
 
-                std::map<std::string,UnstemmedCount>::iterator pos;
+                std::multimap<std::string,UnstemmedCount>::iterator pos;
                 for( pos = wordlist.begin(); pos != wordlist.end(); ++pos ){
                     std::string stemmed = pos->first;
                     UnstemmedCount unstemmed = pos->second;
@@ -402,7 +402,7 @@ namespace semantic {
                                         filename, node_type_major_doc));
                             // attach the text
                             base_type::g.set_vertex_meta_value(u, "body", text);
-                        } catch ( std::exception &){
+                        } catch ( std::exception &e){
                             //std::cerr << "Error: " << e.what() << std::endl;
                             continue;
                         }
@@ -481,8 +481,8 @@ namespace semantic {
             void manage_wordlist(const unsigned int max=3)
             {
                 typedef std::multimap<int,std::string,std::less<int> > RevMap;
-                std::map<std::string,std::string> to_delete;
-                std::map<std::string,UnstemmedCount>::iterator pos;
+                std::multimap<std::string,std::string> to_delete;
+                std::multimap<std::string,UnstemmedCount>::iterator pos;
                 for( pos = wordlist.begin(); pos != wordlist.end(); ++pos ){
                     std::string stemmed = pos->first;
                     UnstemmedCount unstemmed = pos->second;
@@ -496,7 +496,7 @@ namespace semantic {
                             }
                         }
                         RevMap::iterator spos;
-                        unsigned int i = (unsigned int)lookup.size();
+                        unsigned int i = lookup.size();
                         for( spos = lookup.begin(); spos != lookup.end(); ++spos ){
                             if( i-- > max ){
                                 to_delete.insert( make_pair( stemmed, spos->second ) );

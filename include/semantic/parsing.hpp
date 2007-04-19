@@ -13,11 +13,7 @@
 #include <cctype>
 #include <iostream>
 
-
 namespace semantic {
-
-
-
 
 /* *******************************************************
         TEXT PARSER
@@ -155,15 +151,18 @@ namespace semantic {
     add_word_filter ( class word_filter ) -- add a word-based filter
                                              to the parser
    ************************************************************************ */
+            
             template <class Filter>
             void add_word_filter(Filter f) {
                 word_filters.push_back( WordPtr( new Filter(f) ) );
             }
+            
 
-
+            
             void set_stemming(bool val){
                 enable_stemming = val;
             }
+            
 
         private:
             typedef boost::shared_ptr<word_filter> WordPtr;
@@ -184,27 +183,27 @@ namespace semantic {
                         const std::map<std::string,int>& terms,
                         std::map<std::string,UnstemmedCount>& unstemmed ){
 
-                    stemming::english_stem Stemmer;
-                    std::map<std::string,int> stemmed;
-                    std::map<std::string,int>::const_iterator pos;
-                    for( pos = terms.begin(); pos != terms.end(); ++pos ){
-                        std::string word( pos->first );
-                        std::string original(word);
-                        if( enable_stemming ){
-                            Stemmer(word);
-                        }
-                        if( word.length() > 0 ){
-
-                            // Make lower case
-                            std::string lower(word);
-                            std::transform(word.begin(),word.end(),lower.begin(),tolower);
-
-                            stemmed[lower] += pos->second;
-                            unstemmed[lower][original]++;
-                            unstemmed[lower]["__count"]++;
-                        }
+                stemming::english_stem Stemmer;
+                std::map<std::string,int> stemmed;
+                std::map<std::string,int>::const_iterator pos;
+                for( pos = terms.begin(); pos != terms.end(); ++pos ){
+                    std::string word( pos->first );
+                    std::string original(word);
+                    if( enable_stemming ){
+                        Stemmer(word);
                     }
-                    return stemmed;
+                    if( word.length() > 0 ){
+
+                        // Make lower case
+                        std::string lower(word);
+                        std::transform(word.begin(),word.end(),lower.begin(),tolower);
+
+                        stemmed[lower] += pos->second;
+                        unstemmed[lower][original]++;
+                        unstemmed[lower]["__count"]++;
+                    }
+                }
+                return stemmed;
 
             }
 
