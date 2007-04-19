@@ -39,6 +39,7 @@ SearchWidget::SearchWidget(QString dataFile, QWidget *parent)
 		controller->initializeDataFile(dataFile);
 	}
 	
+	collectionComboBox = new QComboBox();
 	openDataFile(dataFile);
 
 	setupLayout();
@@ -74,9 +75,9 @@ void SearchWidget::openDataFile(QString dataFile){
 }
 
 void SearchWidget::populateCollectionMenu(){
+	
 	QStringList collections = controller->listCollections();
-    collectionComboBox = new QComboBox();
-	collectionComboBox->clear();
+    collectionComboBox->clear();
     for( int i = 0; i < collections.size(); ++i ){
         collectionComboBox->addItem(collections.at(i));
     }
@@ -90,10 +91,7 @@ void SearchWidget::setupLayout(){
 	basket = new BasketWidget;
 	
 	QHBoxLayout *tools = new QHBoxLayout;
-	//QToolBar *tools = new QToolBar;
 	find_similar = new QToolButton;
-//	find_similar->setIcon(QPixmap(":/icons/find.png"));
-//	find_similar->setIconSize(QSize(20,20));
 	find_similar->setMinimumSize(QSize(20,26));
 	find_similar->setText(tr("Find Similar"));
 	find_similar->setToolTip(tr("Find similar results"));
@@ -101,28 +99,19 @@ void SearchWidget::setupLayout(){
 	clear = new QToolButton;
 	clear->setIcon(QPixmap(":/icons/clear.png"));
 	clear->setMinimumSize(QSize(20,26));
-//	clear->setIconSize(QSize(20,20));
 	clear->setToolTip(tr("Clear saved results"));
 	
-	save = new QToolButton;
-	save->setIcon(QPixmap(":/icons/save.png"));
-	save->setIconSize(QSize(20,20));
-	save->setToolTip(tr("Save these results"));
 	
 	// results tools
 	tools->setSpacing(2);
 	tools->setAlignment(Qt::AlignRight);
 	tools->addWidget(clear);
-	//tools->addWidget(save);
 	tools->addWidget(find_similar);
 	tools->setMargin(0);
-	//find_similar = tools->addAction(tr("Find Similar"));
-	//clear = tools->addAction(QIcon(QPixmap(":/icons/clear.png")), tr("Clear"));
 	
 	QVBoxLayout *contents = new QVBoxLayout;
 	contents->addWidget(basket);
 	contents->addLayout(tools);
-	//contents->addWidget(tools);
 	saved->setLayout(contents);
 	
 	// settings 
@@ -194,6 +183,7 @@ void SearchWidget::setupConnections(){
 	connect(queryField, SIGNAL(returnPressed()), search, SLOT(animateClick()));
 	connect(search, SIGNAL(clicked()), this, SLOT(startSearch()));
 	connect(indexer, SIGNAL(collectionListChanged()), this, SLOT(populateCollectionMenu()));
+	connect(indexer, SIGNAL(collectionWindowClosed()), this, SLOT(populateCollectionMenu()));
 	connect(search_area, SIGNAL(displaySingleResultWindow(QString &)),this, SLOT(showResultWindow(QString &)));
 	connect(cluster_area, SIGNAL(displaySingleResultWindow(QString &)),this, SLOT(showResultWindow(QString &)));
 	connect(visualization_area, SIGNAL(displaySingleResultWindow(QString &)), this, SLOT(showResultWindow(QString &)));

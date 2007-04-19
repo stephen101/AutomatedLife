@@ -27,10 +27,10 @@ void CollectionWidget::saveCollectionData(){
 
 void CollectionWidget::renameCollection(QString previous, QString current){
 
-	/* emit */ collectionListChanged();
 
-	// stub for semantic code -- rename the collection!
-	std::cerr << previous.toStdString() << " -> " << current.toStdString() << std::endl;
+	m_graph->rename_collection(previous.toStdString(), current.toStdString());
+	
+	/* emit */ collectionListChanged();
 
 }
 
@@ -43,12 +43,10 @@ void CollectionWidget::removeCollection(){
 										collectionsList->row(
 											collectionsList->selectedItems()[0]));
 		QString collectionTitle = item->data(CollectionWidget::Title).toString();
+		m_graph->remove_collection( collectionTitle.toStdString() );
 
 		/* emit */ collectionListChanged();
 	
-	// semantic stub code:
-	// now actually remove this collection ...
-
 	}							
 }
 
@@ -288,7 +286,6 @@ void CollectionWidget::closeWindow(){
 		}
 	}
 	saveCollectionData();
-	
 	this->hide();
 }
 

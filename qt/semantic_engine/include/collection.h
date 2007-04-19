@@ -43,7 +43,8 @@ class CollectionWidget : public QWidget
 	
 	signals:
 		void collectionListChanged();
-	
+		void collectionWindowClosed();
+		
 	private:
 		Graph *m_graph;
 		void setupCollectionData();
