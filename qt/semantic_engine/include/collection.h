@@ -1,12 +1,7 @@
 #ifndef COLLECTION_H
 #define COLLECTION_H
 
-#include <QWidget>
-#include <QStringList>
-#include <QListWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QToolButton>
+#include <QtGui>
 
 #include "se_graph.h"
 

@@ -1,13 +1,7 @@
 #ifndef CLUSTERS_H
 #define CLUSTERS_H
 
-#include <QPushButton>
-#include <QProgressBar>
-#include <QSpinBox>
-#include <QLabel>
-#include <QTreeWidget>
-#include <QThread>
-#include <QBrush>
+#include <QtGui>
 
 #include "se_graph.h"
 #include "tabbed_display.h"

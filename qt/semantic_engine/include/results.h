@@ -1,21 +1,7 @@
 #ifndef RESULTS_H
 #define RESULTS_H
 
-#include <QWidget>
-#include <QString>
-#include <QLabel>
-#include <QListView>
-#include <QStandardItemModel>
-#include <QAbstractListModel>
-#include <QMap>
-#include <QVariant>
-#include <QStringList>
-#include <QPaintEvent>
-#include <QScrollBar>
-#include <QMessageBox>
-#include <QFile>
-#include <QDrag>
-#include <QThread>
+#include <QtGui>
 
 #include "se_graph.h"
 #include "tabbed_display.h"

@@ -1,13 +1,7 @@
 #ifndef BASKET_H
 #define BASKET_H
 
-#include <QWidget>
-#include <QListView>
-#include <QKeyEvent>
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QListWidget>
-#include <QStringList>
+#include <QtGui>
 
 class BasketWidget : public QListWidget
 {

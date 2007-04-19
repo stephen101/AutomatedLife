@@ -2,12 +2,6 @@
 // local
 #include "visual_display.h"
 
-// Qt
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QLabel>
 
 /**
  * Computing Thread -- handles the computation of LinLog 2D layout in the background,

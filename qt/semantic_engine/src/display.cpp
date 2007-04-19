@@ -1,33 +1,9 @@
 
-
-#include <QWidget>
-#include <QGroupBox>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QFont>
-#include <QPixmap>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QTabWidget>
-#include <QGridLayout>
-#include <QToolButton>
-#include <QFileDialog>
-#include <QShortcut>
-
 #include <iostream>
 #include <semantic/search.hpp>
 
 #include "display.h"
-#include "results.h"
-#include "basket.h"
-#include "collection.h"
-#include "clusters.h"
-#include "single_result.h"
-#include "graph_controller.h"
 #include "locate_datafile.h"
-#include "se_graph.h"
 
 
 

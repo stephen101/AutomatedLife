@@ -1,15 +1,5 @@
 #include "single_result.h"
 
-// Qt
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <QSize>
-#include <QMenu>
-#include <QAction>
-#include <QMenuBar>
-#include <QApplication>
-#include <QShortcut>
-
 
 SingleResultWindow::SingleResultWindow(QString &content, QString &title, QWidget *parent) : QWidget(parent) {
 	

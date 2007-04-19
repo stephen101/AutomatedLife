@@ -2,7 +2,7 @@
 #define _VISUAL_GL_DISPLAY_H_
 
 // Qt
-#include <QWidget>
+#include <QtGui>
 #include <QtOpenGL>
 
 // local

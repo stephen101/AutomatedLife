@@ -1,23 +1,5 @@
-#include <QLabel>
-#include <QFont>
-#include <QWidget>
-#include <QString>
-#include <QVBoxLayout>
-#include <QGridLayout>
-#include <QColor>
-#include <QAbstractListModel>
-#include <QPoint>
-#include <QModelIndex>
-#include <QDragEnterEvent>
-#include <QPen>
-#include <QPainter>
-#include <QStylePainter>
-#include <QUrl>
-#include <QDesktopServices>
-
 
 #include "results.h"
-#include "se_graph.h"
 
 #include <iostream>
 #include <string>

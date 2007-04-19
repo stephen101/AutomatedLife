@@ -1,13 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <QWidget>
-#include <QLineEdit>
-#include <QLabel>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QToolButton>
-#include <QAction>
+#include <QtGui>
 
 #include "results.h"
 #include "collection.h"

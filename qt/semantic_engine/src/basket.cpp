@@ -1,14 +1,4 @@
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QToolButton>
-
-#include <QLabel>
-#include <QGroupBox>
-#include <QListView>
-#include <QStringList>
-#include <QStringListModel>
 
 #include "basket.h"
 

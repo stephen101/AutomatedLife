@@ -10,10 +10,7 @@
 #include <semantic/analysis/linlog.hpp>
 
 // Qt
-#include <QThread>
-#include <QWidget>
-#include <QPushButton>
-#include <QButtonGroup>
+#include <QtGui>
 
 
 class VisualDisplayComputeThread : public QThread {

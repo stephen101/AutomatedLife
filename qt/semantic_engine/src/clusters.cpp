@@ -1,15 +1,3 @@
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QTreeWidget>
-#include <QProgressBar>
-#include <QSpacerItem>
-#include <QSpinBox>
-#include <QLabel>
-#include <QDrag>
-#include <QMimeData>
-#include <QFile>
-#include <QDesktopServices>
-#include <QUrl>
 #include <iostream>
 
 // semantic
@@ -19,7 +7,6 @@
 
 #include "clusters.h"
 #include "single_result.h"
-#include "se_graph.h"
 
 
 

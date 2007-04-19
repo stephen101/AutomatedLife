@@ -1,7 +1,7 @@
 #ifndef TABBED_DISPLAY_H
 #define TABBED_DISPLAY_H
 
-#include <QLabel>
+#include <QtGui>
 
 class SearchStatus : public QLabel
 {

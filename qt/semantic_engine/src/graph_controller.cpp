@@ -1,9 +1,6 @@
-#include <QFile>
-#include <QDebug>
-#include <QMessageBox>
+#include <QtGui>
 
 #include "graph_controller.h"
-#include "se_graph.h"
 #include "locate_datafile.h"
 #include <iostream>
 

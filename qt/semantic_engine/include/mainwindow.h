@@ -1,10 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QMenu>
-#include <QCloseEvent>
-#include <QAction>
+#include <QtGui>
+
 #include "display.h"
 
 class MainWindow : public QMainWindow

@@ -1,13 +1,3 @@
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QListWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QToolButton>
-#include <QFileDialog>
-#include <QMessageBox>
 
 #include <iostream>
 #include <iterator>

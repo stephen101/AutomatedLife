@@ -1,7 +1,7 @@
 #ifndef GRAPH_CONTROLLER_H
 #define GRAPH_CONTROLLER_H
 
-#include <QWidget>
+#include <QtGui>
 
 #include "se_graph.h"
 

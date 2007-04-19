@@ -1,7 +1,5 @@
-#include <QtGui>
 #include <iostream>
 
-#include "display.h"
 #include "mainwindow.h"
 #include "locate_datafile.h"
 #include <semantic/version.hpp>

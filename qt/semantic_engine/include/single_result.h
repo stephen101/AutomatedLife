@@ -1,9 +1,7 @@
 #ifndef SINGLE_RESULT_H
 #define SINGLE_RESULT_H
 
-#include <QString>
-#include <QWidget>
-#include <QTextEdit>
+#include <QtGui>
 
 class SingleResultWindow : public QWidget {
 	
