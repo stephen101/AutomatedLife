@@ -141,12 +141,17 @@ EXTRA_DIST = $(top_srcdir)/bootstrap \
 			 $(top_srcdir)/sql/sqlite3/termlist.sql \
 			 $(top_srcdir)/sql/sqlite3/triggers.sql \
 			 $(top_srcdir)/doc/html/examples.html \
-			 $(top_srcdir)/doc/html/filtering.html \
-			 $(top_srcdir)/doc/html/indexing.html \
-			 $(top_srcdir)/doc/html/weights.html \
+			 $(top_srcdir)/doc/html/filter.html \
 			 $(top_srcdir)/doc/html/index.html \
+			 $(top_srcdir)/doc/html/indexing.html \
 			 $(top_srcdir)/doc/html/installation.html \
-			 $(top_srcdir)/doc/html/usage.html
+			 $(top_srcdir)/doc/html/perl.html \
+			 $(top_srcdir)/doc/html/semantic.html \
+			 $(top_srcdir)/doc/html/spreading_activation.html \
+			 $(top_srcdir)/doc/html/tools.html \
+			 $(top_srcdir)/doc/html/usage.html \
+			 $(top_srcdir)/doc/html/utility.html \
+			 $(top_srcdir)/doc/html/weighting.html
 
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

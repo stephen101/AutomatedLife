@@ -1,5 +1,5 @@
-@p maximum_input_line_length = 500
-@p maximum_output_line_length = 500
+@p maximum_input_line_length = 100
+@p maximum_output_line_length = 100
 @t vskip 40 mm
 @t title titlefont centre "Semantic Engine C++ API"
 @t title smalltitlefont centre "Utility Functions"
@@ -128,14 +128,20 @@ namespace detail {
 } // namespace detail
 
 template <class I>
-boost::transform_iterator<detail::extract_first<typename I::value_type>, I> extract_first_iterator(I it) {
-    return boost::transform_iterator<detail::extract_first<typename I::value_type>, I>(it, detail::extract_first<typename I::value_type>());
+boost::transform_iterator<detail::extract_first<typename I::value_type>, I>
+extract_first_iterator(I it) {
+    return boost::transform_iterator<detail::extract_first<typename I::value_type>, I>(
+                    it, detail::extract_first<typename I::value_type>()
+                );
 }
 #define extract_keys(x) ( extract_first_iterator(x) )
 
 template <class I>
-boost::transform_iterator<detail::extract_second<typename I::value_type>, I> extract_second_iterator(I it) {
-    return boost::transform_iterator<detail::extract_second<typename I::value_type>, I>(it, detail::extract_second<typename I::value_type>());
+boost::transform_iterator<detail::extract_second<typename I::value_type>, I>
+extract_second_iterator(I it) {
+    return boost::transform_iterator<detail::extract_second<typename I::value_type>, I>(
+                    it, detail::extract_second<typename I::value_type>()
+                );
 }
 #define extract_values(x) ( extract_second_iterator(x) )
 @}

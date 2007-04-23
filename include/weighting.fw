@@ -1,5 +1,5 @@
-@p maximum_input_line_length = 500
-@p maximum_output_line_length = 500
+@p maximum_input_line_length = 100
+@p maximum_output_line_length = 100
 @t vskip 40 mm
 @t title titlefont centre "Semantic Engine C++ API"
 @t title smalltitlefont centre "Weighting Algorithms"
@@ -87,7 +87,9 @@ degree of the target node, but only those edges pointing at nodes of the same ty
 as the source node.
 
 @$@<IDF in graph@>==@{put(w, *ei, log(1+count/(g[*ei].to_degree)));@}
-@$@<IDF not in graph@>==@{put(w, g.get_vertex_id((*ei).second), log(1+count/((*ei).first.to_degree)));@}
+@$@<IDF not in graph@>==@{
+    put(w, g.get_vertex_id((*ei).second), log(1+count/((*ei).first.to_degree)));
+@}
 
 Since we need to get the node counts from the graph, we need this code:
 
@@ -204,7 +206,9 @@ namespace semantic {
 
                 iterator ei;
                 for(ei = nlist.begin(); ei != nlist.end(); ++ei) {
-                    typename se_graph_traits<typename Graph::storage_policy_type>::vertex_id_type id = g.get_vertex_id((*ei).second);
+                    typename se_graph_traits<
+                                    typename Graph::storage_policy_type
+                                >::vertex_id_type id = g.get_vertex_id((*ei).second);
                     put(w, id, get(lmap, id) * get(gmap, id));
                 }
             }
@@ -226,7 +230,9 @@ namespace semantic {
                 global.apply_weights(u, g, gmap);
 
                 iterator ei, ei_end;
-                for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) put(w, *ei, lw[*ei] * gw[*ei]);
+                for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei){
+                    put(w, *ei, lw[*ei] * gw[*ei]);
+                }
             }
 
         private:

@@ -23,7 +23,8 @@ namespace semantic {
                 typename property_traits<RankMap>::value_type energy,
                 std::set<typename se_graph_traits<Graph>::edge_descriptor> &seen)
         {
-            if (energy_hits == 0) return; // don't even go there! *snap* -- only if we won't be modifying anything
+            if (energy_hits == 0) return;
+            // don't even go there! *snap* -- only if we won't be modifying anything
             
             typename property_traits<RankMap>::value_type total = 0;
             BGL_FORALL_OUTEDGES_T(u, e, g, Graph) total += get(w, e);
@@ -34,7 +35,8 @@ namespace semantic {
                 if (!seen.count(*ei)) {
                     seen.insert(*ei);
                     // we haven't seen this vertex yet, spider it!
-                    activation_spider(g, target(*ei, g), w, r, g[*ei].energy_hits, energy * (get(w, *ei) / total), seen);
+                    activation_spider(g, target(*ei, g), w, r,
+                                      g[*ei].energy_hits, energy * (get(w, *ei) / total), seen);
                 }
             }
         }
@@ -57,13 +59,16 @@ namespace semantic {
         std::map<id_type, typename se_graph_traits<Graph>::vertex_descriptor> vertex_map;
     
         // get those vertex descriptors from the graph
-        g.vertices_by_id(extract_first_iterator(n.begin()), extract_first_iterator(n.end()), inserter(vertex_map, vertex_map.end()));
+        g.vertices_by_id(extract_first_iterator(n.begin()),
+                         extract_first_iterator(n.end()),
+                         inserter(vertex_map, vertex_map.end()));
     
         
         for(typename NodeMap::iterator i = n.begin(); i != n.end(); ++i) {
             // id is i->first, starting energy is i->second
             id_type id = (*i).first;
-            detail::activation_spider(g, vertex_map[id], w, r, get_property(g, graph_energy_hits), (*i).second, seen);
+            detail::activation_spider(g, vertex_map[id], w, r,
+                                      get_property(g, graph_energy_hits), (*i).second, seen);
         }
     }
 } // namespace semantic

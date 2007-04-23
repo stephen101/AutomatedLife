@@ -39,6 +39,7 @@ class SearchWidget : public QWidget
 		void startSearch();
 		void populateSearchResults();
 		void newSearch(QString &);
+		void changeCollection(const QString &);
 		
 	private:
 		search<Graph> *m_searchEngine;

@@ -47,16 +47,30 @@ namespace semantic {
             }
             
             typename storage_traits::vertex_properties_type &
-            operator [] (typename se_traits::vertex_descriptor v) { return (get(vertex_bundle, *this))[v]; }
+            operator [] (typename se_traits::vertex_descriptor v) {
+                return (get(vertex_bundle, *this))[v];
+            }
             const typename storage_traits::vertex_properties_type &
-            operator [] (typename se_traits::vertex_descriptor v) const { return (get(vertex_bundle, *this))[v]; }
+            operator [] (typename se_traits::vertex_descriptor v) const {
+                return (get(vertex_bundle, *this))[v];
+            }
             typename storage_traits::edge_properties_type &
-            operator [] (typename se_traits::edge_descriptor e) { return (get(edge_bundle, *this))[e]; }
+            operator [] (typename se_traits::edge_descriptor e) {
+                return (get(edge_bundle, *this))[e];
+            }
             const typename storage_traits::edge_properties_type &
-            operator [] (typename se_traits::edge_descriptor e) const { return (get(edge_bundle, *this))[e]; }
+            operator [] (typename se_traits::edge_descriptor e) const {
+                return (get(edge_bundle, *this))[e];
+            }
             
             std::string collection() const {
                 return get_property(*this, graph_name);
+            }
+            
+            void set_collection(string name){
+                clear();
+                set_property(*this, graph_name, name);
+                set_property(*this, graph_energy_hits, 1);
             }
             
             template <class WeightingPolicy, class WeightMap>
@@ -67,7 +81,10 @@ namespace semantic {
             
                 // make sure we were passed the right kind of WeightMap
                 function_requires< WritablePropertyMapConcept<WeightMap, Edge> >();
-                BOOST_STATIC_ASSERT((boost::is_same<typename boost::property_traits<WeightMap>::value_type, weight_type>::value));
+                BOOST_STATIC_ASSERT((
+                    boost::is_same<typename boost::property_traits<WeightMap>::value_type,
+                    weight_type>::value
+                ));
             
                 // go through all the vertices and apply our weighting algorithm
                 iterator vi, vi_end;
@@ -132,11 +149,14 @@ namespace boost {
     
     template <class StoragePolicySelector, class SEBase>
     inline typename se_graph_traits<StoragePolicySelector>::vertex_descriptor
-    add_vertex(const typename se_storage_traits<StoragePolicySelector>::vertex_properties_type &p, SEGraph<StoragePolicySelector, SEBase> &g)
+    add_vertex(const typename se_storage_traits<StoragePolicySelector>::vertex_properties_type &p,
+               SEGraph<StoragePolicySelector, SEBase> &g)
     {
         typedef typename se_graph_traits<StoragePolicySelector>::base_graph_type base_type;
         typedef typename graph_traits<base_type>::vertex_descriptor Vertex;
-        typedef typename se_storage_traits<StoragePolicySelector>::vertex_properties_type vertex_properties_type;
+        typedef typename se_storage_traits<
+                              StoragePolicySelector
+                            >::vertex_properties_type vertex_properties_type;
     
         base_type& base_g = static_cast<base_type&>(g);
     
@@ -492,7 +512,9 @@ namespace boost {
 
 template<class S, class B>
 std::ostream & operator<<(std::ostream &o, const SEGraph<S,B> &g) {
-    o << "graph: " << get_property(g, graph_name) << " (v:" << num_vertices(g) << " e:" << num_edges(g) << ")" << std::endl;
+    o << "graph: " << get_property(g, graph_name)
+                   << " (v:" << num_vertices(g) << " e:"
+                   << num_edges(g) << ")" << std::endl;
     typename se_graph_traits<S>::vertex_iterator vi, vi_end;
     for(boost::tie(vi, vi_end) = vertices(g); vi != vi_end; ++vi) {
         typename se_graph_traits<S>::adjacency_iterator ai, ai_end;

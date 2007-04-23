@@ -9,13 +9,13 @@ INCLUDEPATH += . ./include ../../include
 RESOURCES = resources.qrc
 QT += opengl
 debug {
-	message("Building Debug")
-	TARGET = SemanticEngine-debug
+    message("Building Debug")
+    TARGET = SemanticEngine-debug
 }
 !debug {
-	message("Building Release")
-	TARGET = SemanticEngine
-	CONFIG += no_warn
+    message("Building Release")
+    TARGET = SemanticEngine
+    CONFIG += no_warn
 }
 
 # Input

@@ -91,14 +91,20 @@ namespace semantic {
     } // namespace detail
     
     template <class I>
-    boost::transform_iterator<detail::extract_first<typename I::value_type>, I> extract_first_iterator(I it) {
-        return boost::transform_iterator<detail::extract_first<typename I::value_type>, I>(it, detail::extract_first<typename I::value_type>());
+    boost::transform_iterator<detail::extract_first<typename I::value_type>, I>
+    extract_first_iterator(I it) {
+        return boost::transform_iterator<detail::extract_first<typename I::value_type>, I>(
+                        it, detail::extract_first<typename I::value_type>()
+                    );
     }
     #define extract_keys(x) ( extract_first_iterator(x) )
     
     template <class I>
-    boost::transform_iterator<detail::extract_second<typename I::value_type>, I> extract_second_iterator(I it) {
-        return boost::transform_iterator<detail::extract_second<typename I::value_type>, I>(it, detail::extract_second<typename I::value_type>());
+    boost::transform_iterator<detail::extract_second<typename I::value_type>, I>
+    extract_second_iterator(I it) {
+        return boost::transform_iterator<detail::extract_second<typename I::value_type>, I>(
+                        it, detail::extract_second<typename I::value_type>()
+                    );
     }
     #define extract_values(x) ( extract_second_iterator(x) )
     

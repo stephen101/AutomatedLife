@@ -158,7 +158,7 @@ void SearchWidget::setupConnections(){
 	connect(clear,SIGNAL(clicked()), basket, SLOT(clearAll()));
 	connect(queryField, SIGNAL(returnPressed()), search, SLOT(animateClick()));
 	connect(search, SIGNAL(clicked()), this, SLOT(startSearch()));
-	connect(indexer, SIGNAL(collectionListChanged()), this, SLOT(populateCollectionMenu()));
+	connect(indexer, SIGNAL(collectionTitleChanged()), this, SLOT(populateCollectionMenu()));
 	connect(indexer, SIGNAL(collectionWindowClosed()), this, SLOT(populateCollectionMenu()));
 	connect(search_area, SIGNAL(displaySingleResultWindow(QString &)),this, SLOT(showResultWindow(QString &)));
 	connect(cluster_area, SIGNAL(displaySingleResultWindow(QString &)),this, SLOT(showResultWindow(QString &)));
@@ -166,7 +166,13 @@ void SearchWidget::setupConnections(){
 	connect(visualization_area, SIGNAL(doSearch(QString &)), this, SLOT(newSearch(QString &)));
 	connect(search_area, SIGNAL(searchFinished()), this, SLOT(populateSearchResults()) );
 	connect(find_similar, SIGNAL(clicked()), this, SLOT(findSimilar()));
+	connect(collectionComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(changeCollection(const QString &)));
 }
+
+void SearchWidget::changeCollection(const QString &collection){
+	m_graph->set_collection(collection.toStdString());
+}
+
 
 
 void SearchWidget::newSearch(QString &query){

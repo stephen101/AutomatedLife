@@ -5,5 +5,7 @@
     <file>icons/find.png</file>
     <file>icons/clear.png</file>
 	<file>icons/wrench.png</file>
+	<file>data/lexicon.txt</file>
+	<file>data/stoplist_en.txt</file>
 </qresource>
 </RCC>

@@ -2,8 +2,39 @@
 #define COLLECTION_H
 
 #include <QtGui>
+#include <semantic/indexing.hpp>
+#include <semantic/file_finder.hpp>
 
 #include "se_graph.h"
+
+class IndexingThread : public QThread {
+    Q_OBJECT
+    
+    public:
+        IndexingThread(Graph *, QStringList, QObject * = 0);
+        
+    protected:
+        void run();
+        
+    signals:
+		void status(QString);
+        void progress(int,int);
+        void finishedIndexing();
+        void startedIndexing();
+        
+    public slots:
+        void safeTerminate();
+        
+    private:
+		std::set<std::string> load_stoplist(const std::string &);
+		bool				 try_loading_stoplist(const std::string &, std::set<string> &);
+        Graph                *m_graph;
+		QStringList			 m_directories;
+        bool                 m_safeTerminate;
+}; // class ClusteringThread
+
+
+
 
 class CollectionWidget : public QWidget
 {
@@ -23,38 +54,49 @@ class CollectionWidget : public QWidget
 		
 		QStringList getCollectionList();
 		void setWindowFlags(Qt::WindowFlags);
+		void indexFiles();
 	
 	
 	protected slots:
-		void getCollectionData();
+		void updateStatus(QString);
+		void updateProgress(int,int);
 		void startEditItem(QListWidgetItem *);
 		void endEditItem(QListWidgetItem *, QListWidgetItem *);
 		void endEditItem(QListWidgetItem *);
-		void addCollection();
 		void closeWindow();
 		void getFilePaths();
 		void removeFiles();
 		void removeCollection();
+		void startIndexing();
+		void finishIndexing();
+		void escCloseWindow();
 	
 	signals:
-		void collectionListChanged();
+		void collectionTitleChanged();
 		void collectionWindowClosed();
 		
 	private:
+		QShortcut *closeShortcut;
 		Graph *m_graph;
 		void setupCollectionData();
 		void setupLayout();
 		void setupConnections();
-		void renameCollection(QString, QString);
+		void renameCollection(QString);
 		void saveCollectionData();
 		
 		QString m_dataFile;
 		bool editOpen;
+		bool isIndexing;
 		QStringList directoryList;
 		QString editPrevTitle;
 		QSet<QString> collectionTitles;
+		QMap<CollectionWidget::Roles,QVariant> collectionData;
+		QProgressBar *indexingProgress;
+		QListWidget *indexingStatus;
+		
+		IndexingThread *m_indexingThread;
 		QListWidget *collectionsList;
-				
+		QLineEdit *collectionTitle;		
 		QLabel *documentCount;
 		QLabel *termCount;
 		QLabel *parserType;

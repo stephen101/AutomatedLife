@@ -228,10 +228,10 @@ namespace semantic {
                     std::vector<std::string> tags = phrase.second;
 
                     // erase any noun phrases that have lower case nouns and adjectives
-                    for( std::vector<std::string>::size_type i = words.size() - 1;
-                             i >= 0; --i ){
-                        std::string t = simplify_tag(tags[i]);
-                        if( ( t == "N" || t == "M" ) && is_lower(words[i]) ){
+                    for( std::vector<std::string>::size_type i = words.size();
+                             i > 0; --i ){
+                        std::string t = simplify_tag(tags[i-1]);
+                        if( ( t == "N" || t == "M" ) && is_lower(words[i-1]) ){
                             to_erase.insert(pos->first);
                             i = 0; // short circuit
                         }
