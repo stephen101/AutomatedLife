@@ -40,8 +40,10 @@ class SearchWidget : public QWidget
 		void populateSearchResults();
 		void newSearch(QString &);
 		void changeCollection(const QString &);
+		void reloadWordlist();
 		
 	private:
+		
 		search<Graph> *m_searchEngine;
 		Graph *m_graph;
 		void setupLayout();

@@ -66,7 +66,12 @@ namespace semantic {
 			}
 		}
 		
-		// @TODO unstem should be stored and then processed during get_top_terms or something.
+		void reset_wordlist(){
+			wordlist.clear();
+			if( stemming ){
+				wordlist = unserialize_wordlist();
+			}
+		}
 		
 		std::string unstem_word(const std::string &word){
 			if( wordlist.size() == 0 ){

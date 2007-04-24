@@ -26,8 +26,6 @@ class IndexingThread : public QThread {
         void safeTerminate();
         
     private:
-		std::set<std::string> load_stoplist(const std::string &);
-		bool				 try_loading_stoplist(const std::string &, std::set<string> &);
         Graph                *m_graph;
 		QStringList			 m_directories;
         bool                 m_safeTerminate;
@@ -60,13 +58,9 @@ class CollectionWidget : public QWidget
 	protected slots:
 		void updateStatus(QString);
 		void updateProgress(int,int);
-		void startEditItem(QListWidgetItem *);
-		void endEditItem(QListWidgetItem *, QListWidgetItem *);
-		void endEditItem(QListWidgetItem *);
 		void closeWindow();
 		void getFilePaths();
 		void removeFiles();
-		void removeCollection();
 		void startIndexing();
 		void finishIndexing();
 		void escCloseWindow();
@@ -74,36 +68,33 @@ class CollectionWidget : public QWidget
 	signals:
 		void collectionTitleChanged();
 		void collectionWindowClosed();
+		void indexingCompleted();
 		
 	private:
 		QShortcut *closeShortcut;
 		Graph *m_graph;
-		void setupCollectionData();
+		void getCollectionData();
 		void setupLayout();
 		void setupConnections();
 		void renameCollection(QString);
 		void saveCollectionData();
 		
-		QString m_dataFile;
-		bool editOpen;
 		bool isIndexing;
-		QStringList directoryList;
-		QString editPrevTitle;
-		QSet<QString> collectionTitles;
 		QMap<CollectionWidget::Roles,QVariant> collectionData;
 		QProgressBar *indexingProgress;
 		QListWidget *indexingStatus;
+		QLabel *indexingLabel;
+		
+		QGroupBox *collectionBox;
+		QGroupBox *directoriesBox;
 		
 		IndexingThread *m_indexingThread;
-		QListWidget *collectionsList;
 		QLineEdit *collectionTitle;		
 		QLabel *documentCount;
 		QLabel *termCount;
 		QLabel *parserType;
 		QListWidget *directoryListWidget;
 		QPushButton *closeButton;
-		QToolButton *addCollectionButton;
-		QToolButton *removeCollectionButton;
 		QToolButton *addDocumentsButton;
 		QToolButton *removeDocumentsButton;
 		QPushButton *indexButton;

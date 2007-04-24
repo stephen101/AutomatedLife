@@ -45,7 +45,7 @@ void SearchResults::displayItem(const QModelIndex &index){
 	QString title = index.data(ResultsModel::TitleRole).toString();
 	
 	if( QFile::exists( title ) ){
-		QDesktopServices::openUrl(QUrl(title));
+		QDesktopServices::openUrl(QUrl::fromLocalFile(title));
 	} else {
 		/* emit */ displaySingleResultWindow(title);
 	}

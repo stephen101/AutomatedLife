@@ -14,36 +14,17 @@ IndexingThread::IndexingThread(Graph *g, QStringList dirs, QObject *parent)
 		m_safeTerminate = false;
 }
 
-std::set<std::string> IndexingThread::load_stoplist(const std::string &filename){
-    std::set<std::string> stoplist;
-    if (try_loading_stoplist(STOPLIST_INSTALL_LOCATION, stoplist)) return stoplist;
-    if (try_loading_stoplist(filename, stoplist)) return stoplist;
-    
-    std::cerr << "Could not load stop list from either '" << filename << "' or '" << STOPLIST_INSTALL_LOCATION << "'!" << std::endl;
-	return stoplist;
-}
 
-bool IndexingThread::try_loading_stoplist(const std::string &filename, std::set<string> &stoplist) {
-    std::ifstream file;
-    file.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-    if (file) {
-        std::string line;
-        while( std::getline( file, line ) ){
-    		stoplist.insert( line );
-    	}
-    	file.clear();
-    	file.close();
-    	return true;
-    }
-    return false;
-}
 
 
 void IndexingThread::run(){
 	/* emit */ startedIndexing();
 	/* emit */ status(QString(tr("Collecting files")));
+	
+	
 	std::vector<std::string> filenames;
 	for( int i = 0; i < m_directories.count(); ++i ){
+		std::cerr << m_directories.at(i).toStdString() << std::endl;
 		file_finder f(m_directories.at(i).toStdString());
 		f.add_file_ext("html");
 		f.add_file_ext("htm");
@@ -53,21 +34,60 @@ void IndexingThread::run(){
 		f.add_file_ext("txt");
 		std::vector<std::string> files = f.get_filenames();
 		for( unsigned j = 0; j < files.size(); ++j ){
+			std::cerr << files[j] << std::endl;
 			filenames.push_back(files[j]);
 		}
 	}
+	std::cerr << filenames.size() << " files" << std::endl;
 	if( filenames.size() == 0 ){
 		/* emit */ finishedIndexing();
 		return;
 	}
 	int i = 0;
 	/* emit */ progress(i, filenames.size());
-	/* emit */ status(QString(tr("Loading indexer")));
-	text_indexer<Graph> indexer(*m_graph, ":data/lexicon.txt" );
- 	std::set<std::string> blacklist = load_stoplist(":data/stoplist_en.txt");
+	QString indexingMessage = tr("Indexing ") + QVariant((int)filenames.size()).toString() + " files";
+	/* emit */ status(indexingMessage);
 	
+	QFile blacklistFile(":data/stoplist_en.txt");
+	blacklistFile.open(QIODevice::ReadOnly);
+	QTextStream blacklistStream(&blacklistFile);
+	QFile lexiconFile(":data/lexicon.txt");
+	lexiconFile.open(QIODevice::ReadOnly);
+	QTextStream lexiconStream(&lexiconFile);
+	
+	// blacklist
+	std::set<std::string> blacklist;
+	while(true) {
+		QString str = blacklistStream.readLine();
+		if (str.isNull()) break;
+		blacklist.insert(str.toStdString());
+	}
+	
+	// lexicon
+	std::string lexicon;
+	while(true) {
+		QString str = lexiconStream.readLine();
+		if (str.isNull()) break;
+		lexicon += str.toStdString() + "\n";
+	}
+	// turn the lexicon into a stringstream for reading by the indexer/parser
+	std::stringstream lexiconStrStream(lexicon, std::ios_base::in);
+	
+	
+	m_graph->set_mirror_changes_to_storage(true);
+	m_graph->set_meta_value("locations", m_directories.join(", ").toStdString());
+	m_graph->set_meta_value("max_phrase_length", "3");
+	m_graph->set_meta_value("parser", "nouns");
+	m_graph->set_meta_value("min", "3"); // collection_minimum
+	m_graph->set_mirror_changes_to_storage(false);
+	m_graph->set_mirror_changes_to_storage(true);
+	
+	
+	semantic::text_indexer<Graph> indexer(*m_graph, lexiconStrStream );
 	std::string max = m_graph->get_meta_value("max_phrase_length","3");
 	std::string parser = m_graph->get_meta_value("parser", "nouns");
+	
+	indexer.store_text(false);
 	indexer.add_word_filter(blacklist_filter(blacklist));
  	indexer.add_word_filter(too_many_numbers_filter(1));
  	indexer.add_word_filter(minimum_length_filter(3));
@@ -86,7 +106,7 @@ void IndexingThread::run(){
 		}
 		try {
 			QString statusMessage = QString(tr("Indexing ")) + QString::fromStdString(this_file);
-			/* emit */ status( statusMessage );
+			/* emit */ //status( statusMessage );
 			indexer.index( this_file );
 			
 		} catch (std::exception &e){
@@ -98,8 +118,41 @@ void IndexingThread::run(){
 		/* emit */ progress(++i, filenames.size());
 	}
 	/* emit */ status( QString(tr("Storing Graph")));
-	indexer.finish();
+	try {
+		indexer.finish();
+		m_graph->set_mirror_changes_to_storage(false);
+		
+	} catch ( std::exception &e ){
+		std::cerr << "Error " << e.what() << std::endl;
+	}
 	
+	/* emit */ status(QString(tr("Storing text")));
+	file_reader reader;
+
+    reader.set_pdfLayout( "layout" );
+	i = 0;
+	for( pos = filenames.begin(); pos != filenames.end(); ++pos ){
+
+
+        std::string text = reader( *pos );
+        
+		GraphTraits::vertex_descriptor u;
+    	try {
+        	u = m_graph->vertex_by_id(
+	                m_graph->fetch_vertex_id_by_content_and_type(
+	                    *pos, node_type_major_doc));
+	        // attach the text
+	        m_graph->set_vertex_meta_value(u, "body", text);
+	    } catch ( std::exception &e){
+	        //std::cerr << "Error: " << e.what() << std::endl;
+	        continue;
+	    }
+		/* emit */ progress(++i, filenames.size());
+	
+    }
+	
+	
+	/* emit */ status( QString(tr("Done")));
 	/* emit */ finishedIndexing();
 	
 }
@@ -111,18 +164,27 @@ void IndexingThread::safeTerminate(){
 
 
 void CollectionWidget::startIndexing(){
-	// hide certain parts of the widget!
-	// clear and then show indexing output 
-	// extract dirList from QListWidget
-	
-	QStringList dirList;
+	//dataLayout->setEnabled(false);
 	indexingStatus->clear();
-	m_indexingThread = new IndexingThread(m_graph, dirList);
+	indexingLabel->setVisible(true);
+	indexingStatus->setVisible(true);
+	indexingProgress->setVisible(true);
+	directoriesBox->setVisible(false);
+	collectionBox->setVisible(false);
+	
+	isIndexing = true;
+	closeButton->setEnabled(false);
+	indexButton->setEnabled(false);
+	QStringList directoryList;
+	for( int i = 0; i < directoryListWidget->count(); ++i ){
+		QListWidgetItem *item = directoryListWidget->item(i);
+		directoryList << item->text();
+	}
+	m_indexingThread = new IndexingThread(m_graph, directoryList);
     connect(m_indexingThread, SIGNAL(finishedIndexing()), this, SLOT(finishIndexing()));
     connect(m_indexingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress(int, int)));
 	connect(m_indexingThread, SIGNAL(status(QString)), this, SLOT(updateStatus(QString)));
 	m_indexingThread->start();
-	isIndexing = true;
 	
 }
 
@@ -133,13 +195,27 @@ void CollectionWidget::updateProgress(int s, int total){
 
 void CollectionWidget::updateStatus(QString message){
 	indexingStatus->addItem(message);
+	indexingStatus->scrollToBottom();
 	std::cerr << message.toStdString() << std::endl;
 }
 
 void CollectionWidget::finishIndexing(){
-	// hide indexing output
-	// show standard widget parts
+	indexingLabel->setVisible(false);
+	indexingStatus->setVisible(false);
+	indexingProgress->setVisible(false);
+	directoriesBox->setVisible(true);
+	collectionBox->setVisible(true);
+	closeButton->setEnabled(true);
+	indexButton->setEnabled(true);
+	collectionTitle->setFocus();
+	
 	isIndexing = false;
+	getCollectionData();
+	documentCount->setText(collectionData[CollectionWidget::DocumentCount].toString());
+	termCount->setText(collectionData[CollectionWidget::TermCount].toString());
+	parserType->setText(collectionData[CollectionWidget::Parser].toString());
+	/* emit */ indexingCompleted();
+	
 }
 
 
@@ -148,7 +224,7 @@ CollectionWidget::CollectionWidget(Graph *g, QWidget *parent)
 {
 	setWindowTitle(tr("Manage Document Collections"));
 	setMinimumSize(200,200);
-	setupCollectionData();
+	getCollectionData();
 	
 	setupLayout();
 	setupConnections();
@@ -170,23 +246,9 @@ void CollectionWidget::renameCollection(QString newName){
 	}
 }
 
-void CollectionWidget::removeCollection(){
-	int ret = QMessageBox::question(this, tr("Remove Collection"), 
-								tr("Are you sure that you want to remove this collection?"),
-								QMessageBox::Yes, QMessageBox::Cancel);
-	if( ret == QMessageBox::Yes ){
-		QListWidgetItem *item = collectionsList->takeItem(
-										collectionsList->row(
-											collectionsList->selectedItems()[0]));
-		QString collectionTitle = item->data(CollectionWidget::Title).toString();
-		m_graph->remove_collection( collectionTitle.toStdString() );
-
-		/* emit */ collectionTitleChanged();
-	}							
-}
 
 
-void CollectionWidget::setupCollectionData(){
+void CollectionWidget::getCollectionData(){
 	
 	collectionData.clear();
 	collectionData.insert(CollectionWidget::DocumentCount, (double)m_graph->get_vertex_count_of_type(node_type_major_doc));
@@ -211,21 +273,23 @@ void CollectionWidget::setWindowFlags(Qt::WindowFlags flags){
 void CollectionWidget::setupLayout(){
 	
 	isIndexing = false;
-	editOpen = false;
 	closeShortcut = new QShortcut(QKeySequence(tr("Esc", "Close")), this);
 	
 	// indexing
 	indexingProgress = new QProgressBar;
 	indexingStatus = new QListWidget;
-	QHBoxLayout *indexingLayout = new QHBoxLayout;
-	indexingLayout->setAlignment(Qt::AlignTop);
+	indexingLabel = new QLabel(tr("Indexing Document Collection"));
+	QVBoxLayout *indexingLayout = new QVBoxLayout;
+	indexingLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+	indexingLayout->addWidget(indexingLabel);
 	indexingLayout->addWidget(indexingStatus);
 	indexingLayout->addWidget(indexingProgress);
-	
-	
+	indexingStatus->setVisible(false);
+	indexingProgress->setVisible(false);
+	indexingLabel->setVisible(false);
 	
 	// collections
-	QGroupBox *collectionBox = new QGroupBox(tr("Collection Settings"));
+	collectionBox = new QGroupBox(tr("Collection Settings"));
 	collectionTitle = new QLineEdit(QString::fromStdString(m_graph->collection()));
 
 	
@@ -258,8 +322,8 @@ void CollectionWidget::setupLayout(){
 	
 
 	// directories
-	QGroupBox *directoriesBox = new QGroupBox(tr("Directory Locations"));
-	directoriesBox->setToolTip(tr("The directories included in this collection"));
+	directoriesBox = new QGroupBox(tr("Document Locations"));
+	directoriesBox->setToolTip(tr("The document locations included in this collection"));
 	
 	QHBoxLayout *directoryToolsLayout = new QHBoxLayout;
 	directoryListWidget = new QListWidget;
@@ -309,6 +373,7 @@ void CollectionWidget::setupLayout(){
 	
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->addLayout(dataLayout);
+	layout->addLayout(indexingLayout);
 	layout->addLayout(toolLayout);
 	setLayout(layout);	
 
@@ -330,10 +395,11 @@ void CollectionWidget::getFilePaths(){
 
 void CollectionWidget::setupConnections(){
 	connect(closeButton,SIGNAL(clicked()), this, SLOT(closeWindow()));
+	connect(indexButton,SIGNAL(clicked()), this, SLOT(startIndexing()));
 	connect(addDocumentsButton, SIGNAL(clicked()), this, SLOT(getFilePaths()));
 	connect(removeDocumentsButton, SIGNAL(clicked()), this, SLOT(removeFiles()));
 	connect(closeShortcut, SIGNAL(activated()),this, SLOT(escCloseWindow()));
-
+	
 }
 
 void CollectionWidget::escCloseWindow(){
@@ -365,39 +431,6 @@ void CollectionWidget::closeWindow(){
 
 
 
-void CollectionWidget::startEditItem(QListWidgetItem *item){
-	
-	editOpen = true;
-	editPrevTitle = item->data(CollectionWidget::Title).toString();
-
-	collectionsList->openPersistentEditor(item);
-	collectionsList->editItem(item);
-
-}
-
-void CollectionWidget::endEditItem( QListWidgetItem *, QListWidgetItem *previousItem){
-	if( editOpen ){
-		collectionsList->closePersistentEditor(previousItem);
-		editOpen = false;
-	}
-}
-
-void CollectionWidget::endEditItem( QListWidgetItem *item){
-	if( editOpen ){
-		
-		QString newTitle = item->data(CollectionWidget::Title).toString();
-		collectionTitles.remove(editPrevTitle);
-		collectionsList->closePersistentEditor(item);
-		
-		if( collectionTitles.contains(newTitle)){
-			item->setData(CollectionWidget::Title, editPrevTitle);
-			std::cerr << "\tduplicate!" << std::endl;
-		} else {
-			renameCollection(newTitle);
-		}
-	}
-	editOpen = false;
-}
 
 
 
