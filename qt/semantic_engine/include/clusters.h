@@ -39,7 +39,7 @@ class ClusterWidget : public QWidget {
 	Q_OBJECT
 	
 	public:
-		ClusterWidget(Graph *g, search<Graph> *, QWidget *parent=0);
+		ClusterWidget(Graph *g, QWidget *parent=0);
 		void setResultData(QStringList,QList<QPair<QString,double> >);
 		void setWeightMap(QPair<WeightingTraits::edge_weight_map,WeightingTraits::vertex_weight_map>);
 		void startSearch();
@@ -70,10 +70,10 @@ class ClusterWidget : public QWidget {
 		void setupLayout();
 		void setupConnections();
 		void setStatus(QString);
+		std::string unstemTerm(const std::string &);
 		
 		ClusteringThread    *m_clusteringThread;
-		search<Graph> *m_searchEngine;        
-        QBrush m_backgroundColor;
+		QBrush m_backgroundColor;
         maps::unordered<std::string,std::string> wordlist;
    		Graph *m_graph;
 		unsigned maxClusters;

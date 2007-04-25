@@ -40,7 +40,6 @@ class SearchWidget : public QWidget
 		void populateSearchResults();
 		void newSearch(QString &);
 		void changeCollection(const QString &);
-		void reloadWordlist();
 		
 	private:
 		

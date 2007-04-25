@@ -15,10 +15,9 @@ void VisualGLDisplay::reset() {
 	isSearching = false;
 }
 
-void VisualGLDisplay::reset(Graph *g, search<Graph> *s, WeightingTraits::edge_weight_map weights) {
+void VisualGLDisplay::reset(Graph *g, WeightingTraits::edge_weight_map weights) {
 	reset();
 	m_graph = g;
-	m_searchEngine = s;
 	
 	double max = 0;
 	WeightingTraits::edge_weight_map::iterator it;
@@ -462,6 +461,23 @@ void VisualGLDisplay::moveLabels() {
 	}
 }
 
+std::string VisualGLDisplay::unstemTerm(const std::string &stem){
+	GraphTraits::vertex_descriptor u;
+	u = m_graph->vertex_by_id(
+             m_graph->fetch_vertex_id_by_content_and_type(
+                 stem, node_type_major_term));
+
+	std::string term = m_graph->get_vertex_meta_value(u, "term");
+    std::string::size_type pos = term.find_last_of(":");
+	if( pos != std::string::npos && pos > 0 ){
+		std::string word = term.substr(0,pos);
+		return word;
+    } else {
+		return stem;
+	}
+}
+
+
 void VisualGLDisplay::drawLabels() {
 	if( isSearching ) 
 		return;
@@ -488,8 +504,7 @@ void VisualGLDisplay::drawLabels() {
 				the_label = (*m_graph)[u].content;
 				// the_label = scrub_vertex_title(m_graph, (*m_graph)[u].content);
 			} else {
-				the_label = m_searchEngine->unstem_word((*m_graph)[u].content);
-	//			the_label = (*m_graph)[u].content;
+				the_label = unstemTerm((*m_graph)[u].content);
 		    }
 		}
 		
@@ -552,7 +567,7 @@ void VisualGLDisplay::mouseDoubleClickEvent(QMouseEvent *) {
 			/* emit */ documentDoubleClicked(nodeTitle);
 		} else {
 			reset();
-			QString nodeTitle = QString::fromStdString( m_searchEngine->unstem_word( node ));
+			QString nodeTitle = QString::fromStdString( unstemTerm( node ));
 			isSearching = true;
 			/* emit */ termDoubleClicked(nodeTitle);
 			//std::cerr << "emit: term double clicked" << std::endl;

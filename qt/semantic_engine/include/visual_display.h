@@ -47,7 +47,7 @@ class VisualDisplayController : public QWidget {
     Q_OBJECT
     
     public:
-        VisualDisplayController(Graph *, search<Graph> *, QWidget * = 0);
+        VisualDisplayController(Graph *, QWidget * = 0);
         virtual ~VisualDisplayController() {};
         void setWeightMap(WeightingTraits::edge_weight_map);
 		void startSearch();
@@ -87,7 +87,6 @@ class VisualDisplayController : public QWidget {
 		QCheckBox					*m_showTermNodes;
         int                         options_flags_;
 		SearchStatus 				*searchStatus;
-		search<Graph> 				*m_searchEngine;  
 		
 }; // class VisualDisplayController
 

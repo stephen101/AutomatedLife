@@ -117,16 +117,22 @@ void IndexingThread::run(){
 		}
 		/* emit */ progress(++i, filenames.size());
 	}
-	/* emit */ status( QString(tr("Storing Graph")));
+	/* emit */ status( QString(tr("Storing Semantic Index")));
 	try {
-		indexer.finish();
-		m_graph->set_mirror_changes_to_storage(false);
+        indexer.commit_changes_to_storage();
+    } catch ( std::exception &e){
+        std::cerr << "Error Indexing to Database: " << e.what() << std::endl;
+    }
+
+	/* emit */ status(QString(tr("Storing Terms")));
+    try {
+         indexer.store_wordlist();
+    }    catch ( std::exception &e ) {
+        std::cerr << "Error storing wordlist" << e.what() << std::endl;
+    }
 		
-	} catch ( std::exception &e ){
-		std::cerr << "Error " << e.what() << std::endl;
-	}
 	
-	/* emit */ status(QString(tr("Storing text")));
+	/* emit */ status(QString(tr("Storing Text")));
 	file_reader reader;
 
     reader.set_pdfLayout( "layout" );
@@ -150,6 +156,7 @@ void IndexingThread::run(){
 		/* emit */ progress(++i, filenames.size());
 	
     }
+	indexer.commit_changes_to_storage();
 	
 	
 	/* emit */ status( QString(tr("Done")));
@@ -203,6 +210,7 @@ void CollectionWidget::finishIndexing(){
 	indexingLabel->setVisible(false);
 	indexingStatus->setVisible(false);
 	indexingProgress->setVisible(false);
+	indexButton->setVisible(false);
 	directoriesBox->setVisible(true);
 	collectionBox->setVisible(true);
 	closeButton->setEnabled(true);
@@ -361,6 +369,7 @@ void CollectionWidget::setupLayout(){
 	closeButton = new QPushButton(tr("Close"));
 	indexButton = new QPushButton(tr("Index"));
 	indexButton->setToolTip(tr("Index or re-index the documents in the selected collection"));
+	indexButton->setVisible(false);
 	
 	QHBoxLayout *toolLayout = new QHBoxLayout;
 	toolLayout->addWidget(closeButton);
@@ -389,7 +398,8 @@ void CollectionWidget::getFilePaths(){
 		directoryListWidget->clear();
 	}
 	if( !directoryListWidget->findItems(directory, Qt::MatchExactly).count() ){
-		directoryListWidget->addItem(directory);	
+		directoryListWidget->addItem(directory);
+		indexButton->setVisible(true);
 	}
 }
 
@@ -412,6 +422,7 @@ void CollectionWidget::removeFiles(){
 	QList<QListWidgetItem *> selected = directoryListWidget->selectedItems();
 	for( int i = 0; i < selected.size(); ++i ){
 		directoryListWidget->takeItem(directoryListWidget->row(selected.at(i)));
+		indexButton->setVisible(true);
 	}
 	
 	QStringList dirList;

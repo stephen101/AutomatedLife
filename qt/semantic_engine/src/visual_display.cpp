@@ -43,8 +43,8 @@ void VisualDisplayComputeThread::run() {
  * Controller -- this communicates between the compute thread and the display widget
  */
 
-VisualDisplayController::VisualDisplayController(Graph *g, search<Graph> *s, QWidget *parent) 
-	: QWidget(parent), m_graph(g), m_searchEngine(s)
+VisualDisplayController::VisualDisplayController(Graph *g, QWidget *parent) 
+	: QWidget(parent), m_graph(g)
 {
     display_ = new VisualGLDisplay("hello");
     compute_ = 0;
@@ -171,7 +171,7 @@ void VisualDisplayController::setWeightMap(WeightingTraits::edge_weight_map weig
 
 void VisualDisplayController::resetEverything() {
     stop();
-    display_->reset(m_graph, m_searchEngine, m_weightMap);
+    display_->reset(m_graph, m_weightMap);
     go_button_->setEnabled(true);
 }
 
@@ -179,7 +179,7 @@ void VisualDisplayController::start() {
     
 	stop();
 	if( m_weightMap.size() > 0 ){
-	    display_->reset(m_graph, m_searchEngine, m_weightMap);
+	    display_->reset(m_graph, m_weightMap);
     
 	    compute_ = new VisualDisplayComputeThread(m_graph, boost::make_assoc_property_map(m_weightMap));
 	    connect(compute_, SIGNAL(newPositionMap(PositionMap)), this, SLOT(updateDisplay(PositionMap)));

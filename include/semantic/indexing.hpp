@@ -314,51 +314,55 @@ namespace semantic {
                 return new_wordlist;
             }
 
-/* **************************************************** *
- *        get_unstemmed_words()
- * **************************************************** */
-            std::map<std::string,UnstemmedCount> get_unstemmed_words(const int max=2)
-            {
-                manage_wordlist(max);
-                return wordlist;
-            }
-
 
 /* **************************************************** *
- *        serialize_wordlist(min=2)
+ *        store_wordlist(int min=2)
  *
  *        this method takes the wordlist, prunes out the less
  *        commonly occurring variations of words and puts
- *        them into a long string in this format --- stem,word:count;
- *        any words occurring less often than the 'min' value are excluded
+ *        them into the node_meta table; any words occurring
+ *        less often than the 'min' value are excluded
  *
  * **************************************************** */
+    void store_wordlist(int min=2){
 
+        typename se_graph_traits<Graph>::vertex_descriptor u;
 
-            std::string serialize_wordlist(const int min_occurrence=2){
-                std::string serialization;
-                std::map<std::string,
-                         std::pair<std::string,int>
-                    > my_wordlist = prune_wordlist(min_occurrence);
-                std::map<std::string, std::pair<std::string, int> >::iterator pos;
-                for( pos = my_wordlist.begin(); pos != my_wordlist.end(); ++pos ){
-                    std::string stem = pos->first;
-                    std::pair<std::string,int> termCount = pos->second;
+        std::map<std::string,
+                  std::pair<std::string,int>
+            > my_wordlist = prune_wordlist(min);
+        std::map<std::string, std::pair<std::string, int> >::iterator pos;
+        for( pos = my_wordlist.begin(); pos != my_wordlist.end(); ++pos ){
+            std::string stem = pos->first;
+            std::pair<std::string,int> termCount = pos->second;
 
-                    std::string word = termCount.first;
-                    int count = termCount.second;
-                    if( stem.find_first_of(",:;") == std::string::npos &&
-                            word.find_first_of(",:;") == std::string::npos ){
-                        // any phrases occurring only once get omitted.
-                        if( stem.find_first_of(" ") == std::string::npos || count > 1 ){
-                            std::ostringstream oss;
-                            oss << count;
-                            serialization.append(stem+","+word+":"+oss.str()+";");
+            std::string word = termCount.first;
+            int count = termCount.second;
+
+            try {
+                u = base_type::g.vertex_by_id(
+                         base_type::g.fetch_vertex_id_by_content_and_type(
+                             stem, node_type_major_term));
+                // attach the text
+                std::ostringstream oss;
+                oss << count;
+                word.append(":" + oss.str());
+                std::string prev = base_type::g.get_vertex_meta_value(u, "term");
+                if( prev.size() > 0 ){
+                    std::string::size_type pos = prev.find_last_of(":");
+                    if( pos < prev.size() - 1){
+                        int prev_cnt = atoi(prev.substr(pos+1,prev.size()-pos-1).c_str());
+                        if( prev_cnt > count ){
+                            word = prev;
                         }
                     }
                 }
-                return serialization;
+                base_type::g.set_vertex_meta_value(u, "term", word);
+            } catch ( std::exception &){
+                continue;
             }
+        }
+    }
 
             std::string get_collection_value(const std::string key,
                                              const std::string default_value){
@@ -367,6 +371,13 @@ namespace semantic {
 
             void set_collection_value(const std::string key, const std::string& value){
                 base_type::g.set_meta_value(key,value);
+            }
+
+/* **************************************************** *
+ *         commit_changes_to_storage()
+ * **************************************************** */
+            void commit_changes_to_storage(){
+                base_type::g.commit_changes_to_storage();
             }
 
 /* **************************************************** *
@@ -382,10 +393,9 @@ namespace semantic {
                 }
 
                 try {
-                    std::string wordlist = serialize_wordlist(min);
-                    base_type::g.set_meta_value("wordlist", wordlist);
+                     store_wordlist(min);
                 }    catch ( std::exception &e ) {
-                    std::cerr << "Error getting wordlist" << e.what() << std::endl;
+                    std::cerr << "Error storing wordlist" << e.what() << std::endl;
                 }
 
 

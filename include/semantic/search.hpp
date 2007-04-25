@@ -23,33 +23,6 @@
 
 namespace semantic {
 	
-	/*************************************
-	* wordlist unserializer
-	*************************************/
-	inline maps::unordered<std::string,std::string> 
-	unserialize_wordlist(const std::string &serialization)
-	{
-		maps::unordered<std::string, std::string> coll;
-		std::string::size_type pos = serialization.find_first_of(",",0);
-		std::string::size_type lastPos = 0;
-		while( pos != std::string::npos ){
-			std::string stem = serialization.substr(lastPos,pos-lastPos);
-			lastPos = pos + 1;
-			pos = serialization.find_first_of(":",pos);
-
-			std::string word = serialization.substr(lastPos,pos-lastPos);
-			lastPos = pos + 1;
-			pos = serialization.find_first_of(";",pos);
-
-			std::string count_str = serialization.substr(lastPos,pos-lastPos);
-//			int count = atoi( count_str.c_str() );
-			lastPos = pos + 1;
-			pos = serialization.find_first_of(",",pos);
-
-			coll.insert(std::make_pair(stem,word));
-		}
-		return coll;
-	}
 	
 	template<class Graph>
 	class search {
@@ -58,29 +31,31 @@ namespace semantic {
 		typedef std::pair<sorted_results,sorted_results> search_results;
 		
 		search(Graph &g, const int unstem=1) : g(g) {
-			stemming = true;
 			if( unstem == 1){
-				wordlist = unserialize_wordlist();
+				stemming = true;
 			} else {
 				stemming = false;
 			}
 		}
 		
-		void reset_wordlist(){
-			wordlist.clear();
-			if( stemming ){
-				wordlist = unserialize_wordlist();
-			}
-		}
 		
-		std::string unstem_word(const std::string &word){
-			if( wordlist.size() == 0 ){
-				wordlist = unserialize_wordlist();
+		std::string unstem_term(const std::string &stem){
+			if( !stemming ){
+				return stem;
 			}
-			if( wordlist.count(word)){
-				return wordlist[word];
-			} else {
+			
+			typename se_graph_traits<Graph>::vertex_descriptor u;
+			u = g.vertex_by_id(
+                     g.fetch_vertex_id_by_content_and_type(
+                         stem, node_type_major_term));
+
+			std::string term = g.get_vertex_meta_value(u, "term");
+            std::string::size_type pos = term.find_last_of(":");
+			if( pos != std::string::npos && pos > 0 ){
+				std::string word = term.substr(0,pos);
 				return word;
+            } else {
+				return stem;
 			}
 		}
 
@@ -266,7 +241,6 @@ namespace semantic {
 			Graph &g;
 			bool stemming;
 			std::map<std::string,double> stemmed_terms;
-			maps::unordered<std::string,std::string> wordlist;
 			typedef std::multimap<double,std::string,std::greater<double> > m_sorted_results;
 			typedef weighting_traits<Graph> wtraits;
 			
@@ -336,11 +310,8 @@ namespace semantic {
 						relevance--;
 					
 					stemmed_terms.insert(std::make_pair(mpos->second,relevance));
-					if( wordlist.count(mpos->second)){
-						terms_list.push_back(std::make_pair(wordlist[mpos->second],relevance));
-					} else {
-						terms_list.push_back(std::make_pair(mpos->second,relevance));
-					}
+					std::string unstemmed = unstem_term(mpos->second);
+					terms_list.push_back(std::make_pair(unstemmed,relevance));
 				}
 			
 				return std::make_pair(docs_list, terms_list);
@@ -348,9 +319,6 @@ namespace semantic {
 
 
 			
-			maps::unordered<std::string,std::string> unserialize_wordlist(){
-				return semantic::unserialize_wordlist(g.get_meta_value("wordlist"));
-			}	
 	}; // class search
 	
 } // namespace semantic

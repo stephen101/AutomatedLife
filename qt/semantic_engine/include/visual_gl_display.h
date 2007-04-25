@@ -32,7 +32,7 @@ public:
 	VisualGLDisplay (std::string, QWidget *parent = 0);
 
 	void reset();
-	void reset(Graph *, search<Graph> *, WeightingTraits::edge_weight_map);
+	void reset(Graph *, WeightingTraits::edge_weight_map);
 	
 	void draw(PositionMap);
 	
@@ -66,6 +66,7 @@ private:
 	float getVertexSize(graph_vertex);
 	
 	point screenToLocal(const point &, bool = false);
+	std::string unstemTerm(const std::string &);
 
 	Graph			*m_graph;
 	PositionMap	m_position;
@@ -92,7 +93,6 @@ private:
 	
 	WeightingTraits::edge_weight_map    m_normalized_weights;
 	bool isSearching;
-	search<Graph> *m_searchEngine;        
 	
 };
 

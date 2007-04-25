@@ -42,8 +42,8 @@ void SearchWidget::openDataFile(QString dataFile){
 		
 		// tabbed result area
 		search_area = new SearchResults(m_searchEngine);
-		cluster_area = new ClusterWidget(m_graph, m_searchEngine);
-		visualization_area = new VisualDisplayController(m_graph, m_searchEngine);
+		cluster_area = new ClusterWidget(m_graph);
+		visualization_area = new VisualDisplayController(m_graph);
 	
 		populateCollectionMenu();
 		
@@ -153,13 +153,9 @@ void SearchWidget::setupLayout(){
 
 }
 
-void SearchWidget::reloadWordlist(){
-	m_searchEngine->reset_wordlist();
-}
 
 
 void SearchWidget::setupConnections(){
-	connect(indexer, SIGNAL(indexingCompleted()), this, SLOT(reloadWordlist()));
 	connect(keywordShortcut, SIGNAL(activated()),keyword, SLOT(toggle()));
 	connect(clear,SIGNAL(clicked()), basket, SLOT(clearAll()));
 	connect(queryField, SIGNAL(returnPressed()), search, SLOT(animateClick()));

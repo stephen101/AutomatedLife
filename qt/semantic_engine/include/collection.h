@@ -94,10 +94,10 @@ class CollectionWidget : public QWidget
 		QLabel *termCount;
 		QLabel *parserType;
 		QListWidget *directoryListWidget;
+		QPushButton *indexButton;
 		QPushButton *closeButton;
 		QToolButton *addDocumentsButton;
 		QToolButton *removeDocumentsButton;
-		QPushButton *indexButton;
 		QMap<int,QString> doc_counts;
 		QMap<int,QString> term_counts;
 		QMap<int,QString> parsers;
