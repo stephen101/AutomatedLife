@@ -65,7 +65,7 @@ namespace semantic {
 			typedef se_graph_traits<Graph> traits;
 			
 			g.clear();
-
+			
 			// parse the query
 			search_query query(q_string, g);
 			std::vector<std::string> q_vector = query.tokenize();
@@ -259,13 +259,11 @@ namespace semantic {
 				for( pos = ids.begin(); pos != ids.end(); ++pos){
 					nodes[*pos] = pow((double)10,10); // starting energy on search
 				}
-				
 				try {
 					g.fetch_subgraph_starting_from( ids.begin(), ids.end() );
 				} catch ( std::exception &e ){
 					std::cout << "Vertex not found: " << e.what() << std::endl;
 				}
-				
 				return do_ranking(nodes);
 			}
 			

@@ -19,7 +19,7 @@ debug {
 }
 
 # define storage engine
-DEFINES += SQLITE_STORAGE
+DEFINES += MYSQL_STORAGE
 
 
 # Input
@@ -60,9 +60,15 @@ win32 {
     RC_FILE = search.rc
     SOURCES += src/locate_datafile_win32.cpp
 
-    QMAKE_CXXFLAGS += -IC:/Boost/include/boost-1_33_1 -IC:/SQLite/include
+    QMAKE_CXXFLAGS += -IC:/Boost/include/boost-1_33_1 \
+                      -IC:/SQLite/include \
+                      -IC:/MySQL/include \
+                      -IC:/Progra~1/GnuWin32/include
 
-    LIBS += C:/Boost/lib/libboost_filesystem-mgw.lib C:/SQLite/lib/sqlite3.dll
+    LIBS += C:/Boost/lib/libboost_filesystem-mgw.lib \
+            C:/SQLite/lib/sqlite3.dll \
+            C:/MySQL/lib/opt/libmysql.a \
+            C:/Progra~1/GnuWin32/lib/libiconv.lib
 
 }
 

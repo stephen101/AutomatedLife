@@ -7,6 +7,7 @@ this follows the storage policy description found in docs/storage/policy.txt
 #if SEMANTIC_HAVE_MYSQL
 
 #ifdef WIN32
+#include <windows.h>
 #include <winsock.h>
 #endif
 
@@ -499,7 +500,6 @@ namespace semantic {
 #endif
 				if (m_con != NULL) return; // already connected
 				m_con = mysql_init(NULL);
-				
 				if (m_con == NULL) throw MySQLException("Could not initialize MYSQL connection struct.");
 				
 				// let's actually connect now

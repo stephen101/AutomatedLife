@@ -286,7 +286,7 @@ namespace semantic {
                 std::map<std::string, std::pair<std::string,int> > new_wordlist;
                 typedef std::multimap< int, std::string, std::greater<int> > RevMap;
 
-                std::multimap<std::string,UnstemmedCount>::iterator pos;
+				std::map<std::string,UnstemmedCount>::iterator pos;
                 for( pos = wordlist.begin(); pos != wordlist.end(); ++pos ){
                     std::string stemmed = pos->first;
                     UnstemmedCount unstemmed = pos->second;
@@ -412,7 +412,7 @@ namespace semantic {
                                         filename, node_type_major_doc));
                             // attach the text
                             base_type::g.set_vertex_meta_value(u, "body", text);
-                        } catch ( std::exception &e){
+                        } catch ( std::exception &){
                             //std::cerr << "Error: " << e.what() << std::endl;
                             continue;
                         }
@@ -480,14 +480,15 @@ namespace semantic {
                         base_type::add_doc_term_edge( doc_id, term, weight );
                     }
                 }
-
+/*
                 if( !(files_indexed % 5000 ) ){
                     manage_wordlist();
                 }
-            }
+*/ 
+			}
 
 
-
+/*
             void manage_wordlist(const unsigned int max=3)
             {
                 typedef std::multimap<int,std::string,std::less<int> > RevMap;
@@ -519,7 +520,7 @@ namespace semantic {
                     wordlist[dpos->first].erase(dpos->second);
                 }
             }
-
+*/
 /*
             RevMap lookup;
             int total = wordlist[stemmed]["__count"];

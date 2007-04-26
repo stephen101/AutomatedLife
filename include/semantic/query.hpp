@@ -20,11 +20,12 @@ namespace semantic {
 			template <class Graph>
 			search_query(const std::string& str, Graph &g) : query_string(str) {
 				// get the phrase length from the graph
+
 				std::string phrase_length_str = g.get_meta_value("max_phrase_length", "1");
 				phrase_length = atoi(phrase_length_str.c_str());
-				
 				// parse!
 				parse();
+				
 				set_stemming(true);
 			}
 			
@@ -57,8 +58,9 @@ namespace semantic {
 					try {
 						node_ids.push_back( g.fetch_vertex_id_by_content_and_type(*pos, node_type_major_term) );
 					//	std::cout << "Vertex found: " << *pos << std::endl;
-					} catch ( std::exception& ){
-						// vertext not found.
+					} catch ( std::exception & ){
+						// vertex not found.
+						//std::cerr << "Vertex not found: " << e.what() << std::endl;
 						continue;
 					}
 				}

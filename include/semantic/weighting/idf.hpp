@@ -22,7 +22,7 @@ namespace semantic {
                                 = g.get_vertex_count_of_type(g[u].type_major);
                 iterator ei;
                 for(ei = nlist.begin(); ei != nlist.end(); ++ei) { 
-                                                                       put(w, g.get_vertex_id((*ei).second), log(1+count/((*ei).first.to_degree))); }
+                           put(w, g.get_vertex_id((*ei).second), (float)log(1+count/(double)((*ei).first.to_degree))); }
             }
 
             
@@ -38,7 +38,7 @@ namespace semantic {
                                 = g.get_vertex_count_of_type(g[u].type_major);
                 iterator ei, ei_end;
                 for(boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) { 
-                                                                                        put(w, *ei, log(1+count/(g[*ei].to_degree))); }
+                             put(w, *ei, (float)log(1+count/(double)(g[*ei].to_degree))); }
             }
     };
 } // namespace semantic
