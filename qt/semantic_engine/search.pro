@@ -18,6 +18,10 @@ debug {
     CONFIG += no_warn
 }
 
+# define storage engine
+DEFINES += SQLITE_STORAGE
+
+
 # Input
 HEADERS += include/display.h \
            include/mainwindow.h \
@@ -67,8 +71,14 @@ unix {
         SOURCES += src/locate_datafile_unix.cpp
     }
 
-    QMAKE_CXXFLAGS += -I/usr/local/include/boost-1_33_1 -I/usr/include -I/usr/local/include/msword-reader -I/usr/local/include/pdf-reader
+    QMAKE_CXXFLAGS += 	-I/usr/local/include/boost-1_33_1 \
+						-I/usr/include \
+						-I/usr/local/include/msword-reader \
+						-I/usr/local/include/pdf-reader \
+						-I/usr/local/mysql/include
 
-    LIBS += /usr/local/lib/libsqlite3.a -lboost_filesystem -L/usr/local/lib -lmsword_reader -L/usr/local/lib -lpdf_reader -liconv
+    LIBS += /usr/local/lib/libsqlite3.a \
+			/usr/local/mysql/lib/libmysqlclient.a \
+ 			-L/usr/local/lib -lboost_filesystem -lmsword_reader -lpdf_reader -liconv \
 
 }

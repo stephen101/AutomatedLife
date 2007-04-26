@@ -155,13 +155,13 @@ namespace semantic {
 				if (get_mirror_changes_to_storage()) (*this)[v].dirty = true;
 			}
 			
-			bool will_add_edge(Vertex u, Vertex v, const edge_properties &ep) {
+			bool will_add_edge(Vertex , Vertex , const edge_properties &) {
 				// if the edge exists, updating the properties will be handled by
 				// the engine
 				return true;
 			}
 			
-			void did_add_edge(Edge e, bool did, Vertex u, Vertex v, const edge_properties &ep) {
+			void did_add_edge(Edge e, bool , Vertex , Vertex , const edge_properties &) {
 				// if mutable, flag as dirty
 				if (get_mirror_changes_to_storage()) (*this)[e].dirty = true;
 			}
@@ -482,7 +482,7 @@ namespace semantic {
 			
 			template <class Inserter>
 			void get_collections_list(Inserter i) {
-				query("select name from collections");
+				query("select name from collection");
 				MYSQL_RES *r = result_store();
 				MYSQL_ROW row;
 				

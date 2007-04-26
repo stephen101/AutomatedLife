@@ -1,20 +1,24 @@
 #ifndef SE_GRAPH_H
 #define SE_GRAPH_H
 
+
 #include <semantic/semantic.hpp>
 #include <semantic/search.hpp>
 
+// version information
+#include <semantic/version.hpp> // gives us SEMANTIC_VERSION_STRING and SEMANTIC_PACKAGE_NAME
+
 // subgraph -- searching behavior
 #include <semantic/subgraph/pruning_random_walk.hpp>
+
 // weighting -- applies to search & ranking behavior
 #include <semantic/weighting/tf.hpp>
 #include <semantic/weighting/lg.hpp>
 #include <semantic/weighting/idf.hpp>
+
 // ranking
 #include <semantic/ranking/spreading_activation.hpp>
 
-// storage -- sqlite3 will be used
-#include <semantic/storage/sqlite3.hpp>
 
 // semantic clustering
 #include <semantic/analysis/agglomerate_clustering/dendrogram.hpp>
@@ -23,18 +27,34 @@
 #include <semantic/analysis/linlog.hpp>
 
 
-// version information
-#include <semantic/version.hpp> // gives us SEMANTIC_VERSION_STRING and SEMANTIC_PACKAGE_NAME
+
+#if !SEMANTIC_HAVE_MYSQL
+	#undef MYSQL_STORAGE
+#endif
+#if !SEMANTIC_HAVE_SQLITE3
+	#undef SQLITE_STORAGE
+#endif
+
+#ifdef SQLITE_STORAGE
+	#include <semantic/storage/sqlite3.hpp>
+	typedef SQLite3StoragePolicy				TheStoragePolicy;
+#elif defined MYSQL_STORAGE
+	#include <semantic/storage/mysql5.hpp>
+	typedef MySQL5StoragePolicy					TheStoragePolicy;
+#else
+	#error "No Storage Engine Defined!"
+	typedef NoStoragePolicy						TheStoragePolicy;
+#endif
 
 typedef LGWeighting<TFWeighting, IDFWeighting, double>	WeightingPolicy;
 typedef SESubgraph<
-	SQLite3StoragePolicy,
+	TheStoragePolicy,
 	PruningRandomWalkSubgraph,
 	WeightingPolicy>									Graph;
 
-typedef StorageInfoQuery<SQLite3StoragePolicy>			StorageInfo;
+typedef StorageInfoQuery<TheStoragePolicy>			StorageInfo;
 typedef se_graph_traits<Graph>							GraphTraits;
-typedef weighting_traits<SQLite3StoragePolicy,
+typedef weighting_traits<TheStoragePolicy,
 						WeightingPolicy>				WeightingTraits;
 
 // some typedefs for clustering

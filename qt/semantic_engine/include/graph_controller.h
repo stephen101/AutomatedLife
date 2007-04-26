@@ -12,15 +12,26 @@ class GraphController : public QWidget
 	
 	public:
 		GraphController(QWidget *parent=0);
-		void copyDataFile(QString &);
-		void setDataFile(QString &);
 		Graph* instance();
 		QStringList listCollections();
+		
+		// sqlite
+		void copyDataFile(QString &);
+		void setDataFile(QString &);
 		void initializeDataFile(QString &);
 		
 	private:
-		QString m_dataFile;
 		Graph *m_graph;
+		int trials;
+		int depth;
+		float top_edges;
+		// sqlite
+		QString m_dataFile;
+		// mysql
+		QString m_database;
+		QString m_host;
+		QString m_user;
+		QString m_password;
 
 };
 
