@@ -22,6 +22,7 @@ void IndexingThread::run(){
 	/* emit */ status(QString(tr("Clearing index")));
 	m_graph->reset_collection();
 	
+	
 	std::vector<std::string> filenames;
 	for( int i = 0; i < m_directories.count(); ++i ){
 		std::cerr << m_directories.at(i).toStdString() << std::endl;
@@ -72,7 +73,6 @@ void IndexingThread::run(){
 	// turn the lexicon into a stringstream for reading by the indexer/parser
 	std::stringstream lexiconStrStream(lexicon, std::ios_base::in);
 	
-	
 	m_graph->set_mirror_changes_to_storage(true);
 	m_graph->set_meta_value("locations", m_directories.join(", ").toStdString());
 	m_graph->set_meta_value("max_phrase_length", "3");
@@ -117,6 +117,7 @@ void IndexingThread::run(){
 		/* emit */ progress(++i, filenames.size());
 	}
 	/* emit */ status( QString(tr("Storing Semantic Index")));
+
 	try {
         indexer.commit_changes_to_storage();
     } catch ( std::exception &e){
@@ -155,9 +156,8 @@ void IndexingThread::run(){
 		/* emit */ progress(++i, filenames.size());
 	
     }
-	indexer.commit_changes_to_storage();
 	
-	
+	m_graph->set_mirror_changes_to_storage(false);
 	/* emit */ status( QString(tr("Done")));
 	/* emit */ finishedIndexing();
 	

@@ -38,7 +38,7 @@ namespace semantic {
 			}
 		}
 		
-		
+/*		
 		std::string unstem_term(const std::string &stem){
 			if( !stemming ){
 				return stem;
@@ -56,7 +56,7 @@ namespace semantic {
 			}
 			return stem;
 		}
-
+*/
 
 /* ************************************* *
  * 		Spreading activation search 
@@ -218,7 +218,9 @@ namespace semantic {
 			summarizer summer(stemmed_terms);
 			
 			std::string text = g.get_vertex_meta_value(g.vertex_by_id(g.fetch_vertex_id_by_content_and_type(id, node_type_major_doc)), "body");
+			
 			std::vector<std::string> summaries = summer.summarize(text,length);
+			
 			std::vector<std::string>::iterator pos;
 			std::string summary;
 			unsigned int i = 0;
@@ -306,7 +308,7 @@ namespace semantic {
 						relevance--;
 					
 					stemmed_terms.insert(std::make_pair(mpos->second,relevance));
-					std::string unstemmed = unstem_term(mpos->second);
+					std::string unstemmed = g.unstem_term(mpos->second);
 					terms_list.push_back(std::make_pair(unstemmed,relevance));
 				}
 			

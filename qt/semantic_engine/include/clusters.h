@@ -70,7 +70,6 @@ class ClusterWidget : public QWidget {
 		void setupLayout();
 		void setupConnections();
 		void setStatus(QString);
-		std::string unstemTerm(const std::string &);
 		
 		ClusteringThread    *m_clusteringThread;
 		QBrush m_backgroundColor;

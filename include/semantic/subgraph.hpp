@@ -126,6 +126,21 @@ namespace semantic {
 				}
 			}
 			
+			std::string unstem_term(const std::string &stem){
+				typename se_traits::vertex_descriptor u;
+				u = storage_policy::vertex_by_id(
+	                     storage_policy::fetch_vertex_id_by_content_and_type(
+	                         stem, node_type_major_term));
+
+				std::string term = storage_policy::get_vertex_meta_value(u, "term");
+	            std::string::size_type pos = term.find_last_of(":");
+				if( pos != std::string::npos && pos > 0 ){
+					return term.substr(0,pos);
+				}
+				return stem;
+			}
+			
+			
 			template <class WeightMap>
             void populate_weight_map(WeightMap w) {
                 // forward this to our superclass's implementation

@@ -66,8 +66,7 @@ private:
 	float getVertexSize(graph_vertex);
 	
 	point screenToLocal(const point &, bool = false);
-	std::string unstemTerm(const std::string &);
-
+	
 	Graph			*m_graph;
 	PositionMap	m_position;
 	std::map<graph_vertex,

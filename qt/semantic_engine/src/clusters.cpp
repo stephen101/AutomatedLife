@@ -309,19 +309,6 @@ void ClusterWidget::clusteringStarted() {
     clusterProgress->setEnabled(true);
 }
 
-std::string ClusterWidget::unstemTerm(const std::string &stem){
-	GraphTraits::vertex_descriptor u;
-	u = m_graph->vertex_by_id(
-             m_graph->fetch_vertex_id_by_content_and_type(
-                 stem, node_type_major_term));
-
-	std::string term = m_graph->get_vertex_meta_value(u, "term");
-    std::string::size_type pos = term.find_last_of(":");
-	if( pos != std::string::npos && pos > 0 ){
-		return term.substr(0,pos);
-	}
-	return stem;
-}
 
 void ClusterWidget::clusteringCompleted() {
     numberOfClusters->setEnabled(true);
@@ -349,7 +336,7 @@ void ClusterWidget::clusteringCompleted() {
         for(unsigned int k = 0; k < terms.size() && k < 5; k++) {
         	
 			std::string term = (*m_graph)[terms[k]].content;
-			term = unstemTerm(term);
+			term = m_graph->unstem_term(term);
 			if( term.size() ){
 				terms_str.push_back( term );
 			}

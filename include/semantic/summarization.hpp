@@ -25,6 +25,7 @@ namespace semantic {
  *		the top_words provided in the constructor
  * **************************************************************** */
 			std::vector<std::string> summarize( const std::string& text, const unsigned max_sentences = 3 ){
+				
 				std::vector<std::string> sentences = tokenize_sentences( text );
 				std::vector<std::string>::iterator pos;
 				std::map<int,termMap> textData;
@@ -32,6 +33,7 @@ namespace semantic {
 				// loop through the sentences
 				unsigned i = 0;
 				for( pos = sentences.begin(); pos != sentences.end(); ++pos ){
+					
 					std::vector<std::string> terms = tokenize_words(*pos);
 					std::vector<std::string>::iterator wpos;
 					
@@ -156,10 +158,11 @@ namespace semantic {
 				std::string::size_type lastPos = sentence.find_first_not_of(delim,0);
 				std::string::size_type startPos = sentence.find_first_of(delim,lastPos);
 				
-				while( startPos != std::string::npos || lastPos != std::string::npos ){
+				while( startPos != std::string::npos && lastPos != std::string::npos ){
 					std::string::size_type pos;
 					
 					std::string tok = sentence.substr(lastPos,startPos-lastPos);
+					
 					// English-specific contractions 
 					
 					std::vector<std::string> contractions;
@@ -186,17 +189,17 @@ namespace semantic {
 									pos += cont.size();
 								}
 							}
-							tok.find(cont,pos);
+							pos = tok.find(cont,pos);
 						}
 					}
 					
-					pos = tok.find_first_of(letters+numbers);
+					pos = tok.find_first_of(letters);
 					if( pos != 0 && pos != std::string::npos ){
-						tok = tok.substr(0,pos);
+						tok = tok.substr(pos,tok.size()-pos);
 					}
-					pos = tok.find_last_of(letters+numbers);
+					pos = tok.find_last_of(letters);
 					if( pos != tok.size()-1 && pos != std::string::npos ){
-						tok = tok.substr(pos+1,tok.size()-pos-1);
+						tok = tok.substr(0,pos+1);
 					}
 
 					if( tok.size() > 2 ){
@@ -208,6 +211,7 @@ namespace semantic {
 							terms.push_back( lower );
 						}
 					}
+
 					lastPos = sentence.find_first_not_of(delim,startPos);
 					startPos = sentence.find_first_of(delim,lastPos);
 				}

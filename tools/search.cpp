@@ -112,7 +112,7 @@ void cluster(Graph &g, std::string query_string, int num) {
         std::vector<vertex> top_terms = helper.terms(i);
         for(unsigned int t = 0; t < 5 && t < top_terms.size(); t++) {
             if (t != 0) std::cout << ", ";
-            std::cout << g[top_terms[t]].content;
+            std::cout << g.unstem_term(g[top_terms[t]].content);
         }
         std::cout << std::endl;
         std::vector<vertex> docs = helper.docs(i);
@@ -230,24 +230,28 @@ int main( int argc, char* argv[]){
 		} catch (std::exception &e ){
 			std::cerr << "Error: " << e.what() << std::endl;
 		}
+
+
+
 		search<SQLiteGraph> engine(g);
 		
 		docs_and_terms results;
 		
 		try {
-			results = engine.do_better_search(vm["query"].as<std::string>());
+			results = engine.semantic(vm["query"].as<std::string>());
 		} catch ( std::exception &e ){
 			std::cerr << "Error: " << e.what() << std::endl;
 		}
 		
 		docs = results.first;
 		terms = results.second;
-		if( vm.count("summaries"))
+
+		if (vm.count("cluster"))
+		    cluster(g, vm["query"].as<std::string>(), vm["num_clusters"].as<int>());
+
+		if( vm.count("summaries") && !vm.count("cluster"))
 			summaries = engine.summarize_documents(docs);
 		
-		if (vm.count("cluster")) {
-		    cluster(g, vm["query"].as<std::string>(), vm["num_clusters"].as<int>());
-		}
 #endif
 		
 	} else if (vm.count("mysql")) { // MySQL
@@ -267,12 +271,20 @@ int main( int argc, char* argv[]){
 			std::cerr << "Error: " << e.what() << std::endl;
 		}
 
+
 		search<MySQLGraph> engine(g);
-		docs_and_terms results = engine.do_better_search(vm["query"].as<std::string>());
+		docs_and_terms results = engine.semantic(vm["query"].as<std::string>());
+
 		docs = results.first;
 		terms = results.second;
-		if( vm.count("summaries"))
+		
+		if (vm.count("cluster"))
+		    cluster(g, vm["query"].as<std::string>(), vm["num_clusters"].as<int>());
+
+		if( vm.count("summaries") && !vm.count("cluster"))
 			summaries = engine.summarize_documents(docs);
+		
+		
 		
 #endif
 	}
