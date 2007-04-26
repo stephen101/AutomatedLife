@@ -83,7 +83,7 @@ namespace semantic {
 			
 			void rename_collection(std::string, std::string) {}
 			void remove_collection(std::string) {}
-
+			void reset_collection(){}
 			
 		protected:
 			bool mirror_flag;

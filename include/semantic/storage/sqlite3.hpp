@@ -512,8 +512,7 @@ namespace semantic {
 					queries.push_back("CREATE TABLE 'node' ( 'id' integer primary key, 'fk_collection' integer, 'type_major' integer, 'type_minor' integer, 'fk_content' integer, UNIQUE('fk_collection', 'type_major', 'type_minor', 'fk_content') )");
 					queries.push_back("CREATE TABLE 'node_count' ( 'fk_collection' integer, 'type_major' integer, 'count' integer, PRIMARY KEY ('fk_collection','type_major') )");
 					queries.push_back("CREATE TABLE 'node_meta' ( 'fk_node' integer, 'key' text, 'value' text, UNIQUE('fk_node','key') )");
-					queries.push_back("create trigger node_ad after delete on node for each row begin delete from edge where fk_node_from = OLD.id or fk_node_to = OLD.id; delete from edge_query where fk_node_from = OLD.id or fk_node_to = OLD.id; end");
-					// @TODO -- node_ad must also delete node_meta
+					queries.push_back("create trigger node_ad after delete on node for each row begin delete from degree where fk_node = OLD.id; delete from edge where fk_node_from = OLD.id or fk_node_to = OLD.id; delete from node_meta where fk_node = OLD.id; delete from edge_query where fk_node_from = OLD.id or fk_node_to = OLD.id; end");
 					queries.push_back("create trigger collection_ad after delete on collection for each row begin delete from node where fk_collection=OLD.id; delete from node_count where fk_collection=OLD.id; delete from collection_meta where fk_collection=OLD.id; end");
 					
 					// execute each query
@@ -532,6 +531,12 @@ namespace semantic {
 //				std::cerr << "closing connection." << std::endl;
 				m_con = NULL;
 				m_connected=false;
+			}
+			
+			void reset_collection() {
+				query("DELETE FROM node WHERE fk_collection="+to_string(get_collection_id()));
+				query("DELETE FROM node_count WHERE fk_collection="+to_string(get_collection_id()));
+				query("DELETE FROM collection_meta WHERE fk_collection="+to_string(get_collection_id()));
 			}
 
 			void set_file(std::string file) { m_file = file; }
@@ -596,7 +601,6 @@ namespace semantic {
 				open();
 				query("PRAGMA synchronous=OFF");
 				query("BEGIN TRANSACTION");
-				
 				if (m_clear_all) {
 				    // we are supposed to clear out the entire collection... we can do that.
 				    remove_collection(get_property(*this, graph_name));
@@ -672,7 +676,6 @@ namespace semantic {
     			    query("delete from edge where fk_node_from = " + to_string(id) + " or fk_node_to = " + to_string(id));
 			    }
 			    m_to_clear.clear();
-			    
 				query("COMMIT TRANSACTION");
 				query("BEGIN TRANSACTION");
 				

@@ -83,10 +83,9 @@ class CollectionWidget : public QWidget
 		QMap<CollectionWidget::Roles,QVariant> collectionData;
 		QProgressBar *indexingProgress;
 		QListWidget *indexingStatus;
-		QLabel *indexingLabel;
 		
-		QGroupBox *collectionBox;
 		QGroupBox *directoriesBox;
+		QGroupBox *indexingBox;
 		
 		IndexingThread *m_indexingThread;
 		QLineEdit *collectionTitle;		

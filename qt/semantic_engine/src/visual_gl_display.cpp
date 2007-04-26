@@ -470,11 +470,9 @@ std::string VisualGLDisplay::unstemTerm(const std::string &stem){
 	std::string term = m_graph->get_vertex_meta_value(u, "term");
     std::string::size_type pos = term.find_last_of(":");
 	if( pos != std::string::npos && pos > 0 ){
-		std::string word = term.substr(0,pos);
-		return word;
-    } else {
-		return stem;
+		return term.substr(0,pos);
 	}
+	return stem;
 }
 
 

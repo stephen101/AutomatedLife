@@ -450,6 +450,13 @@ namespace semantic {
 			void remove_collection(std::string name) {
 			    query("delete from collection where name = '" + escape(name) + "'");
 			}
+			
+			// reset the current collection
+			void reset_collection(){
+				query("DELETE FROM node WHERE fk_collection="+to_string(get_collection_id()));
+				query("DELETE FROM node_count WHERE fk_collection="+to_string(get_collection_id()));
+				query("DELETE FROM collection_meta WHERE fk_collection="+to_string(get_collection_id()));
+			}
 
 			// collection meta data functions
 			void set_meta_value(const std::string key, const std::string value) {

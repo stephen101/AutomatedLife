@@ -12,6 +12,8 @@ begin
 	delete from degree where fk_node = OLD.id;
 	-- clear all edges working with this node
 	delete from edge where fk_node_from = OLD.id or fk_node_to = OLD.id;
+	-- clear all node meta values
+	delete from node_meta where fk_node = OLD.id;
 end; //
 
 -- collection triggers

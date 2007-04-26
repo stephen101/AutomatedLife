@@ -19,8 +19,8 @@ IndexingThread::IndexingThread(Graph *g, QStringList dirs, QObject *parent)
 
 void IndexingThread::run(){
 	/* emit */ startedIndexing();
-	/* emit */ status(QString(tr("Collecting files")));
-	
+	/* emit */ status(QString(tr("Clearing index")));
+	m_graph->reset_collection();
 	
 	std::vector<std::string> filenames;
 	for( int i = 0; i < m_directories.count(); ++i ){
@@ -34,12 +34,11 @@ void IndexingThread::run(){
 		f.add_file_ext("txt");
 		std::vector<std::string> files = f.get_filenames();
 		for( unsigned j = 0; j < files.size(); ++j ){
-			std::cerr << files[j] << std::endl;
 			filenames.push_back(files[j]);
 		}
 	}
-	std::cerr << filenames.size() << " files" << std::endl;
 	if( filenames.size() == 0 ){
+		/* emit */ status(QString(tr("Done")));
 		/* emit */ finishedIndexing();
 		return;
 	}
@@ -173,11 +172,8 @@ void IndexingThread::safeTerminate(){
 void CollectionWidget::startIndexing(){
 	//dataLayout->setEnabled(false);
 	indexingStatus->clear();
-	indexingLabel->setVisible(true);
-	indexingStatus->setVisible(true);
-	indexingProgress->setVisible(true);
+	indexingBox->setVisible(true);
 	directoriesBox->setVisible(false);
-	collectionBox->setVisible(false);
 	
 	isIndexing = true;
 	closeButton->setEnabled(false);
@@ -207,21 +203,23 @@ void CollectionWidget::updateStatus(QString message){
 }
 
 void CollectionWidget::finishIndexing(){
-	indexingLabel->setVisible(false);
-	indexingStatus->setVisible(false);
-	indexingProgress->setVisible(false);
 	indexButton->setVisible(false);
+	indexingBox->setVisible(false);
 	directoriesBox->setVisible(true);
-	collectionBox->setVisible(true);
 	closeButton->setEnabled(true);
 	indexButton->setEnabled(true);
 	collectionTitle->setFocus();
 	
 	isIndexing = false;
+	
+	// reload the collection data
 	getCollectionData();
 	documentCount->setText(collectionData[CollectionWidget::DocumentCount].toString());
 	termCount->setText(collectionData[CollectionWidget::TermCount].toString());
-	parserType->setText(collectionData[CollectionWidget::Parser].toString());
+	QString parserString = collectionData[CollectionWidget::Parser].toString();
+	parserString.replace(0,1,parserString[0].toUpper());
+	parserType->setText(parserString);
+	
 	/* emit */ indexingCompleted();
 	
 }
@@ -286,18 +284,18 @@ void CollectionWidget::setupLayout(){
 	// indexing
 	indexingProgress = new QProgressBar;
 	indexingStatus = new QListWidget;
-	indexingLabel = new QLabel(tr("Indexing Document Collection"));
+	
 	QVBoxLayout *indexingLayout = new QVBoxLayout;
 	indexingLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-	indexingLayout->addWidget(indexingLabel);
 	indexingLayout->addWidget(indexingStatus);
 	indexingLayout->addWidget(indexingProgress);
-	indexingStatus->setVisible(false);
-	indexingProgress->setVisible(false);
-	indexingLabel->setVisible(false);
+	
+	indexingBox = new QGroupBox(tr("Indexing Status"));
+	indexingBox->setLayout(indexingLayout);
+	indexingBox->setVisible(false);
 	
 	// collections
-	collectionBox = new QGroupBox(tr("Collection Settings"));
+	QGroupBox *collectionBox = new QGroupBox(tr("Collection Settings"));
 	collectionTitle = new QLineEdit(QString::fromStdString(m_graph->collection()));
 
 	
@@ -306,7 +304,9 @@ void CollectionWidget::setupLayout(){
 	
 	termCount = new QLabel(collectionData[CollectionWidget::TermCount].toString());
 	termCount->setToolTip(tr("The number of terms included in the collection"));
-	parserType = new QLabel(collectionData[CollectionWidget::Parser].toString());
+	QString parserString = collectionData[CollectionWidget::Parser].toString();
+	parserString.replace(0,1,parserString[0].toUpper());
+	parserType = new QLabel(parserString);
 	parserType->setToolTip(tr("The grammatical class of words used to create the term index"));
 	
 	QGridLayout *settingsGridLayout = new QGridLayout;
@@ -335,15 +335,15 @@ void CollectionWidget::setupLayout(){
 	
 	QHBoxLayout *directoryToolsLayout = new QHBoxLayout;
 	directoryListWidget = new QListWidget;
+	directoryListWidget->setTextElideMode(Qt::ElideMiddle);
+	directoryListWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	
 	QString locations(collectionData[CollectionWidget::Locations].toString());
 	if( locations.length()){
 		QStringList directoryLocations = locations.split(", ");
 		for( int i = 0; i < directoryLocations.size(); ++i ){
 			directoryListWidget->addItem(directoryLocations.at(i));
 		}
-	} else {
-		directoryListWidget->addItem(QString(tr("(Unknown)")));
-		
 	}
 	addDocumentsButton = new QToolButton;
 	addDocumentsButton->setText("+");
@@ -379,10 +379,10 @@ void CollectionWidget::setupLayout(){
 	QHBoxLayout *dataLayout = new QHBoxLayout;
 	dataLayout->addWidget(collectionBox);
 	dataLayout->addLayout(allSettingsLayout);
+	dataLayout->addWidget(indexingBox);
 	
 	QVBoxLayout *layout = new QVBoxLayout;
 	layout->addLayout(dataLayout);
-	layout->addLayout(indexingLayout);
 	layout->addLayout(toolLayout);
 	setLayout(layout);	
 
@@ -394,9 +394,6 @@ void CollectionWidget::getFilePaths(){
 							this,
 							QString("Select a directory to add to the collection"));
 	
-	if( directoryListWidget->count() == 1 && directoryListWidget->item(0)->text() == QString(tr("(Unknown)"))){
-		directoryListWidget->clear();
-	}
 	if( !directoryListWidget->findItems(directory, Qt::MatchExactly).count() ){
 		directoryListWidget->addItem(directory);
 		indexButton->setVisible(true);
