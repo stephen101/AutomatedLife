@@ -27,11 +27,11 @@ class SearchThread : public QThread {
         void startedSearching();
                 
     private:
-        search<Graph> *searchEngine;
-		searchType m_type;
-		QStringList 	m_query;
-        QList<QPair<QString,double> > m_resultList;
-		QStringList m_topTerms;
+        search<Graph> 					*searchEngine;
+		searchType 						m_type;
+		QStringList 					m_query;
+        QList<QPair<QString,double> > 	m_resultList;
+		QStringList 					m_topTerms;
 
 }; // class SearchThread
 
@@ -48,7 +48,7 @@ class ResultsModel : public QAbstractListModel {
 			OriginalTitleRole,                  // unaltered title
 		};
 	
-		ResultsModel(QList<QPair<QString,double> > &, QObject *parent = 0);
+		ResultsModel(search<Graph> *, QList<QPair<QString,double> > &, QObject *parent = 0);
 		
 		
 		int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -59,7 +59,10 @@ class ResultsModel : public QAbstractListModel {
 		double max() const;
 		
 	private:
-		QList<QPair<QString,double> > m_resultList;
+		search<Graph>					*m_searchEngine;
+		QList<QPair<QString,double> >   m_resultList;
+		mutable QMap<int, QString>		    m_summaryList;
+		
 	    
 };
 
@@ -130,14 +133,14 @@ class SearchResults : public QWidget
 		void setupConnections();
 		void addRow(QStandardItemModel *model, const QString &title);
 		
-		QList<QPair<QString,double> > resultList;
-		search<Graph> *searchEngine;
-		QStringList topTerms;
-		QLabel *related_terms;
-		QLabel *related_label;
-		ResultsView *search_result_list;
-		SearchThread *m_searchThread;
-		SearchStatus 				*searchStatus;
+		QList<QPair<QString,double> > 	resultList;
+		search<Graph> 					*searchEngine;
+		QStringList 					topTerms;
+		QLabel 							*related_terms;
+		QLabel 							*related_label;
+		ResultsView 					*search_result_list;
+		SearchThread 					*m_searchThread;
+		SearchStatus 					*searchStatus;
 };
 
 

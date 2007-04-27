@@ -69,7 +69,7 @@ void SearchResults::setupLayout(){
 	search_result_list->setDragEnabled(true);
 	search_result_list->setAlternatingRowColors(true);
 	search_result_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	search_result_list->setModel(new ResultsModel(resultList));
+	search_result_list->setModel(new ResultsModel(searchEngine, resultList));
 	
 	searchStatus = new SearchStatus();
 	searchStatus->setAlignment(Qt::AlignCenter);
@@ -114,13 +114,13 @@ void SearchResults::searchCompleted(){
 
 	resultList = resultList = m_searchThread->getSearchResults();
 	if( resultList.count() ){
-		ResultsModel *model = new ResultsModel(resultList);
+		ResultsModel *model = new ResultsModel(searchEngine, resultList);
 		search_result_list->setModel(model);
 		searchStatus->setVisible(false);
 		search_result_list->setVisible(true);
 	} else {
 		searchStatus->setStatus("No Results");
-//		search_result_list->setModel(new ResultsModel(resultList));
+//		search_result_list->setModel(new ResultsModel(searchEngine, resultList));
 	}
 	searchFinished();
 		
@@ -229,8 +229,12 @@ void SearchThread::run() {
 /* ***************************************************************** *
  * 		ResultsModel implementation
  * ***************************************************************** */
-ResultsModel::ResultsModel(QList<QPair<QString,double> > &resultList, QObject *parent)
-			: QAbstractListModel(parent), m_resultList(resultList) {}
+ResultsModel::ResultsModel(search<Graph> *s, QList<QPair<QString,double> > &resultList, QObject *parent)
+			: QAbstractListModel(parent), m_searchEngine(s)
+{
+	m_resultList = resultList; 
+	m_summaryList.clear();
+}
 
 
 int ResultsModel::rowCount(const QModelIndex &) const 
@@ -266,14 +270,18 @@ QVariant ResultsModel::data(const QModelIndex &index, int role) const
 		return QVariant();		
 		
 	QPair<QString,double> singleResult = m_resultList[index.row()];
-		
+	QString title = singleResult.first;
 		
 	switch(role) {
 		case TitleRole:
-			return QString(singleResult.first);
+			return QString(title);
 			break;
 		case DetailRole:
-			return QString("");
+			if(!m_summaryList.count(index.row())) {
+				std::string summary = m_searchEngine->summarize_document(title.toStdString(),2);
+				m_summaryList.insert(index.row(),QString::fromStdString(summary));
+			}
+			return QString(m_summaryList[index.row()]);
 			break;
 		case IdRole:
 			return 101;
@@ -289,6 +297,8 @@ QVariant ResultsModel::data(const QModelIndex &index, int role) const
 	}
 	return QVariant();
 }
+
+
 
 QMap<int, QVariant>
 ResultsModel::itemData(const QModelIndex &index) const 
@@ -310,35 +320,6 @@ ResultsModel::itemData(const QModelIndex &index) const
 	return data_map;
 }
 
-/* Helper functions */
-QStringList make_string_conform_to_width(QString s, QFontMetrics m, unsigned int w, int max) {
-    std::vector<unsigned int> p;
-    
-    if (m.boundingRect(s).width() <= static_cast<int>(w)) return QStringList() << s;
-    QStringList l = s.split(" ", QString::SkipEmptyParts);
-    
-	QStringList n;
-    int i;
-    
-    QString cs;
-    for(i = 0; i < l.size(); i++) {
-        QString test = cs.append(l[i]).append(" ");
-        
-        if (m.boundingRect(test).width() >= static_cast<int>(w) || l.size()-1==i) {
-            // if this is our last one (max will be hit), then add "..." to end if more exists
-            if (n.size()+1 == max && i < l.size()-1) {
-                cs = cs.append("...");
-            }
-            n << cs;
-            cs.clear();
-        } else {
-            cs = test;            
-        }
-        if (n.size() == max) break; // if we've hit max
-    }
-    
-    return n;
-}
 
 
 /* ********************************************************************** *
@@ -365,7 +346,7 @@ QRect ResultsView::visualRect(const QModelIndex &index) const
 	}
 
 int ResultsView::rowHeight() const {
-	return 30;
+	return 50;
 }
 
 void ResultsView::scrollTo(const QModelIndex &index, ScrollHint)
@@ -561,8 +542,8 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 	QColor rankBarColor(200, 70, 70);
 	QFont font("Verdana", 12);
 	QFont small_font("Verdana", 9);
-	QFontMetrics metrics(font);
-	QFontMetrics small_metrics(small_font);
+	QFontMetricsF metrics(font);
+	QFontMetricsF small_metrics(small_font);
 	
 	QPainter painter(viewport());
 	painter.setRenderHint(QPainter::Antialiasing);
@@ -592,7 +573,7 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 				QString elidedTitle = metrics.elidedText(titleString, Qt::ElideMiddle, viewport()->width() - D_LEFT_SPACING - D_RIGHT_SPACING - D_RANK_BAR_WIDTH - 10 );
 				
 				
-				QRect titleRect = metrics.boundingRect(elidedTitle);
+				QRectF titleRect = metrics.boundingRect(elidedTitle);
 				painter.drawText(D_LEFT_SPACING, i*rowHeight() + titleRect.height() + D_TOP_SPACING - 1, elidedTitle);
 				
 				
@@ -605,7 +586,7 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 					
 					
 				
-				QRect barRect(viewport()->width() - D_RANK_BAR_WIDTH - D_RIGHT_SPACING, D_TOP_SPACING + i*rowHeight(), width, D_RANK_BAR_HEIGHT);
+				QRectF barRect(viewport()->width() - D_RANK_BAR_WIDTH - D_RIGHT_SPACING, D_TOP_SPACING + i*rowHeight(), width, D_RANK_BAR_HEIGHT);
 				painter.fillRect(barRect, isH?highlightedColor:rankBarColor);
 				
 				// the summary -- just below the title
@@ -613,11 +594,14 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 				painter.setFont(small_font);
 				isH?painter.setPen(Qt::lightGray):painter.setPen(Qt::darkGray);
 				QString summaryString = model()->data(index, ResultsModel::DetailRole).toString();
-				QStringList summaryList = make_string_conform_to_width(summaryString, small_metrics, viewport()->width() - D_LEFT_SPACING - D_RIGHT_SPACING - 30, 2);
-				for(int k = 0; k < summaryList.size(); k++) {
-    				QRect summaryRect = small_metrics.boundingRect(summaryString);
-    				painter.drawText(D_LEFT_SPACING, k*summaryRect.height() + i*rowHeight() + titleRect.height() + summaryRect.height() + D_TOP_SPACING, summaryList[k]);				    
-				}
+				summaryString.replace(QRegExp("\\s+"), " ");
+				QString elidedSummary = small_metrics.elidedText(summaryString, Qt::ElideRight, (viewport()->width() - D_LEFT_SPACING - D_RIGHT_SPACING - D_RANK_BAR_WIDTH - 20)*2 );
+				painter.drawText(	D_LEFT_SPACING + 10, 
+									i*rowHeight() + titleRect.height() + D_TOP_SPACING + 4,
+									viewport()->width() - D_LEFT_SPACING - D_RIGHT_SPACING - D_RANK_BAR_WIDTH - 10,
+									small_metrics.boundingRect(summaryString).height()*2 + 2,
+									Qt::TextWordWrap, elidedSummary);				    
+				
 				painter.restore();
 			}
 		}

@@ -30,7 +30,7 @@ class SearchWidget : public QWidget
 	
 	public slots:	
 		void showCollectionWidget();
-		//void doSearch();
+		void updatePruning(int);
 		void findSimilar();
 		void paste();
 		void populateCollectionMenu();
@@ -55,6 +55,7 @@ class SearchWidget : public QWidget
 		CollectionWidget *indexer;
 		searchType m_searchMethod;
 		
+		QSpinBox *pruningSpinBox;
 		QTabWidget *resultsTab;
 		QShortcut *keywordShortcut;
 		GraphController *controller;

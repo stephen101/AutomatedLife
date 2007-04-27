@@ -40,7 +40,7 @@ void MainWindow::copyIndex(){
 
  void MainWindow::about()
  {
-	QString text(tr("The Semantic Engine is an attempt to improve on keyword searches.\n\n"));
+	QString text(tr("The Semantic Engine is a tool for exploring and visualizing textual data, based on the underlying semantic structure of the documents.\n\n"));
 	text += QString(tr("Version ")) + QString(SEMANTIC_VERSION_STRING);
 
     QMessageBox::about(this,tr("Semantic Engine"),text);
@@ -118,7 +118,7 @@ void MainWindow::minimize(){
      fileMenu = menuBar()->addMenu(tr("&File"));
      //fileMenu->addAction(openAct);
 	 //fileMenu->addAction(exportAct);
-     fileMenu->addSeparator();
+     //fileMenu->addSeparator();
 	 fileMenu->addAction(closeAct);
      fileMenu->addAction(exitAct);
 

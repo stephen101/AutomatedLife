@@ -16,6 +16,7 @@ SearchWidget::SearchWidget(QString dataFile, QWidget *parent)
 	}
 	
 	collectionComboBox = new QComboBox();
+	
 	openDataFile(dataFile);
 
 	setupLayout();
@@ -78,6 +79,7 @@ void SearchWidget::setupLayout(){
 	clear->setToolTip(tr("Clear saved results"));
 	
 	
+	
 	// results tools
 	tools->setSpacing(2);
 	tools->setAlignment(Qt::AlignRight);
@@ -91,15 +93,35 @@ void SearchWidget::setupLayout(){
 	saved->setLayout(contents);
 	
 	// settings 
-	QGroupBox *settingsBox = new QGroupBox(tr("Settings"));
+	QGroupBox *settingsBox = new QGroupBox(tr("Search Settings"));
 	QVBoxLayout *settingsLayout = new QVBoxLayout;
 	
-		
-	keyword = new QCheckBox(tr("Keyword Only"));
+	QFont settingsFont("Lucida Grande",12);
+	keyword = new QCheckBox(tr("Keyword"));
+	keyword->setFont(settingsFont);
+	
+	pruningSpinBox = new QSpinBox;
+	pruningSpinBox->setRange(10,100);
+	pruningSpinBox->setSuffix("%");
+	pruningSpinBox->setSingleStep(5);
+	pruningSpinBox->setValue(30);
+	pruningSpinBox->setMaximumWidth(60);
+	pruningSpinBox->setToolTip(tr("Set the 'graph pruning factor' -- a higher value returns more results but is slower"));
+	pruningSpinBox->setFont(settingsFont);
+	
+	collectionComboBox->setFont(settingsFont);
+	
+	QLabel *pruningLabel = new QLabel("Pruning");
+	pruningLabel->setFont(settingsFont);
+	
+	QHBoxLayout *graphSettingsLayout = new QHBoxLayout();
+	graphSettingsLayout->addWidget(keyword);
+	graphSettingsLayout->addWidget(pruningSpinBox);
+	graphSettingsLayout->addWidget(pruningLabel);
 	
 	settingsLayout->setAlignment(Qt::AlignTop);
 	settingsLayout->addWidget(collectionComboBox);
-	settingsLayout->addWidget(keyword);
+	settingsLayout->addLayout(graphSettingsLayout);
 	settingsBox->setLayout(settingsLayout);
 
 	// query 
@@ -153,9 +175,14 @@ void SearchWidget::setupLayout(){
 
 }
 
-
+void SearchWidget::updatePruning(int val){
+	float pruning = (float)val/100;
+	m_graph->keep_only_top_edges(pruning);
+	
+}
 
 void SearchWidget::setupConnections(){
+	connect(pruningSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updatePruning(int)));
 	connect(keywordShortcut, SIGNAL(activated()),keyword, SLOT(toggle()));
 	connect(clear,SIGNAL(clicked()), basket, SLOT(clearAll()));
 	connect(queryField, SIGNAL(returnPressed()), search, SLOT(animateClick()));
@@ -178,12 +205,10 @@ void SearchWidget::changeCollection(const QString &collection){
 
 
 void SearchWidget::newSearch(QString &query){
-	std::cerr << "new search" << std::endl;
 	if( query.contains(" ") ){
 		query = "\"" + query + "\"";
 	}
 	queryField->setText(query);
-	std::cerr << query.toStdString() << std::endl;
 	startSearch();
 }
 
@@ -214,9 +239,11 @@ void SearchWidget::findSimilar(){
 }
 
 void SearchWidget::startSearch() { 
-	//std::cerr << "started Search" << std::endl;
 	find_similar->setEnabled(false);
+	pruningSpinBox->setEnabled(false);
+	keyword->setEnabled(false);
 	search->setEnabled(false);
+	collectionComboBox->setEnabled(false);
 	cluster_area->startSearch();
 	visualization_area->startSearch();
 	if( keyword->checkState() == Qt::Checked ){
@@ -228,7 +255,6 @@ void SearchWidget::startSearch() {
 }
 
 void SearchWidget::populateSearchResults(){
-	//std::cerr << "search completed" << std::endl;
 	
 	QList<QPair<QString,double> > results = search_area->getSearchResults();
 	
@@ -246,6 +272,10 @@ void SearchWidget::populateSearchResults(){
 
 	find_similar->setEnabled(true);
 	search->setEnabled(true);
+	pruningSpinBox->setEnabled(true);
+	keyword->setEnabled(true);
+	collectionComboBox->setEnabled(true);
+	
 	if( resultsTab->currentIndex() == VisualTab and m_searchMethod != KeywordSearch  ){
 		visualization_area->start();
 	}
