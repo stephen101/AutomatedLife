@@ -19,7 +19,13 @@ debug {
 }
 
 # define storage engine
-DEFINES += MYSQL_STORAGE
+contains( STORAGE, mysql ) {
+    message( "Building with MySQL storage" )
+	DEFINES += MYSQL_STORAGE
+} else {
+	message ("Building with SQLite storage")
+	DEFINES += SQLITE_STORAGE
+}
 
 
 # Input

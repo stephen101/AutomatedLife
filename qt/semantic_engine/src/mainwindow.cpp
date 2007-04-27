@@ -51,15 +51,15 @@ void MainWindow::copyIndex(){
  void MainWindow::createActions()
  {
 
-     openAct = new QAction(tr("&Open..."), this);
-     openAct->setShortcut(tr("Ctrl+O"));
-     openAct->setStatusTip(tr("Open an existing index file"));
-     connect(openAct, SIGNAL(triggered()), this, SLOT(openIndex()) );
+     //openAct = new QAction(tr("&Open..."), this);
+     //openAct->setShortcut(tr("Ctrl+O"));
+     //openAct->setStatusTip(tr("Open an existing index file"));
+     //connect(openAct, SIGNAL(triggered()), this, SLOT(openIndex()) );
 
-     exportAct = new QAction(tr("&Export..."), this);
-     exportAct->setShortcut(tr("Ctrl+E"));
-     exportAct->setStatusTip(tr("Save this semantic index"));
-     connect(exportAct, SIGNAL(triggered()), this, SLOT(copyIndex()) );
+     //exportAct = new QAction(tr("&Export..."), this);
+     //exportAct->setShortcut(tr("Ctrl+E"));
+     //exportAct->setStatusTip(tr("Save this semantic index"));
+     //connect(exportAct, SIGNAL(triggered()), this, SLOT(copyIndex()) );
 
 	 closeAct = new QAction(tr("&Close"), this);
 	 closeAct->setShortcut(tr("Ctrl+W"));
@@ -116,8 +116,8 @@ void MainWindow::minimize(){
  void MainWindow::createMenus()
  {
      fileMenu = menuBar()->addMenu(tr("&File"));
-     fileMenu->addAction(openAct);
-	 fileMenu->addAction(exportAct);
+     //fileMenu->addAction(openAct);
+	 //fileMenu->addAction(exportAct);
      fileMenu->addSeparator();
 	 fileMenu->addAction(closeAct);
      fileMenu->addAction(exitAct);

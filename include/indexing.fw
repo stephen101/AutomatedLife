@@ -1939,7 +1939,7 @@ namespace semantic {
                 std::map<std::string, std::pair<std::string,int> > new_wordlist;
                 typedef std::multimap< int, std::string, std::greater<int> > RevMap;
 
-                std::multimap<std::string,UnstemmedCount>::iterator pos;
+                std::map<std::string,UnstemmedCount>::iterator pos;
                 for( pos = wordlist.begin(); pos != wordlist.end(); ++pos ){
                     std::string stemmed = pos->first;
                     UnstemmedCount unstemmed = pos->second;
@@ -2065,7 +2065,7 @@ namespace semantic {
                                         filename, node_type_major_doc));
                             // attach the text
                             base_type::g.set_vertex_meta_value(u, "body", text);
-                        } catch ( std::exception &e){
+                        } catch ( std::exception &){
                             //std::cerr << "Error: " << e.what() << std::endl;
                             continue;
                         }
@@ -2172,28 +2172,6 @@ namespace semantic {
                     wordlist[dpos->first].erase(dpos->second);
                 }
             }
-
-/*
-            RevMap lookup;
-            int total = wordlist[stemmed]["__count"];
-            UnstemmedCount::iterator cpos;
-            for( cpos = unstemmed.begin(); cpos != unstemmed.end(); ++cpos ){
-                if( cpos->first != "__count" && total >= min_occurrence ){
-                    lookup.insert( make_pair( cpos->second, cpos->first ) );
-                }
-            }
-            if( lookup.size() >= 1 ){
-                std::string word = lookup.begin()->second;
-                std::string lower(word);
-                std::transform(word.begin(),word.end(),lower.begin(),tolower);
-
-                // skip words that don't have differing stems
-                if( lower != stemmed ){
-                    new_wordlist.insert( std::make_pair(stemmed, std::make_pair(word, total) ) );
-                }
-            }
-*/
-
 
             std::string get_mime_type_from_filename( const std::string& filename )
             {
