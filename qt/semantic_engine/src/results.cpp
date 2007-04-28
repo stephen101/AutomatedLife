@@ -542,8 +542,8 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 	QColor rankBarColor(200, 70, 70);
 	QFont font("Verdana", 12);
 	QFont small_font("Verdana", 9);
-	QFontMetricsF metrics(font);
-	QFontMetricsF small_metrics(small_font);
+	QFontMetrics metrics(font);
+	QFontMetrics small_metrics(small_font);
 	
 	QPainter painter(viewport());
 	painter.setRenderHint(QPainter::Antialiasing);
@@ -573,7 +573,7 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 				QString elidedTitle = metrics.elidedText(titleString, Qt::ElideMiddle, viewport()->width() - D_LEFT_SPACING - D_RIGHT_SPACING - D_RANK_BAR_WIDTH - 10 );
 				
 				
-				QRectF titleRect = metrics.boundingRect(elidedTitle);
+				QRect titleRect = metrics.boundingRect(elidedTitle);
 				painter.drawText(D_LEFT_SPACING, i*rowHeight() + titleRect.height() + D_TOP_SPACING - 1, elidedTitle);
 				
 				
@@ -586,7 +586,7 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 					
 					
 				
-				QRectF barRect(viewport()->width() - D_RANK_BAR_WIDTH - D_RIGHT_SPACING, D_TOP_SPACING + i*rowHeight(), width, D_RANK_BAR_HEIGHT);
+				QRect barRect(viewport()->width() - D_RANK_BAR_WIDTH - D_RIGHT_SPACING, D_TOP_SPACING + i*rowHeight(), width, D_RANK_BAR_HEIGHT);
 				painter.fillRect(barRect, isH?highlightedColor:rankBarColor);
 				
 				// the summary -- just below the title
