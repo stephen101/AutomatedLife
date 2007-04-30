@@ -68,13 +68,13 @@ win32 {
 
     QMAKE_CXXFLAGS += -IC:/Boost/include/boost-1_33_1 \
                       -IC:/SQLite/include \
-                      -IC:/MySQL/include \
-                      -IC:/Progra~1/GnuWin32/include
+                      -IC:/Progra~1/GnuWin32/include \
+                      -IC:/Semantic/include/msword-reader \
+                      -IC:/Semantic/include/pdf-reader
 
     LIBS += C:/Boost/lib/libboost_filesystem-mgw.lib \
             C:/SQLite/lib/sqlite3.dll \
-            C:/MySQL/lib/opt/libmysql.a \
-            C:/Progra~1/GnuWin32/lib/libiconv.lib
+            C:/Progra~1/GnuWin32/lib/libiconv.lib 
 
 }
 

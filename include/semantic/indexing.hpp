@@ -181,9 +181,10 @@ namespace semantic {
 
                 if( pdfLayout.size() && pdfLayout != "layout")
                     reader.set_pdfLayout( pdfLayout );
+				
 
                 std::string text = reader( filename );
-                if( text.size() > 10 ){
+				if( text.size() > 10 ){
                     add_to_index( filename, text, multiplier );
                 }
                 return text;
@@ -360,7 +361,10 @@ namespace semantic {
                 base_type::g.set_vertex_meta_value(u, "term", word);
             } catch ( std::exception &){
                 continue;
-            }
+			} catch ( char * e ){
+				std::cerr << "Error: " << e << std::endl;
+				continue;
+			}
         }
     }
 
@@ -390,13 +394,18 @@ namespace semantic {
                 } catch ( std::exception &e){
                     std::cerr << "Error Indexing to Database: " << e.what() << std::endl;
                     return false;
-                }
+				} catch ( char * e ){
+					std::cerr << "Error: " << e << std::endl;
+					return false;
+				}
 
                 try {
                      store_wordlist(min);
                 }    catch ( std::exception &e ) {
                     std::cerr << "Error storing wordlist" << e.what() << std::endl;
-                }
+				} catch ( char * e ){
+					std::cerr << "Error: " << e << std::endl;
+				}
 
 
                 std::map<std::string,std::string>::iterator pos;
@@ -415,7 +424,11 @@ namespace semantic {
                         } catch ( std::exception &){
                             //std::cerr << "Error: " << e.what() << std::endl;
                             continue;
-                        }
+						} catch ( char * e ){
+							std::cerr << "Error: " << e << std::endl;
+							continue;
+						}
+
                     }
                 }
                 return true;
@@ -468,11 +481,12 @@ namespace semantic {
                 if( storeText ){
                     text_store[doc_id] = text;
                 }
-                std::map<std::string,int> terms = parser.parse( text, wordlist );
+				std::map<std::string,int> terms = parser.parse( text, wordlist );
                 std::map<std::string,int>::iterator tpos;
-                std::string value = base_type::g.get_meta_value("doc_min","1");
+				
+				std::string value = base_type::g.get_meta_value("doc_min","1");
                 int min = atoi(value.c_str());
-                for( tpos = terms.begin(); tpos != terms.end(); ++tpos ){
+				for( tpos = terms.begin(); tpos != terms.end(); ++tpos ){
                     std::string term = tpos->first;
                     if( tpos->second >= min ){
                         unsigned int weight = tpos->second * multiplier;
@@ -481,13 +495,13 @@ namespace semantic {
                     }
                 }
 
-                if( !(files_indexed % 5000 ) ){
-                    manage_wordlist();
-                }
+//                if( !(files_indexed % 5000 ) ){
+//                    manage_wordlist();
+//                }
             }
 
 
-
+/*
             void manage_wordlist(const unsigned int max=3)
             {
                 typedef std::multimap<int,std::string,std::less<int> > RevMap;
@@ -506,7 +520,7 @@ namespace semantic {
                             }
                         }
                         RevMap::iterator spos;
-                        unsigned int i = lookup.size();
+                        unsigned int i = (int)lookup.size();
                         for( spos = lookup.begin(); spos != lookup.end(); ++spos ){
                             if( i-- > max ){
                                 to_delete.insert( make_pair( stemmed, spos->second ) );
@@ -520,7 +534,8 @@ namespace semantic {
                 }
             }
 
-            std::string get_mime_type_from_filename( const std::string& filename )
+*/
+			std::string get_mime_type_from_filename( const std::string& filename )
             {
                 std::string::size_type pos = filename.find_last_of(".");
                 std::string ext = filename.substr(pos+1,filename.size()-pos-1);

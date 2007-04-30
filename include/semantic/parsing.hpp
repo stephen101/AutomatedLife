@@ -92,8 +92,8 @@ namespace semantic {
 
                 // POS tag
                 std::map<std::string,int> terms;
-
-                try {
+				
+				try {
                     if( POS_pattern == "noun_phrases"){
                         terms = parser.get_noun_phrases( intext );
                     } else if ( POS_pattern == "adjectives"){
@@ -107,7 +107,7 @@ namespace semantic {
                     } else {
                         terms = parser.get_nouns( intext );
                     }
-                    terms = parser.remove_tags( terms );
+					terms = parser.remove_tags( terms );
 
                 } catch ( std::exception& e ){
                     std::string POS = POS_pattern;
@@ -115,11 +115,11 @@ namespace semantic {
                         POS = "nouns";
                     }
                     std::cerr << "Error getting " << POS << ": " << e.what() << std::endl;
-                }
+				} catch ( char * e ){
+					std::cerr << "Error: " << e << std::endl;
+				}
 
                 // pass through a word filter
-                
-                
                 for( std::vector<WordPtr>::iterator ptr = word_filters.begin();
                          ptr != word_filters.end(); ++ptr ){
                      WordPtr filter = *ptr;
@@ -139,9 +139,8 @@ namespace semantic {
                         terms.erase(*i);
                     }
                 }
-                
-
-                return stem ( terms, unstemmed );
+				
+                return stem( terms, unstemmed );
             }
 
 
@@ -182,14 +181,15 @@ namespace semantic {
             std::map<std::string,int> stem(
                         const std::map<std::string,int>& terms,
                         std::map<std::string,UnstemmedCount>& unstemmed ){
-
-                stemming::english_stem Stemmer;
-                std::map<std::string,int> stemmed;
+				stemming::english_stem Stemmer;
+                std::string letters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+				std::map<std::string,int> stemmed;
                 std::map<std::string,int>::const_iterator pos;
-                for( pos = terms.begin(); pos != terms.end(); ++pos ){
+				
+				for( pos = terms.begin(); pos != terms.end(); ++pos ){
                     std::string word( pos->first );
-                    std::string original(word);
-                    if( enable_stemming ){
+				    std::string original(word);
+					if( enable_stemming && word.find_first_of(letters) != std::string::npos){
                         Stemmer(word);
                     }
                     if( word.length() > 0 ){

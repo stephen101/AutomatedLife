@@ -99,6 +99,7 @@ namespace semantic {
 				std::string prev_encoding = default_encoding;
 				set_default_encoding( encoding );
 				std::string text = file_to_text( filename );
+//				std::cerr << text << std::endl;
 				set_default_encoding( prev_encoding );
 				smart_quotes_filter filter;
 				return filter(text);
@@ -113,6 +114,7 @@ namespace semantic {
 				 *		text/html
 				 */	
 				std::string text = file_to_text( filename );
+//				std::cerr << text << std::endl;
 				smart_quotes_filter filter;
 				return filter(text);
 			}
