@@ -49,8 +49,8 @@ void apply_weights(Vertex u, const NeighborList &nlist, Graph &g, WeightMap w)
 In the above, @{NeighborList@} is a @{std::vector@} of
 @{std::pair<edge_properties_type, vertex_properties_type>@}, defining the edge properties
 vertex properties of the target node of the edge for each edge. For this reason, the output
-placed in the @{WeightMap@} (which is a @/BOOST@/ property map) is keyed by the ID (@{se_graph_traits<Graph>::vertex_id_type@})
-of the target node of the edge.
+placed in the @{WeightMap@} (which is a @/BOOST@/ property map) is keyed by the
+ID (@{se_graph_traits<Graph>::vertex_id_type@}) of the target node of the edge.
 
 @C@<Method 2: Edges are in Graph@>
 
@@ -72,8 +72,12 @@ graph using @/BOOST@/ graph library calls. The @{WeightMap@} is keyed by edge
 Term frequency uses the number of times a term appears in a document to describe the weight
 of the edge connecting the two.
 
-@$@<TF in graph@>==@{put(w, *ei, g[*ei].strength);@}
-@$@<TF not in graph@>==@{put(w, g.get_vertex_id((*ei).second), (*ei).first.strength);@}
+@$@<TF in graph@>==@{
+    put(w, *ei, g[*ei].strength);
+@}
+@$@<TF not in graph@>==@{
+    put(w, g.get_vertex_id((*ei).second), (*ei).first.strength);
+@}
 
 @C@<IDF: Inverse Document Frequency@>
 
@@ -86,7 +90,9 @@ of nodes of the same type as the @/source@/ node type, and the @{degree@} is the
 degree of the target node, but only those edges pointing at nodes of the same type
 as the source node.
 
-@$@<IDF in graph@>==@{put(w, *ei, log(1+count/(g[*ei].to_degree)));@}
+@$@<IDF in graph@>==@{
+    put(w, *ei, log(1+count/(g[*ei].to_degree)));
+@}
 @$@<IDF not in graph@>==@{
     put(w, g.get_vertex_id((*ei).second), log(1+count/((*ei).first.to_degree)));
 @}
@@ -107,8 +113,12 @@ that takes two other @/Weighting Algorithms@/ and multiplies them together.
 The @/Semantic Engine@/ also offers a "No Weighting" class, which just sets any weight asked
 for to "1".
 
-@$@<None in graph@>==@{put(w, *ei, 1);@}
-@$@<None not in graph@>==@{put(w, g.get_vertex_id((*ei).second), 1);@}
+@$@<None in graph@>==@{
+    put(w, *ei, 1);
+@}
+@$@<None not in graph@>==@{
+    put(w, g.get_vertex_id((*ei).second), 1);
+@}
 
 @B@<The Code Files@>
 
