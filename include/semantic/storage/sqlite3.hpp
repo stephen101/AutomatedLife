@@ -164,7 +164,7 @@ namespace semantic {
 			}
 			
 			// methods for fetching graph contents
-#ifdef MSVC
+#ifdef WIN32
 			Vertex vertex_by_id(id_type id) throw (...) {
 #else
 			Vertex vertex_by_id(id_type id) throw (VertexNotFoundException<id_type>) {
@@ -186,7 +186,7 @@ namespace semantic {
 			}
 			
 			template <class Iterator, class OutIterator>
-#ifdef MSVC
+#ifdef WIN32
 			void vertices_by_id(Iterator i, Iterator i_end, OutIterator out) throw (...) {
 #else
 			void vertices_by_id(Iterator i, Iterator i_end, OutIterator out) throw (VertexNotFoundException<id_type>) {
@@ -218,7 +218,7 @@ namespace semantic {
 				}
 			}
 
-#ifdef MSVC
+#ifdef WIN32
 			id_type get_vertex_id(const Vertex u) const throw(...) {
 #else
 			id_type get_vertex_id(const Vertex u) const throw(IdNotFoundException) {
@@ -227,7 +227,7 @@ namespace semantic {
 				throw IdNotFoundException();
 			}
 
-#ifdef MSVC
+#ifdef WIN32
 			id_type get_vertex_id(const vertex_properties &p) const throw(...) {
 #else
 			id_type get_vertex_id(const vertex_properties &p) const throw(IdNotFoundException) {
@@ -236,7 +236,7 @@ namespace semantic {
 				throw IdNotFoundException();
 			}
 
-#ifdef MSVC
+#ifdef WIN32
 			id_type fetch_vertex_id_by_content_and_type(std::string content, int type) throw(...) {
 #else
 			id_type fetch_vertex_id_by_content_and_type(std::string content, int type) throw(VertexContentNotFoundException) {
@@ -478,7 +478,7 @@ namespace semantic {
 			}
 			
 			// specific functions for this storage policy
-#ifdef MSVC
+#ifdef WIN32
 			void open() throw (...) {
 #else
 			void open() throw (SQLiteException) {
@@ -708,7 +708,7 @@ namespace semantic {
 				return res_str;
 			}
 
-#ifdef MSVC
+#ifdef WIN32
 			void query(std::string q) throw(...) {
 #else
 			void query(std::string q) throw(SQLiteException) {
