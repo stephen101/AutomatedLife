@@ -202,7 +202,7 @@ namespace semantic {
 						tok = tok.substr(0,pos+1);
 					}
 
-					if( tok.size() > 2 ){
+					if( tok.size() > 2 && tok.find_first_of(letters,0) != std::string::npos ){
 						Stemmer(tok);
 						if( tok.length() > 0 ){
 							// make lower case

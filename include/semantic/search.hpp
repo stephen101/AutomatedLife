@@ -161,9 +161,10 @@ namespace semantic {
 			for(; i != i_end; ++i ){
 				try {
 				    vertices.push_back( g.fetch_vertex_id_by_content_and_type(*i, node_type_major_doc) );
-			    } catch (std::exception &e) {
+			    } catch (std::exception &) {
 			        // something didn't work! oh well...
-			    }
+					continue;
+				}
 			}
 			return do_search(vertices);
 		}

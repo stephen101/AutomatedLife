@@ -196,7 +196,8 @@ namespace semantic {
                 std::string::size_type nextPos;
                 std::string::size_type pos;
 
-                delim = "\u2015";
+#ifndef WIN32
+				delim = "\u2015";
                 replace = "";
                 
                 pos = cleaned.find_first_of(delim,0);
@@ -224,9 +225,13 @@ namespace semantic {
                     }
                     pos = cleaned.find_first_of(delim,pos);
                 }
-                
+#endif                
 
-                delim = "\u2012\u2013\u2014";
+#ifdef WIN32
+                delim = "\u2013\u2014";
+#else
+				delim = "\u2012\u2013\u2014";
+#endif
                 replace = "--";
                 
                 pos = cleaned.find_first_of(delim,0);

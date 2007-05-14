@@ -144,7 +144,7 @@ namespace semantic {
 			
 			template <class Rand> void set_rand(Rand &r, D range = 1.0) {
 				for(int i = 0; i < 3; i++) {
-					m_pt[i] = ((D) ((D)(r() + Rand::min_value)/(D)(Rand::max_value - Rand::min_value)) - 0.5) * 2.0 * range;
+					m_pt[i] = ((D) ((D)(r() + Rand::min_value)/(D)(Rand::max_value - Rand::min_value)) - (D)0.5) * (D)2.0 * range;
 				}
 			}
 			
@@ -171,8 +171,8 @@ namespace semantic {
 			T operator-(const T p) const { return T(x() - p.x(), y() - p.y(), z() - p.z()); }
 			T& operator -=(const T p) { set(*this - p); return *this; }
 			T& operator +=(const T p) { set(*this + p); return *this; }
-			template <typename N> T operator*(const N n) const { return T(x()*n, y()*n, z()*n); }
-			template <typename N> T operator/(const N n) const { return T(x()/n, y()/n, z()/n); }
+			template <typename N> T operator*(const N n) const { return T((float)x()*(float)n, (float)y()*(float)n, (float)z()*(float)n); }
+			template <typename N> T operator/(const N n) const { return T((float)x()/(float)n, (float)y()/(float)n, (float)z()/(float)n); }
 			template <typename N> T& operator*=(const N n) { set(*this*n); return *this; }
 			template <typename N> T& operator/=(const N n) { set(*this/n); return *this; }
 			T& operator=(const T p) { set(p); return *this; }

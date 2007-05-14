@@ -193,7 +193,7 @@ namespace semantic {
 			}
 			
 			
-			std::string file_to_text(const std::string& filename){
+			std::string file_to_text(const std::string filename){
 				std::string::size_type pos;
 				std::string ext;
 				std::string text;

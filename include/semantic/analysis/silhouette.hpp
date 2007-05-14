@@ -7,6 +7,7 @@
 #ifndef __SEMANTIC_ANALYSIS_SILHOUETTE_HPP__
 #define __SEMANTIC_ANALYSIS_SILHOUETTE_HPP__
 
+#include <semantic/semantic.hpp>
 #include <semantic/analysis/shortest_paths.hpp>
 
 namespace semantic { namespace analysis {
@@ -86,7 +87,9 @@ namespace semantic { namespace analysis {
 				if (b[i] < b_best || b_best == 0) b_best = b[i];
 			}
 			a = a_count==0?0:a/a_count;
-			quality_measure_type s = (b_best - a) / max(a, b_best);
+			quality_measure_type m = a>b_best?a:b_best;
+
+			quality_measure_type s = (b_best - a) / m;
 			if (a_count == 0) s = 0; // experiment -- if our cluster only has one node, it gets a quilty of zero
 			put(quality, *vi, s);
 			cluster_quality[this_component] += s;

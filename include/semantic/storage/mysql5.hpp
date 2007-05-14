@@ -501,7 +501,6 @@ namespace semantic {
 				if (m_con != NULL) return; // already connected
 				m_con = mysql_init(NULL);
 				if (m_con == NULL) throw MySQLException("Could not initialize MYSQL connection struct.");
-				
 				// let's actually connect now
 				if (mysql_real_connect(
 						m_con,

@@ -22,12 +22,15 @@ namespace semantic {
         return t * (t<0?-1:1);
     }
     
-    template <typename T>
-    inline T max(const T& one, const T& two) {
+#ifdef EXTRA
+	template <typename T>
+    inline typename T max(
+		const T& one, const T& two) {
         return one>two?one:two;
     }
-    
-    template <typename T>
+#endif
+
+    template <class T>
     inline std::string to_string(T v) {
         std::stringstream strm;
         strm << v;
