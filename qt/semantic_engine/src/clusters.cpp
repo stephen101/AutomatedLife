@@ -268,7 +268,7 @@ void ClusteringThread::run() {
     
     // now let's silhouette this baby
     // measuring clusters between having 2 and having n-1 (or 30, whichever is smaller)... test silhouettes
-	unsigned int best_num = 0, ;
+	unsigned int best_num = 0;
     double best_silhouette = 0;
     for(unsigned int i = 2; i < max_num_clusters; i++) {
         maps::unordered<vertex, unsigned long> cluster_map;

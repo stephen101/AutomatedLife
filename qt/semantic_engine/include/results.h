@@ -55,8 +55,8 @@ class ResultsModel : public QAbstractListModel {
 		QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 		QMap<int, QVariant> itemData(const QModelIndex &index) const;
-		double min() const;
-		double max() const;
+	//	double min() const;
+	//	double max() const;
 		
 	private:
 		search<Graph>					*m_searchEngine;

@@ -32,6 +32,7 @@ class GraphController : public QWidget
 		QString m_host;
 		QString m_user;
 		QString m_password;
+		int m_port;
 
 };
 

@@ -10,12 +10,13 @@
 
 GraphController::GraphController(QWidget *parent) : QWidget(parent) {
 	trials = 100;
-	top_edges = 0.3;
+	top_edges = (float)0.3;
 	depth = 4;
 #ifdef MYSQL_STORAGE
 	m_host = QString("localhost");
 	m_user = QString("semantic");
 	m_database = QString("semantic_engine");
+	m_port = 3306;
 #endif
 }
 
@@ -48,6 +49,7 @@ Graph *GraphController::instance() {
 	info_query.set_host(m_host.toStdString());
 	info_query.set_user(m_user.toStdString());
 	info_query.set_database(m_database.toStdString());
+	info_query.set_port(m_port);
 	std::vector<std::string> collections = info_query.list_collections();
 
 	if( collections.size() == 0 ){
@@ -57,6 +59,7 @@ Graph *GraphController::instance() {
 	g->set_host(m_host.toStdString());
 	g->set_user(m_user.toStdString());
 	g->set_database(m_database.toStdString());
+	g->set_port(m_port);
 	g->set_trials(trials);
 	g->keep_only_top_edges(top_edges);
 	g->set_depth(depth);
@@ -94,6 +97,7 @@ QStringList GraphController::listCollections(){
 	info_query.set_host(m_host.toStdString());
 	info_query.set_user(m_user.toStdString());
 	info_query.set_database(m_database.toStdString());
+	info_query.set_port(m_port);
 	collections = info_query.list_collections();
 
 	for( unsigned i = 0; i < collections.size(); ++i ){

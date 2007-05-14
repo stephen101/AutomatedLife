@@ -276,7 +276,7 @@ void SearchWidget::populateSearchResults(){
 	keyword->setEnabled(true);
 	collectionComboBox->setEnabled(true);
 	
-	if( resultsTab->currentIndex() == VisualTab and m_searchMethod != KeywordSearch  ){
+	if( resultsTab->currentIndex() == VisualTab && m_searchMethod != KeywordSearch  ){
 		visualization_area->start();
 	}
 }

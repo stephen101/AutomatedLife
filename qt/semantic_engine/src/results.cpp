@@ -243,6 +243,7 @@ int ResultsModel::rowCount(const QModelIndex &) const
 	return m_resultList.size();
 }
 
+/*
 double ResultsModel::max() const
 {
 	int size = m_resultList.size();
@@ -262,7 +263,7 @@ double ResultsModel::min() const
 		return 0;
 	}
 }
-
+*/
 QVariant ResultsModel::data(const QModelIndex &index, int role) const
 {
 	
@@ -278,7 +279,12 @@ QVariant ResultsModel::data(const QModelIndex &index, int role) const
 			break;
 		case DetailRole:
 			if(!m_summaryList.count(index.row())) {
-				std::string summary = m_searchEngine->summarize_document(title.toStdString(),2);
+				std::string summary;
+				try {
+					summary = m_searchEngine->summarize_document(title.toStdString(),2);
+				} catch (...){
+					std::cerr << "Error getting summary from: " << title.toStdString() << std::endl;
+				}
 				m_summaryList.insert(index.row(),QString::fromStdString(summary));
 			}
 			return QString(m_summaryList[index.row()]);
@@ -346,7 +352,11 @@ QRect ResultsView::visualRect(const QModelIndex &index) const
 	}
 
 int ResultsView::rowHeight() const {
+#ifdef WIN32
+	return 60;
+#else
 	return 50;
+#endif
 }
 
 void ResultsView::scrollTo(const QModelIndex &index, ScrollHint)
@@ -611,7 +621,7 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 }
 
 
-void ResultsView::resizeEvent(QResizeEvent */*event*/) {
+void ResultsView::resizeEvent(QResizeEvent * /* event */) {
 	updateGeometries();
 }
 

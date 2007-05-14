@@ -65,17 +65,22 @@ macx {
 win32 {
     RC_FILE = search.rc
     SOURCES += src/locate_datafile_win32.cpp
+    DEFINES += MSVC
 
     QMAKE_CXXFLAGS += -IC:/Boost/include/boost-1_33_1 \
                       -IC:/SQLite/include \
+                      -IC:/MySQL/include \
                       -IC:/Progra~1/GnuWin32/include \
-                      -IC:/Semantic/include/msword-reader \
-                      -IC:/Semantic/include/pdf-reader
+                      -IC:/Semantic/msword-reader \
+                      -IC:/Semantic/pdf-reader
 
-    LIBS += C:/Boost/lib/libboost_filesystem-mgw.lib \
-            C:/SQLite/lib/sqlite3.dll \
-            C:/Progra~1/GnuWin32/lib/libiconv.lib 
-
+    LIBS += C:/Boost/lib/libboost_filesystem-vc80-mt-1_33_1.lib \
+            C:/SQLite/lib/sqlite3.lib \
+            C:/MySQL/lib/opt/libmysql.lib \
+            C:/Progra~1/GnuWin32/lib/libiconv.lib \
+            C:/Semantic/msword-reader/MSWordReader.lib \
+            C:/Semantic/pdf-reader/PDFReader.lib 
+            
 }
 
 unix {

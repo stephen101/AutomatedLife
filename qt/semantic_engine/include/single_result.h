@@ -8,7 +8,7 @@ class SingleResultWindow : public QWidget {
 	Q_OBJECT
 	
 public:
-	SingleResultWindow(QString &, QString &title="Document Viewer", QWidget *parent=0);
+	SingleResultWindow(QString &, QString &title=QString(tr("Document Viewer")), QWidget *parent=0);
 
 public slots:
 	void minimize();

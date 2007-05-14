@@ -1,8 +1,12 @@
 #include "visual_gl_display.h"
 #include "single_result.h"
 
-#include <semantic/analysis/utility.hpp>
 #include <math.h>
+#include <semantic/analysis/utility.hpp>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 VisualGLDisplay::VisualGLDisplay(std::string, QWidget *parent) : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), m_mouse_in(false), m_options(SHOW_TERM_NODES | SHOW_EDGES | SIZE_DEGREE) {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -107,7 +111,7 @@ void VisualGLDisplay::paintGL() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	// if we don't have any points to draw, don't draw them.
-	if (m_position.empty() or isSearching ) return;
+	if (m_position.empty() || isSearching ) return;
 	// or if we have no graph
 	if (!m_graph) return;
 	
@@ -131,7 +135,7 @@ void VisualGLDisplay::paintGL() {
 	}
 	
 	
-	glColor4f(0.0,0.3,0.1,0.3);
+	glColor4f(GLfloat(0.0),GLfloat(0.3),GLfloat(0.1),GLfloat(0.3));
 
 	// translate the mouse coordinate into local coordinates
 	point mouse_pos = screenToLocal(m_mouse_pos, true);
@@ -167,18 +171,18 @@ void VisualGLDisplay::paintGL() {
 		if (m_have_highlighted_node && m_highlighted_node == i->first) continue; // draw the highlighted node last	
 
 		if((*m_graph)[i->first].type_major == node_type_major_doc)
-			drawVertex(i->first, i->second.x(), i->second.y(), 0.0, 0.1, 0.6, getVertexSize(i->first));
+			drawVertex(i->first, i->second.x(), i->second.y(), (GLfloat)0.0, (GLfloat)0.1, (GLfloat)0.6, getVertexSize(i->first));
 		else
-			drawVertex(i->first, i->second.x(), i->second.y(), 0.0, 0.6, 0.1, getVertexSize(i->first));
+			drawVertex(i->first, i->second.x(), i->second.y(), (GLfloat)0.0, (GLfloat)0.6, (GLfloat)0.1, getVertexSize(i->first));
 	}
 	
 	if (m_have_highlighted_node) {
 		graph_vertex u = m_highlighted_node;
 		point p = m_position[u];
 		if((*m_graph)[u].type_major == node_type_major_doc)
-			drawVertex(u, p.x(), p.y(), 0.0, 0.1, 0.6, getVertexSize(u));
+			drawVertex(u, p.x(), p.y(), (GLfloat)0.0, (GLfloat)0.1, (GLfloat)0.6, getVertexSize(u));
 		else
-			drawVertex(u, p.x(), p.y(), 0.0, 0.6, 0.1, getVertexSize(u));		
+			drawVertex(u, p.x(), p.y(), (GLfloat)0.0, (GLfloat)0.6, (GLfloat)0.1, getVertexSize(u));		
 	}
 	
 	std::set<graph_vertex> labels_diff;
@@ -228,14 +232,14 @@ void VisualGLDisplay::drawVertex(graph_vertex u, GLfloat x, GLfloat y, GLfloat r
 	GLfloat a = shouldDrawVertex(u)?0.8:0.1;
 	// see if it's highlighted. if so draw it yellow
 	if (m_have_highlighted_node && m_highlighted_node == u) {
-		r = 0.9; g = 0.8; b = 0.15;
+		r = (GLfloat)0.9; g = (GLfloat)0.8; b = (GLfloat)0.15;
 	}
 	
 	int screen_size = static_cast<int>(size / m_dimensions.x() * width());
 	int seg = screen_size * 20 / 50;
 	keep_within_range(seg, 5, 15);
 	
-	const GLfloat f = 0.6;
+	const GLfloat f = (GLfloat)0.6;
 
 	if (screen_size > 2) {
 		// first draw the outer circle
@@ -474,11 +478,11 @@ void VisualGLDisplay::drawLabels() {
 		GLfloat r,g,b;
 		// get the base color
 		if (m_have_highlighted_node && m_highlighted_node == u) {
-			r = 0.9; g = 0.8; b = 0.15;
+			r = (GLfloat)0.9; g = (GLfloat)0.8; b = (GLfloat)0.15;
 		} else if ((*m_graph)[u].type_major == node_type_major_doc) {
-			r = 0.3; g = 0.5; b = 0.8;
+			r = (GLfloat)0.3; g = (GLfloat)0.5; b = (GLfloat)0.8;
 		} else {
-			r = 0.3; g = 0.8; b = 0.5;
+			r = (GLfloat)0.3; g = (GLfloat)0.8; b = (GLfloat)0.5;
 		}
 
 		
@@ -521,7 +525,7 @@ void VisualGLDisplay::drawLabels() {
 		b_y = d_y - 2.0/height() * m_dimensions.y();
 
 		// first draw the line connecting the label and the node in red
-		glColor4f(r,g,b, 0.7);
+		glColor4f(r,g,b, (GLfloat)0.7);
 		glBegin(GL_LINES);
 		{
 			glVertex2f(orig_x, orig_y);
@@ -530,7 +534,7 @@ void VisualGLDisplay::drawLabels() {
 		glEnd();
 
 	//	glColor4f(0.9,0.9,0.9,1.0);
-		glColor4f(r,g,b,0.8);
+		glColor4f(r,g,b,(GLfloat)0.8);
 		drawFilledRect(b_x,b_y,box_local.x(),box_local.y());
 		glColor4f(0,0,0,1);
 		renderText(d_x,d_y,0,QString(the_label.c_str()),font);

@@ -25,7 +25,7 @@ void IndexingThread::run(){
 	
 	std::vector<std::string> filenames;
 	for( int i = 0; i < m_directories.count(); ++i ){
-		std::cerr << m_directories.at(i).toStdString() << std::endl;
+		//std::cerr << m_directories.at(i).toStdString() << std::endl;
 		file_finder f(m_directories.at(i).toStdString());
 		f.add_file_ext("html");
 		f.add_file_ext("htm");
@@ -48,14 +48,10 @@ void IndexingThread::run(){
 	QString indexingMessage = tr("Indexing ") + QVariant((int)filenames.size()).toString() + " files";
 	/* emit */ status(indexingMessage);
 	
+	// blacklist
 	QFile blacklistFile(":data/stoplist_en.txt");
 	blacklistFile.open(QIODevice::ReadOnly);
 	QTextStream blacklistStream(&blacklistFile);
-	QFile lexiconFile(":data/lexicon.txt");
-	lexiconFile.open(QIODevice::ReadOnly);
-	QTextStream lexiconStream(&lexiconFile);
-	
-	// blacklist
 	std::set<std::string> blacklist;
 	while(true) {
 		QString str = blacklistStream.readLine();
@@ -63,15 +59,6 @@ void IndexingThread::run(){
 		blacklist.insert(str.toStdString());
 	}
 	
-	// lexicon
-	std::string lexicon;
-	while(true) {
-		QString str = lexiconStream.readLine();
-		if (str.isNull()) break;
-		lexicon += str.toStdString() + "\n";
-	}
-	// turn the lexicon into a stringstream for reading by the indexer/parser
-	std::stringstream lexiconStrStream(lexicon, std::ios_base::in);
 	
 	m_graph->set_mirror_changes_to_storage(true);
 	m_graph->set_meta_value("locations", m_directories.join(", ").toStdString());
@@ -81,18 +68,17 @@ void IndexingThread::run(){
 	m_graph->set_mirror_changes_to_storage(false);
 	m_graph->set_mirror_changes_to_storage(true);
 	
-	
-	semantic::text_indexer<Graph> indexer(*m_graph, lexiconStrStream );
+	semantic::text_indexer<Graph> indexer(*m_graph, ":data/lexicon.txt" );
 	std::string max = m_graph->get_meta_value("max_phrase_length","3");
 	std::string parser = m_graph->get_meta_value("parser", "nouns");
-	
 	indexer.store_text(false);
 	indexer.add_word_filter(blacklist_filter(blacklist));
  	indexer.add_word_filter(too_many_numbers_filter(1));
  	indexer.add_word_filter(minimum_length_filter(3));
  	indexer.add_word_filter(maximum_word_length_filter(10));
  	indexer.add_word_filter(maximum_phrase_length_filter(atoi(max.c_str())));
-//	indexer.set_default_encoding( encoding );
+	
+	//	indexer.set_default_encoding( encoding );
 	indexer.set_pdf_layout("raw");
 	indexer.set_parsing_method(parser);
 	
@@ -107,6 +93,7 @@ void IndexingThread::run(){
 			QString statusMessage = QString(tr("Indexing ")) + QString::fromStdString(this_file);
 			/* emit */ //status( statusMessage );
 			indexer.index( this_file );
+			//msleep(300);
 			
 		} catch (std::exception &e){
 			QString statusMessage = QString(tr("Error indexing ")) + QString::fromStdString(this_file);
@@ -149,7 +136,7 @@ void IndexingThread::run(){
 	                    *pos, node_type_major_doc));
 	        // attach the text
 	        m_graph->set_vertex_meta_value(u, "body", text);
-	    } catch ( std::exception &e){
+	    } catch ( std::exception &){
 	        //std::cerr << "Error: " << e.what() << std::endl;
 	        continue;
 	    }
