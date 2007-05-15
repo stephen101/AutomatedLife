@@ -207,12 +207,6 @@ package Semantic::API::Index;
 		return 1;
 	}
 
-	sub serialize_wordlist {
-		my ( $self, $min ) = @_;
-		$min = 1 unless defined $min;
-		my $wordlist = $self->_serialize_wordlist($min);
-		return $wordlist;
-	}
 
 
     sub index{

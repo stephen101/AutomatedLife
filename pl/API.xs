@@ -538,18 +538,6 @@ MySQLIndexer::prune_wordlist(Imin)
 	CODE:
 		THIS->prune_wordlist(SvIV(Imin));
 
-SV*
-MySQLIndexer::_serialize_wordlist(Imin)
-	SV* Imin;
-	PREINIT:
-		std::string wordlist;
-	CODE:
-		wordlist = THIS->serialize_wordlist(SvIV(Imin));
-	
-	RETVAL = newSVpv(wordlist.c_str(), wordlist.length());
-
-	OUTPUT:
-		RETVAL
 		
 	
 	

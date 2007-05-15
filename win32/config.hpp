@@ -79,6 +79,6 @@
 
 #define AUTOCONF_INSTALL_PREFIX "C:/Semantic"
 
-#define LEXICON_INSTALL_LOCATION "C:/Semantic/cpp/data/lexicon.txt"
-#define STOPLIST_INSTALL_LOCATION "C:/Semantic/cpp/data/stoplist_en.txt"
+#define LEXICON_INSTALL_LOCATION "C:/Semantic/share/lexicon.txt"
+#define STOPLIST_INSTALL_LOCATION "C:/Semantic/share/stoplist_en.txt"
 

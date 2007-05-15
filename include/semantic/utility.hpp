@@ -21,14 +21,7 @@ namespace semantic {
     inline T t_abs(const T& t) {
         return t * (t<0?-1:1);
     }
-    
-#ifdef EXTRA
-	template <typename T>
-    inline typename T max(
-		const T& one, const T& two) {
-        return one>two?one:two;
-    }
-#endif
+
 
     template <class T>
     inline std::string to_string(T v) {
