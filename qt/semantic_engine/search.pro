@@ -7,12 +7,13 @@ TARGET = SemanticEngine
 DEPENDPATH += .
 INCLUDEPATH += . ./include ../../include
 RESOURCES = resources.qrc
+CONFIG += thread debug_and_release
 QT += opengl
+
 debug {
     message("Building Debug")
     TARGET = SemanticEngine-debug
-}
-!debug {
+} else {
     message("Building Release")
     TARGET = SemanticEngine
     CONFIG += no_warn
@@ -22,9 +23,17 @@ debug {
 contains( STORAGE, mysql ) {
     message( "Building with MySQL storage" )
 	DEFINES += MYSQL_STORAGE
+    win32{
+        INCLUDEPATH += C:/MySQL/include
+        LIBS += C:/MySQL/lib/opt/libmysql.lib 
+    }
 } else {
 	message ("Building with SQLite storage")
 	DEFINES += SQLITE_STORAGE
+    win32{
+        INCLUDEPATH += C:/SQLite/include
+        LIBS += C:/SQLite/lib/sqlite3.lib
+    }
 }
 
 
@@ -64,19 +73,21 @@ macx {
 
 win32 {
     RC_FILE = search.rc
+
+    CONFIG += embed_manifest_exe
+    debug {
+	    CONFIG += console
+    }
+
     SOURCES += src/locate_datafile_win32.cpp
-    DEFINES += MSVC
+    
 
-    QMAKE_CXXFLAGS += -IC:/Boost/include/boost-1_33_1 \
-                      -IC:/SQLite/include \
-                      -IC:/MySQL/include \
-                      -IC:/Progra~1/GnuWin32/include \
-                      -IC:/Semantic/msword-reader \
-                      -IC:/Semantic/pdf-reader
+    INCLUDEPATH += C:/Boost/include/boost-1_33_1 \
+                   C:/Progra~1/GnuWin32/include \
+                   C:/Semantic/msword-reader \
+                   C:/Semantic/pdf-reader 
 
-    LIBS += C:/Boost/lib/libboost_filesystem-vc80-mt-1_33_1.lib \
-            C:/SQLite/lib/sqlite3.lib \
-            C:/MySQL/lib/opt/libmysql.lib \
+    LIBS += -LC:/Boost/lib -lboost_filesystem-vc80-mt \
             C:/Progra~1/GnuWin32/lib/libiconv.lib \
             C:/Semantic/msword-reader/MSWordReader.lib \
             C:/Semantic/pdf-reader/PDFReader.lib 
@@ -88,7 +99,7 @@ unix {
         SOURCES += src/locate_datafile_unix.cpp
     }
 
-    QMAKE_CXXFLAGS += 	-I/usr/local/include/boost-1_33_1 \
+    INCLUDEPATH += 	-I/usr/local/include/boost-1_33_1 \
 						-I/usr/include \
 						-I/usr/local/include/msword-reader \
 						-I/usr/local/include/pdf-reader \

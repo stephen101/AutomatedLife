@@ -75,42 +75,42 @@ namespace stemming
     const xchar UPPER_Z = 0x5A;
     const xchar LOWER_Z = 0x7A;
 
-    const xchar UPPER_A_ACUTE = 0xC1;
-    const xchar LOWER_A_ACUTE = 0xE1;
-    const xchar UPPER_E_ACUTE = 0xC9;
-    const xchar LOWER_E_ACUTE = 0xE9;
-    const xchar UPPER_I_ACUTE = 0xCD;
-    const xchar LOWER_I_ACUTE = 0xED;
-    const xchar UPPER_O_ACUTE = 0xD3;
-    const xchar LOWER_O_ACUTE = 0xF3;
-    const xchar UPPER_A_CIRCUMFLEX = 0xC2;
-    const xchar LOWER_A_CIRCUMFLEX = 0xE2;
-    const xchar UPPER_E_CIRCUMFLEX = 0xCA;
-    const xchar LOWER_E_CIRCUMFLEX = 0xEA;
-    const xchar UPPER_O_STROKE = 0xD8;
-    const xchar LOWER_O_STROKE = 0xF8;
-    const xchar UPPER_C_CEDILLA = 0xC7;
-    const xchar LOWER_C_CEDILLA = 0xE7;
-    const xchar LOWER_A_UMLAUTS = 0xC4;
-    const xchar UPPER_A_UMLAUTS = 0xE4;
-    const xchar UPPER_O_UMLAUTS = 0xD6;
-    const xchar LOWER_O_UMLAUTS = 0xF6;
-    const xchar TILDE = 0x7E;
-    const xchar UPPER_A_GRAVE = 0xC0;
-    const xchar LOWER_A_GRAVE = 0xE0;
-    const xchar UPPER_E_GRAVE = 0xC8;
-    const xchar LOWER_E_GRAVE = 0xE8;
-    const xchar UPPER_I_GRAVE = 0xCC;
-    const xchar LOWER_I_GRAVE = 0xEC;
-    const xchar UPPER_O_GRAVE = 0xD2;
-    const xchar LOWER_O_GRAVE = 0xF2;
+    const unsigned xchar UPPER_A_ACUTE = 0xC1;
+    const unsigned xchar LOWER_A_ACUTE = 0xE1;
+    const unsigned xchar UPPER_E_ACUTE = 0xC9;
+    const unsigned xchar LOWER_E_ACUTE = 0xE9;
+    const unsigned xchar UPPER_I_ACUTE = 0xCD;
+    const unsigned xchar LOWER_I_ACUTE = 0xED;
+    const unsigned xchar UPPER_O_ACUTE = 0xD3;
+    const unsigned xchar LOWER_O_ACUTE = 0xF3;
+    const unsigned xchar UPPER_A_CIRCUMFLEX = 0xC2;
+    const unsigned xchar LOWER_A_CIRCUMFLEX = 0xE2;
+    const unsigned xchar UPPER_E_CIRCUMFLEX = 0xCA;
+    const unsigned xchar LOWER_E_CIRCUMFLEX = 0xEA;
+    const unsigned xchar UPPER_O_STROKE = 0xD8;
+    const unsigned xchar LOWER_O_STROKE = 0xF8;
+    const unsigned xchar UPPER_C_CEDILLA = 0xC7;
+    const unsigned xchar LOWER_C_CEDILLA = 0xE7;
+    const unsigned xchar LOWER_A_UMLAUTS = 0xC4;
+    const unsigned xchar UPPER_A_UMLAUTS = 0xE4;
+    const unsigned xchar UPPER_O_UMLAUTS = 0xD6;
+    const unsigned xchar LOWER_O_UMLAUTS = 0xF6;
+    const unsigned xchar TILDE = 0x7E;
+    const unsigned xchar UPPER_A_GRAVE = 0xC0;
+    const unsigned xchar LOWER_A_GRAVE = 0xE0;
+    const unsigned xchar UPPER_E_GRAVE = 0xC8;
+    const unsigned xchar LOWER_E_GRAVE = 0xE8;
+    const unsigned xchar UPPER_I_GRAVE = 0xCC;
+    const unsigned xchar LOWER_I_GRAVE = 0xEC;
+    const unsigned xchar UPPER_O_GRAVE = 0xD2;
+    const unsigned xchar LOWER_O_GRAVE = 0xF2;
 	//these characters should not appear in an indexed word
-	const xchar UPPER_Y_HASH = 7;//bell
-	const xchar LOWER_Y_HASH = 9;//tab
-	const xchar UPPER_I_HASH = 10;//line feed
-	const xchar LOWER_I_HASH = 11;//vertical tab
-	const xchar UPPER_U_HASH = 12;//form feed (new page)
-	const xchar LOWER_U_HASH = 13;//carriage return
+	const unsigned xchar UPPER_Y_HASH = 7;//bell
+	const unsigned xchar LOWER_Y_HASH = 9;//tab
+	const unsigned xchar UPPER_I_HASH = 10;//line feed
+	const unsigned xchar LOWER_I_HASH = 11;//vertical tab
+	const unsigned xchar UPPER_U_HASH = 12;//form feed (new page)
+	const unsigned xchar LOWER_U_HASH = 13;//carriage return
 
     //language constants
 //    static const xchar* FRENCH_VOWELS = _XTEXT("aeiouyâàëéêèïîôûùAEIOUYÂÀËÉÊÈÏÎÔÛÙ");
@@ -326,8 +326,8 @@ namespace stemming
 				if (!(text[text.length()-1] >= 48 && text[text.length()-1] <= 57) &&
 					!(text[text.length()-1] >= 65 && text[text.length()-1] <= 90) &&
 					!(text[text.length()-1] >= 97 && text[text.length()-1] <= 122) &&
-					!(text[text.length()-1] >= assign_character(Tchar_type, 192) && text[text.length()-1] <= assign_character(Tchar_type, 246)) &&
-					!(text[text.length()-1] >= assign_character(Tchar_type, 248) && text[text.length()-1] <= assign_character(Tchar_type, 255)) )
+					!(text[text.length()-1] >= assign_character(Tchar_type, (unsigned char)192) && text[text.length()-1] <= assign_character(Tchar_type, (unsigned char)246)) &&
+					!(text[text.length()-1] >= assign_character(Tchar_type, (unsigned char)248) && text[text.length()-1] <= assign_character(Tchar_type, (unsigned char)255)) )
 					{
 					text.erase(text.end()-1);
 					}
@@ -341,8 +341,8 @@ namespace stemming
 				if (!(text[0] >= 48 && text[0] <= 57) &&
 					!(text[0] >= 65 && text[0] <= 90) &&
 					!(text[0] >= 97 && text[0] <= 122) &&
-					!(text[0] >= assign_character(Tchar_type, 192) && text[0] <= assign_character(Tchar_type, 246)) &&
-					!(text[0] >= assign_character(Tchar_type, 248) && text[0] <= assign_character(Tchar_type, 255)) )
+					!(text[0] >= assign_character(Tchar_type, (unsigned char)192) && text[0] <= assign_character(Tchar_type, (unsigned char)246)) &&
+					!(text[0] >= assign_character(Tchar_type, (unsigned char)248) && text[0] <= assign_character(Tchar_type, (unsigned char)255)) )
 					{
 					text.erase(0, 1);
 					}
@@ -2097,8 +2097,8 @@ namespace stemming
 		//----------------------------------------------------------
 		inline void unhash_y(std::basic_string<Tchar_type>& text)
 			{
-			string_util::replace_all(text, LOWER_Y_HASH, LOWER_Y);
-			string_util::replace_all(text, UPPER_Y_HASH, UPPER_Y);
+			string_util::replace_all(text, (unsigned char)LOWER_Y_HASH, (unsigned char)LOWER_Y);
+			string_util::replace_all(text, (unsigned char)UPPER_Y_HASH, (unsigned char)UPPER_Y);
 			}
 
 		//----------------------------------------------------------

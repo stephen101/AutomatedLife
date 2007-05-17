@@ -96,7 +96,8 @@ void SearchWidget::setupLayout(){
 	QGroupBox *settingsBox = new QGroupBox(tr("Search Settings"));
 	QVBoxLayout *settingsLayout = new QVBoxLayout;
 	
-	QFont settingsFont("Lucida Grande",12);
+	QFont settingsFont("Lucida Grande");
+	settingsFont.setPixelSize(12);
 	keyword = new QCheckBox(tr("Keyword"));
 	keyword->setFont(settingsFont);
 	
@@ -106,12 +107,12 @@ void SearchWidget::setupLayout(){
 	pruningSpinBox->setSingleStep(5);
 	pruningSpinBox->setValue(30);
 	pruningSpinBox->setMaximumWidth(60);
-	pruningSpinBox->setToolTip(tr("Set the 'graph pruning factor' -- a higher value returns more results but is slower"));
+	pruningSpinBox->setToolTip(tr("Set the approximate result size -- a higher value returns more results but is slower"));
 	pruningSpinBox->setFont(settingsFont);
 	
 	collectionComboBox->setFont(settingsFont);
 	
-	QLabel *pruningLabel = new QLabel("Pruning");
+	QLabel *pruningLabel = new QLabel("Result Size");
 	pruningLabel->setFont(settingsFont);
 	
 	QHBoxLayout *graphSettingsLayout = new QHBoxLayout();
@@ -128,7 +129,10 @@ void SearchWidget::setupLayout(){
 	QLabel *icon = new QLabel();
 	icon->setPixmap(QPixmap(":/icons/nse.png"));
 	QLabel *queryText = new QLabel(tr("Search "));
-	queryText->setFont(QFont("Lucida Grande",15,QFont::Bold));
+	QFont queryFont("Lucida Grande");
+	queryFont.setBold(true);
+	queryFont.setPixelSize(15);
+	queryText->setFont(queryFont);
 	queryField = new QLineEdit();
 	search = new QPushButton(tr("&Search"));
 	

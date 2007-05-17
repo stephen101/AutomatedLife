@@ -107,7 +107,10 @@ void SearchResults::searchCompleted(){
 	
 	topTerms = m_searchThread->getRelatedTerms();
 	if( topTerms.count() ){
-		related_label->setFont(QFont("Lucida Grande",13,QFont::Bold));
+		QFont relatedFont("Lucida Grande");
+		relatedFont.setBold(true);
+		relatedFont.setPixelSize(12);
+		related_label->setFont(relatedFont);
 		related_label->setText(tr("Related Terms: "));
 		related_terms->setText(topTerms.join(", "));
 	}
@@ -550,8 +553,10 @@ void ResultsView::paintEvent(QPaintEvent *event) {
 	QPen collectionPen(QColor(100,100,100));
 	QColor highlightBackground = option.palette.color(QPalette::Highlight);
 	QColor rankBarColor(200, 70, 70);
-	QFont font("Verdana", 12);
-	QFont small_font("Verdana", 9);
+	QFont font("Verdana");
+	font.setPixelSize(12);
+	QFont small_font("Verdana");
+	small_font.setPixelSize(9);
 	QFontMetrics metrics(font);
 	QFontMetrics small_metrics(small_font);
 	

@@ -31,12 +31,6 @@ void VisualDisplayComputeThread::run() {
     
     /* emit */ finishedComputation();
     
-    // now just continue to emit newPositionMap
-    while(1) {
-        if(safeTerminate_) return;
-        newPositionMap(positions_);
-        msleep(30);
-    }
 }
 
 /**
@@ -115,7 +109,7 @@ void VisualDisplayController::startSearch(){
 	m_showEdges->setVisible(false);
 	setStatus(tr("Searching ..."));
 	searchStatus->setVisible(true);
-	
+	count = 0;	
 	
 }
 
@@ -204,7 +198,6 @@ void VisualDisplayController::stop() {
     compute_->wait();               // wait for thread to terminate cleanly
     compute_->deleteLater();
     compute_ = 0;
-    
 	updateDisplay(PositionMap());   // reset the display with an empty position map
 }
 

@@ -573,11 +573,11 @@ namespace stemming
 			if (text.length() > 2 &&
 				!is_vowel(text[text.length()-2]) )
 				{
-				if (is_either(text[text.length()-1], LOWER_Y, LOWER_Y_HASH) )
+				if (is_either((unsigned char)text[text.length()-1], (unsigned char)LOWER_Y, (unsigned char)LOWER_Y_HASH) )
 					{
 					text[text.length()-1] = LOWER_I;
 					}
-				else if (is_either(text[text.length()-1], UPPER_Y, UPPER_Y_HASH) )
+				else if (is_either((unsigned char)text[text.length()-1], (unsigned char)UPPER_Y, (unsigned char)UPPER_Y_HASH) )
 					{
 					text[text.length()-1] = UPPER_I;
 					}
@@ -1056,7 +1056,7 @@ namespace stemming
                     //following letter
                     (!is_vowel(text[start+1]) &&
 					!string_util::is_one_of(text[start+1], _XTEXT("wxWX")) &&
-					is_neither(text[start+1], LOWER_Y_HASH, UPPER_Y_HASH)) &&
+					is_neither((unsigned char)text[start+1], LOWER_Y_HASH, UPPER_Y_HASH)) &&
                     //proceeding letter
                     !is_vowel(text[start-1]) )
 					{

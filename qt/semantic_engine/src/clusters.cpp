@@ -12,6 +12,7 @@
 
 void ClusterWidget::calculateClusters(){
 	numberOfClusters->setEnabled(false);
+	calculateClustersButton->setEnabled(false);
 	numberOfClusters->setHidden(false);
 	clusterNumberLabel->setHidden(false);
 	startThread();
@@ -223,8 +224,8 @@ void ClusteringThread::run() {
 	if( max_num_clusters < 3 ){
 		return;
 	}
-    
-    LinLog::all_maps maps;
+	
+	LinLog::all_maps maps;
     LinLogHelper::populate_all_maps(*graph_, weights_, maps);
     
     // create a minimizer
@@ -260,17 +261,17 @@ void ClusteringThread::run() {
     if (safeTerminate_) return;
     // now generate an MST
     std::vector<edge> mst;
-    semantic::minimum_weight_spanning_tree(*graph_, extract_keys(distances.begin()), extract_keys(distances.end()), boost::make_assoc_property_map(distances), back_inserter(mst));
+	semantic::minimum_weight_spanning_tree(*graph_, extract_keys(distances.begin()), extract_keys(distances.end()), boost::make_assoc_property_map(distances), back_inserter(mst));
     if (safeTerminate_) return;
     
     // create the dendrogram
-    semantic::dendrogram_from_distance_mst(*graph_, mst, boost::make_assoc_property_map(distances), dendrogram_, SingleLinkDistanceCalculator());
+	semantic::dendrogram_from_distance_mst(*graph_, mst, boost::make_assoc_property_map(distances), dendrogram_, SingleLinkDistanceCalculator());
     
     // now let's silhouette this baby
     // measuring clusters between having 2 and having n-1 (or 30, whichever is smaller)... test silhouettes
 	unsigned int best_num = 0;
     double best_silhouette = 0;
-    for(unsigned int i = 2; i < max_num_clusters; i++) {
+	for(unsigned int i = 2; i < max_num_clusters; i++) {
         maps::unordered<vertex, unsigned long> cluster_map;
         dendrogram_.set_num_clusters(i);
         dendrogram_.get_clusters(inserter(cluster_map, cluster_map.begin()));
@@ -289,7 +290,8 @@ void ClusteringThread::run() {
     
     dendrogram_.set_num_clusters(best_num);
     progress(iterations + max_num_clusters, iterations + max_num_clusters);
-    finishedClustering();
+	
+	finishedClustering();
 }
 
 semantic::dendrogram<Graph> & ClusteringThread::dendrogram() {
@@ -312,6 +314,7 @@ void ClusterWidget::clusteringStarted() {
 
 void ClusterWidget::clusteringCompleted() {
     numberOfClusters->setEnabled(true);
+	calculateClustersButton->setEnabled(true);
 	typedef GraphTraits::vertex_descriptor vertex;
 
 	// rebuild the view

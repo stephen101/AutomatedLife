@@ -51,7 +51,6 @@ class ClusterWidget : public QWidget {
 	
 	signals:
 		void displaySingleResultWindow(QString &);
-       
         
     protected slots:
         // these are for the thread business

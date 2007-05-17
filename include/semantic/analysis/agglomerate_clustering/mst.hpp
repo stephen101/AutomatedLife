@@ -25,7 +25,7 @@ namespace semantic {
 			// a pred-map (parentage)
 			pred_map_type pred_map;
 			rank_map_type rank_map;
-
+	
 			// make the disjoint set
 			boost::disjoint_sets<
 				boost::associative_property_map<rank_map_type>,
@@ -42,10 +42,13 @@ namespace semantic {
 			typedef boost::indirect_cmp<WeightMap, Compare<typename boost::property_traits<WeightMap>::value_type> > weight_compare;
 			weight_compare compare(w);
 			std::priority_queue<edge, std::vector<edge>, weight_compare> Q(compare);
-
+			
 			// push all the edges onto Q
-			for(It i = edge_start; i != edge_end; ++i) 
+
+			// this needs to be made faster!
+			for(It i = edge_start; i != edge_end; ++i) {
 				Q.push(*i);
+			}
 
 			while(! Q.empty()) {
 				edge e = Q.top();

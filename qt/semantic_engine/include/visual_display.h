@@ -39,7 +39,7 @@ class VisualDisplayComputeThread : public QThread {
     private:
         Graph *m_graph;
         bool safeTerminate_, runLinLog_;
-        WeightMapType weights_;
+		WeightMapType weights_;
         PositionMap positions_;
 }; // class VisualDisplayComputeThread
 
@@ -87,6 +87,7 @@ class VisualDisplayController : public QWidget {
 		QCheckBox					*m_showTermNodes;
         int                         options_flags_;
 		SearchStatus 				*searchStatus;
+		int count;
 		
 }; // class VisualDisplayController
 

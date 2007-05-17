@@ -74,7 +74,6 @@ void VisualGLDisplay::initializeGL() {
 	
 	// alpha colors
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnable(GL_BLEND);
 //	glShadeModel(GL_SMOOTH);
 
@@ -92,8 +91,9 @@ void VisualGLDisplay::resizeGL(int w, int h) {
 }
 
 void VisualGLDisplay::paintGL() {
-//	std::cerr << "painting OpenGL: " ;
 	
+	//std::cerr << "painting OpenGL: " ;
+
 	// compute our bounds and set up the GL view
 	semantic::get_bounding_rect(extract_values(m_position.begin()), extract_values(m_position.end()), m_min, m_max);
 	m_max *= 1.1; m_min *= 1.1; // expand a little so we have some visual space on the sides
@@ -135,12 +135,12 @@ void VisualGLDisplay::paintGL() {
 	}
 	
 	
-	glColor4f(GLfloat(0.0),GLfloat(0.3),GLfloat(0.1),GLfloat(0.3));
+	glColor4f((GLfloat)0.0,(GLfloat)0.3,(GLfloat)0.1,(GLfloat)0.3);
 
 	// translate the mouse coordinate into local coordinates
 	point mouse_pos = screenToLocal(m_mouse_pos, true);
 	
-//	mkFilledCircle(mouse_pos.x(), mouse_pos.y(), 40, 3); // <-- debug
+	//mkFilledCircle(mouse_pos.x(), mouse_pos.y(), 40, 3); // <-- debug
 	
 	std::set<graph_vertex> old_labels(extract_keys(m_labeled_vertices.begin()), extract_keys(m_labeled_vertices.end()));
 	m_labeled_vertices.clear();	
@@ -191,6 +191,7 @@ void VisualGLDisplay::paintGL() {
 		m_label_info.erase(*i);
 	}
 
+	
 	// draw the labels
 	drawLabels();
 	
@@ -198,6 +199,7 @@ void VisualGLDisplay::paintGL() {
 	moveLabels();
 	
 	glFlush();
+
 }
 
 float VisualGLDisplay::getVertexSize(graph_vertex u) {
@@ -228,6 +230,7 @@ point VisualGLDisplay::screenToLocal(const point &p, bool flip) {
 }
 
 void VisualGLDisplay::drawVertex(graph_vertex u, GLfloat x, GLfloat y, GLfloat r, GLfloat g, GLfloat b, GLfloat size) {
+	
 	// alpha
 	GLfloat a = shouldDrawVertex(u)?0.8:0.1;
 	// see if it's highlighted. if so draw it yellow
@@ -301,6 +304,7 @@ void VisualGLDisplay::radialVertices(GLfloat x, GLfloat y, GLfloat size, int seg
 }
 
 void VisualGLDisplay::mkCircle(GLfloat x, GLfloat y, GLfloat size, int seg) {
+	
 	static bool first = true;
 	static GLuint object[30];
 	static bool have_object[30];
@@ -329,6 +333,7 @@ void VisualGLDisplay::mkCircle(GLfloat x, GLfloat y, GLfloat size, int seg) {
 }
 
 void VisualGLDisplay::drawFilledRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height) {
+	
 	static bool first = true;
 	static GLuint object;
 	if (first) {
@@ -357,6 +362,7 @@ void VisualGLDisplay::drawFilledRect(GLfloat x, GLfloat y, GLfloat width, GLfloa
 }
 
 void VisualGLDisplay::moveLabels() {
+
 	// this function will move the labels around so that they don't intersect each other
 	// or the side of the screen
 	for(unsigned int i = 0; i < m_labeled_vertices.size(); i++) {
@@ -493,6 +499,7 @@ void VisualGLDisplay::drawLabels() {
 				the_label = (*m_graph)[u].content;
 				// the_label = scrub_vertex_title(m_graph, (*m_graph)[u].content);
 			} else {
+			    //	the_label = (*m_graph)[u].content;
 				the_label = m_graph->unstem_term((*m_graph)[u].content);
 		    }
 		}
@@ -501,7 +508,8 @@ void VisualGLDisplay::drawLabels() {
 		GLfloat d_x, d_y, b_x, b_y;
 
 		// get the metrics for the text
-		QFont font("Arial", 12);
+		QFont font("Arial");
+		font.setPixelSize(12);
 		QFontMetricsF metrics(font, this);
 
 		QRectF box = metrics.boundingRect(QString::fromStdString(the_label));
@@ -533,18 +541,20 @@ void VisualGLDisplay::drawLabels() {
 		}
 		glEnd();
 
-	//	glColor4f(0.9,0.9,0.9,1.0);
 		glColor4f(r,g,b,(GLfloat)0.8);
 		drawFilledRect(b_x,b_y,box_local.x(),box_local.y());
 		glColor4f(0,0,0,1);
-		renderText(d_x,d_y,0,QString(the_label.c_str()),font);
+		renderText(d_x,d_y,0.0,QString(the_label.c_str()),font);
 
 	}
+
 }
 
 void VisualGLDisplay::mouseMoveEvent(QMouseEvent *event) {
+
 	m_mouse_pos = point(event->pos().x(), event->pos().y(), 0);
 	m_mouse_in = true;
+	updateGL();
 }
 
 void VisualGLDisplay::mouseDoubleClickEvent(QMouseEvent *) {
@@ -570,3 +580,6 @@ void VisualGLDisplay::mousePressEvent(QMouseEvent *) {
 //		m_controller->showDocument(m_highlighted_node);
 	}
 }
+
+
+

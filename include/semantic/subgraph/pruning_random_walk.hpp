@@ -37,7 +37,8 @@ namespace semantic {
 			void set_trials(unsigned int t) { m_trials = t; }
 			void set_seed(typename boost::minstd_rand::result_type s) { m_rand.seed(s); }
 			void keep_only_top_edges(float f) { keep_within_range(f, 0.0f, 1.0f); m_prune_keep = f; }
-			
+			float get_prune_keep(){ return m_prune_keep; }
+
 			unsigned int get_depth() { return m_depth; }
 			unsigned int get_trials() { return m_trials; }
 			

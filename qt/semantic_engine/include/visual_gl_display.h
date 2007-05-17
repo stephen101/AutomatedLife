@@ -24,6 +24,10 @@ enum graph_display_options {
 	SIZE_DEGREE = 32
 };
 
+
+
+
+
 class VisualGLDisplay : public QGLWidget
 {
 	Q_OBJECT
@@ -94,5 +98,7 @@ private:
 	bool isSearching;
 	
 };
+
+
 
 #endif // _VISUAL_GL_DISPLAY_HPP_
