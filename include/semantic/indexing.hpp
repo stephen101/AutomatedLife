@@ -325,48 +325,9 @@ namespace semantic {
  *        less often than the 'min' value are excluded
  *
  * **************************************************** */
-    void store_wordlist(int min=2){
+		    void store_wordlist(int min=2){
 
-        typename se_graph_traits<Graph>::vertex_descriptor u;
-
-        std::map<std::string,
-                  std::pair<std::string,int>
-            > my_wordlist = prune_wordlist(min);
-        std::map<std::string, std::pair<std::string, int> >::iterator pos;
-        for( pos = my_wordlist.begin(); pos != my_wordlist.end(); ++pos ){
-            std::string stem = pos->first;
-            std::pair<std::string,int> termCount = pos->second;
-
-            std::string word = termCount.first;
-            int count = termCount.second;
-
-            try {
-                u = base_type::g.vertex_by_id(
-                         base_type::g.fetch_vertex_id_by_content_and_type(
-                             stem, node_type_major_term));
-                // attach the text
-                std::ostringstream oss;
-                oss << count;
-                word.append(":" + oss.str());
-                std::string prev = base_type::g.get_vertex_meta_value(u, "term");
-                if( prev.size() > 0 ){
-                    std::string::size_type pos = prev.find_last_of(":");
-                    if( pos < prev.size() - 1){
-                        int prev_cnt = atoi(prev.substr(pos+1,prev.size()-pos-1).c_str());
-                        if( prev_cnt > count ){
-                            word = prev;
-                        }
-                    }
-                }
-                base_type::g.set_vertex_meta_value(u, "term", word);
-            } catch ( std::exception &){
-                continue;
-			} catch ( char * e ){
-				std::cerr << "Error: " << e << std::endl;
-				continue;
-			}
-        }
-    }
+		  	}
 
             std::string get_collection_value(const std::string key,
                                              const std::string default_value){
@@ -399,37 +360,28 @@ namespace semantic {
 					return false;
 				}
 
-                try {
-                     store_wordlist(min);
-                }    catch ( std::exception &e ) {
-                    std::cerr << "Error storing wordlist" << e.what() << std::endl;
-				} catch ( char * e ){
-					std::cerr << "Error: " << e << std::endl;
+				// store the wordlist
+				std::map<std::string,
+		                  std::pair<std::string,int>
+		            > my_wordlist = prune_wordlist(min);
+
+				BGL_FORALL_VERTICES_T(u, base_type::g, Graph) {
+					if (base_type::g[u].type_major == node_type_major_term && my_wordlist.count(base_type::g[u].content)){
+						std::pair<std::string, int> wordpair = my_wordlist[base_type::g[u].content];
+						std::ostringstream oss;
+						oss << wordpair.second;
+						std::string word = wordpair.first+":"+oss.str();
+						base_type::g.set_vertex_meta_value(u, "term", word);
+					}
 				}
 
-
-                std::map<std::string,std::string>::iterator pos;
+				// store the text
                 if( storeText ){
-                    for( pos = text_store.begin(); pos != text_store.end(); ++pos ){
-                        std::string filename = pos->first;
-                        std::string text = pos->second;
-
-                        typename se_graph_traits<Graph>::vertex_descriptor u;
-                        try {
-                            u = base_type::g.vertex_by_id(
-                                    base_type::g.fetch_vertex_id_by_content_and_type(
-                                        filename, node_type_major_doc));
-                            // attach the text
-                            base_type::g.set_vertex_meta_value(u, "body", text);
-                        } catch ( std::exception &){
-                            //std::cerr << "Error: " << e.what() << std::endl;
-                            continue;
-						} catch ( char * e ){
-							std::cerr << "Error: " << e << std::endl;
-							continue;
+					BGL_FORALL_VERTICES_T(u, base_type::g, Graph) {
+						if (base_type::g[u].type_major == node_type_major_doc && text_store.count(base_type::g[u].content)){
+                            base_type::g.set_vertex_meta_value(u, "body", text_store[base_type::g[u].content]);
 						}
-
-                    }
+					}
                 }
                 return true;
             }

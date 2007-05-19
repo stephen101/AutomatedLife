@@ -112,11 +112,28 @@ void IndexingThread::run(){
     }
 
 	/* emit */ status(QString(tr("Storing Terms")));
-    try {
-         indexer.store_wordlist();
-    }    catch ( std::exception &e ) {
-        std::cerr << "Error storing wordlist" << e.what() << std::endl;
-    }
+	std::map<std::string,
+              std::pair<std::string,int>
+        > my_wordlist = indexer.prune_wordlist(2);
+
+	i = 0;
+	int term_count = m_graph->get_vertex_count_of_type(node_type_major_term);
+	BGL_FORALL_VERTICES(u, *m_graph, Graph) {
+		if ((*m_graph)[u].type_major == node_type_major_term ){
+			i++;
+			if( my_wordlist.count((*m_graph)[u].content)){
+				std::pair<std::string, int> wordpair = my_wordlist[(*m_graph)[u].content];
+				std::ostringstream oss;
+				oss << wordpair.second;
+				std::string word = wordpair.first+":"+oss.str();
+				m_graph->set_vertex_meta_value(u, "term", word);
+				if( !(i % 20) ){
+					/* emit */ progress(i, term_count);
+				}
+			}
+		}
+	}
+    
 		
 	
 	/* emit */ status(QString(tr("Storing Text")));
@@ -124,25 +141,15 @@ void IndexingThread::run(){
 
     reader.set_pdfLayout( "layout" );
 	i = 0;
-	for( pos = filenames.begin(); pos != filenames.end(); ++pos ){
-
-
-        std::string text = reader( *pos );
-        
-		GraphTraits::vertex_descriptor u;
-    	try {
-        	u = m_graph->vertex_by_id(
-	                m_graph->fetch_vertex_id_by_content_and_type(
-	                    *pos, node_type_major_doc));
-	        // attach the text
-	        m_graph->set_vertex_meta_value(u, "body", text);
-	    } catch ( std::exception &){
-	        //std::cerr << "Error: " << e.what() << std::endl;
-	        continue;
-	    }
-		/* emit */ progress(++i, filenames.size());
+	int doc_count = m_graph->get_vertex_count_of_type(node_type_major_doc);
+	BGL_FORALL_VERTICES(u, *m_graph, Graph) {
+		if ((*m_graph)[u].type_major == node_type_major_doc ){
+	        std::string text = reader( (*m_graph)[u].content );
+            m_graph->set_vertex_meta_value(u, "body", text);
+			/* emit */ progress(++i, doc_count);
+		}
+	}
 	
-    }
 	
 	m_graph->set_mirror_changes_to_storage(false);
 	/* emit */ status( QString(tr("Done")));

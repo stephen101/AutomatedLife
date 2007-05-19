@@ -56,7 +56,28 @@ namespace semantic {
             std::set<std::string> words;
     };
     
-
+	class allowable_characters_filter : public word_filter {
+		public:
+			allowable_characters_filter( const std::string& str ) : allowed(str) {}
+			
+			bool operator()(const std::string& word) {
+				return word.find_first_not_of(allowed)==std::string::npos?true:false;
+			}
+			
+		private:
+			std::string allowed;
+	};
+	
+	class illegal_characters_filter : public word_filter {
+		public:
+			illegal_characters_filter( const std::string& str) : illegal(str) {}
+			
+			bool operator()(const std::string& word){
+				return word.find_first_of(illegal)==std::string::npos?true:false;
+			}
+		private:
+			std::string illegal;
+	};
     
     class maximum_word_length_filter : public word_filter {
         public:

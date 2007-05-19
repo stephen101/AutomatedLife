@@ -97,8 +97,13 @@ namespace string_util
 	inline char tolower_western(const char c)
 		{
 		return ((c >= 'A') && (c <= 'Z')) ||
+#if WIN32
 			((c >= assign_character(unsigned char, 0xC0)) && (c <= assign_character(unsigned char, 0xD6))) ||
 			((c >= assign_character(unsigned char, 0xD8)) && (c <= assign_character(unsigned char, 0xDE))) 
+#else
+			((c >= assign_character(char, 0xC0)) && (c <= assign_character(char, 0xD6))) ||
+			((c >= assign_character(char, 0xD8)) && (c <= assign_character(char, 0xDE))) 
+#endif
 				? (c + 32) : c;
 		}
 #if SEMANTIC_UNICODE
@@ -114,8 +119,13 @@ namespace string_util
 	inline char toupper_western(const char c)
 		{
 		return ((c >= 'a') && (c <= 'z')) ||
+#if WIN32
 			((c >= assign_character(unsigned char, 0xE0)) && (c <= assign_character(unsigned char, 0xF6))) ||
 			((c >= assign_character(unsigned char, 0xF8)) && (c <= assign_character(unsigned char, 0xFE)))  
+#else
+			((c >= assign_character( char, 0xE0)) && (c <= assign_character( char, 0xF6))) ||
+			((c >= assign_character( char, 0xF8)) && (c <= assign_character( char, 0xFE)))  
+#endif
 				? (c - 32) : c;
 		}
 #if SEMANTIC_UNICODE
@@ -132,9 +142,15 @@ namespace string_util
 		{
 		return (((c >= 0x41) && (c <= 0x5A)) ||
 			((c >= 0x61) && (c <= 0x7A)) ||
+#if WIN32
 			((c >= assign_character(unsigned char, 0xC0)) && (c <= assign_character(unsigned char, 0xD6)))||
 			((c >= assign_character(unsigned char, 0xD8)) && (c <= assign_character(unsigned char, 0xF6))) ||
 			((c >= assign_character(unsigned char, 0xF8)) && (c <= assign_character(unsigned char, 0xFF))));
+#else			
+			((c >= assign_character( char, 0xC0)) && (c <= assign_character( char, 0xD6)))||
+			((c >= assign_character( char, 0xD8)) && (c <= assign_character( char, 0xF6))) ||
+			((c >= assign_character( char, 0xF8)) && (c <= assign_character( char, 0xFF))));
+#endif
 		}
 #if SEMANTIC_UNICODE
 	inline bool isalpha_western(const wchar_t c)

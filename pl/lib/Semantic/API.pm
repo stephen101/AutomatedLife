@@ -19,14 +19,14 @@ XSLoader::load('Semantic::API', $VERSION);
     sub stoplist {
         my $location = Semantic::API::stoplist_location();
         open FH, $location or die "Stoplist not found at: $location\n";
-		my @stoplist = <FH>;
-		my $blacklist;
-		close FH;
-		foreach my $line ( @stoplist ){
-			chomp $line;
-			push @$blacklist, $line;
-		}
-		return $blacklist;
+        my @stoplist = <FH>;
+        my $blacklist;
+        close FH;
+        foreach my $line ( @stoplist ){
+            chomp $line;
+            push @$blacklist, $line;
+        }
+        return $blacklist;
     }
 
 }
@@ -183,7 +183,7 @@ package Semantic::API::Index;
         
         }
         $self->set_default_encoding( $params{'default_encoding'}) if defined $params{'default_encoding'};
-        $self->set_parsing_method( $params{'parsing_method'}) if defined $params{'parsing_method'};
+        $self->set_parsing_method( $params{'term_type'}) if defined $params{'term_type'};
         return $self;
     }
 
@@ -200,12 +200,12 @@ package Semantic::API::Index;
         }
     }
 
-	sub finish {
-		my ( $self, $min ) = @_;
-		$min = 1 unless $min;
-		$self->_finish($min);
-		return 1;
-	}
+    sub finish {
+        my ( $self, $min ) = @_;
+        $min = 1 unless $min;
+        $self->_finish($min);
+        return 1;
+    }
 
 
 
@@ -362,10 +362,7 @@ storage policy, a collection name, and some database parameters:
     username   => 'mysql username' (optional)
     password   => 'mysql password' (optional)
     host       => 'mysql host' (optional)
-    min_term_frequency => 'minimum occurrence of a term' (optional)
-    max_document_frequency => 'maximum percent of collection in
-                               which a term occurs' (optional)
-
+    
 Additional parameters are listed below.
 
 =back
@@ -374,9 +371,20 @@ Additional parameters are listed below.
 
 Additional optional parameters: 
 
-    lexicon => 'path/to/lexicon.gz'
-    default_encoding => 'iso-8859-1'
-    parsing_method => 'nouns'
+    document_minimum   => 'minimum required occurrences of a term in a
+                           single document' 
+    collection_minimum => 'minimum required occurrences of a term in 
+                           the collection' 
+    collection_maximum => 'maximum percent of collection in
+                           which a term occurs' 
+    lexicon            => 'path/to/lexicon.txt'
+    default_encoding   => 'iso-8859-1'
+    term_type          => 'nouns' (also available: noun_phases, proper_nouns,
+                           verbs, adjectives)
+    store_text         => '1' (set to 0 if you'd like to keep texts stored
+                            elsewhere -- this would prevent you from using 
+                            the summarizer)
+    stemming           => '1' (set to 0 to disable the stemming of words)
 
 =over
 
@@ -492,6 +500,10 @@ Returns true if SQLite support is enabled
 
 Returns true if MySQL support is enabled
 
+=item $Semantic::API::stoplist
+
+Returns an array reference to the default stoplist
+
 =back
 
 =head1 SEE ALSO
@@ -500,12 +512,12 @@ For more information, please visit http://www.knowledgesearch.org
 
 =head1 AUTHORS
 
-    Aaron Coburn, <acoburn@middlebury.edu>
-    Gabe Schine, <gschine@middlebury.edu>
+    Aaron Coburn, <aaron.coburn@knowledgesearch.org>
+    Gabriel Schine
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Aaron Coburn and Gabe Schine
+Copyright (C) 2007 by Aaron Coburn and Gabe Schine
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

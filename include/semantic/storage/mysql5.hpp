@@ -421,6 +421,11 @@ namespace semantic {
 			}
 			
 			// vertex meta data functions
+			void set_vertex_meta_values(const std::map<Vertex, std::pair<std::string, std::string> > ){
+				// select id from node where fk_collection = collection_id
+				
+			}
+			
 			void set_vertex_meta_value(const Vertex u, const std::string key, const std::string value) {
 				query("INSERT IGNORE INTO node_meta (fk_node, `key`, value) VALUES ("
 					+ to_string((*this)[u].id) + ", '"

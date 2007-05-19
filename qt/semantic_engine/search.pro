@@ -99,11 +99,11 @@ unix {
         SOURCES += src/locate_datafile_unix.cpp
     }
 
-    INCLUDEPATH += 	-I/usr/local/include/boost-1_33_1 \
-						-I/usr/include \
-						-I/usr/local/include/msword-reader \
-						-I/usr/local/include/pdf-reader \
-						-I/usr/local/mysql/include
+    INCLUDEPATH += 	/usr/local/include/boost-1_33_1 \
+						/usr/include \
+						/usr/local/include/msword-reader \
+						/usr/local/include/pdf-reader \
+						/usr/local/mysql/include
 
     LIBS += /usr/local/lib/libsqlite3.a \
 			/usr/local/mysql/lib/libmysqlclient.a \

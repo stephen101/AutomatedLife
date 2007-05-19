@@ -1,4 +1,4 @@
-DATABASE_NAME="testing";
+DATABASE_NAME="enron_index4";
 USER="aaron";
 
 echo $DATABASE_NAME;

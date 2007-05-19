@@ -1968,55 +1968,6 @@ namespace semantic {
             }
 
 
-/* **************************************************** *
- *        store_wordlist(int min=2)
- *
- *        this method takes the wordlist, prunes out the less
- *        commonly occurring variations of words and puts
- *        them into the node_meta table; any words occurring
- *        less often than the 'min' value are excluded
- *
- * **************************************************** */
-    void store_wordlist(int min=2){
-
-        typename se_graph_traits<Graph>::vertex_descriptor u;
-
-        std::map<std::string,
-                  std::pair<std::string,int>
-            > my_wordlist = prune_wordlist(min);
-        std::map<std::string, std::pair<std::string, int> >::iterator pos;
-        for( pos = my_wordlist.begin(); pos != my_wordlist.end(); ++pos ){
-            std::string stem = pos->first;
-            std::pair<std::string,int> termCount = pos->second;
-
-            std::string word = termCount.first;
-            int count = termCount.second;
-
-            try {
-                u = base_type::g.vertex_by_id(
-                         base_type::g.fetch_vertex_id_by_content_and_type(
-                             stem, node_type_major_term));
-                // attach the text
-                std::ostringstream oss;
-                oss << count;
-                word.append(":" + oss.str());
-                std::string prev = base_type::g.get_vertex_meta_value(u, "term");
-                if( prev.size() > 0 ){
-                    std::string::size_type pos = prev.find_last_of(":");
-                    if( pos < prev.size() - 1){
-                        int prev_cnt = atoi(prev.substr(pos+1,prev.size()-pos-1).c_str());
-                        if( prev_cnt > count ){
-                            word = prev;
-                        }
-                    }
-                }
-                base_type::g.set_vertex_meta_value(u, "term", word);
-            } catch ( std::exception &){
-                continue;
-            }
-        }
-    }
-
             std::string get_collection_value(const std::string key,
                                              const std::string default_value){
                 return base_type::g.get_meta_value(key, default_value);
@@ -2043,33 +1994,33 @@ namespace semantic {
                 } catch ( std::exception &e){
                     std::cerr << "Error Indexing to Database: " << e.what() << std::endl;
                     return false;
-                }
+				} catch ( char * e ){
+					std::cerr << "Error: " << e << std::endl;
+					return false;
+				}
 
-                try {
-                     store_wordlist(min);
-                }    catch ( std::exception &e ) {
-                    std::cerr << "Error storing wordlist" << e.what() << std::endl;
-                }
+				// store the wordlist
+				std::map<std::string,
+		                  std::pair<std::string,int>
+		            > my_wordlist = prune_wordlist(min);
 
+				BGL_FORALL_VERTICES_T(u, base_type::g, Graph) {
+					if (base_type::g[u].type_major == node_type_major_term && my_wordlist.count(base_type::g[u].content)){
+						std::pair<std::string, int> wordpair = my_wordlist[base_type::g[u].content];
+						std::ostringstream oss;
+						oss << wordpair.second;
+						std::string word = wordpair.first+":"+oss.str();
+						base_type::g.set_vertex_meta_value(u, "term", word);
+					}
+				}
 
-                std::map<std::string,std::string>::iterator pos;
+				// store the texts
                 if( storeText ){
-                    for( pos = text_store.begin(); pos != text_store.end(); ++pos ){
-                        std::string filename = pos->first;
-                        std::string text = pos->second;
-
-                        typename se_graph_traits<Graph>::vertex_descriptor u;
-                        try {
-                            u = base_type::g.vertex_by_id(
-                                    base_type::g.fetch_vertex_id_by_content_and_type(
-                                        filename, node_type_major_doc));
-                            // attach the text
-                            base_type::g.set_vertex_meta_value(u, "body", text);
-                        } catch ( std::exception &){
-                            //std::cerr << "Error: " << e.what() << std::endl;
-                            continue;
-                        }
-                    }
+					BGL_FORALL_VERTICES_T(u, base_type::g, Graph) {
+						if (base_type::g[u].type_major == node_type_major_doc && text_store.count(base_type::g[u].content)){
+                            base_type::g.set_vertex_meta_value(u, "body", text_store[base_type::g[u].content]);
+						}
+					}
                 }
                 return true;
             }
@@ -2133,45 +2084,10 @@ namespace semantic {
                         base_type::add_doc_term_edge( doc_id, term, weight );
                     }
                 }
-
-                if( !(files_indexed % 5000 ) ){
-                    manage_wordlist();
-                }
             }
 
 
 
-            void manage_wordlist(const unsigned int max=3)
-            {
-                typedef std::multimap<int,std::string,std::less<int> > RevMap;
-                std::multimap<std::string,std::string> to_delete;
-                std::multimap<std::string,UnstemmedCount>::iterator pos;
-                for( pos = wordlist.begin(); pos != wordlist.end(); ++pos ){
-                    std::string stemmed = pos->first;
-                    UnstemmedCount unstemmed = pos->second;
-
-                    RevMap lookup;
-                    if( unstemmed.size() > max + 1 ){
-                        UnstemmedCount::iterator cpos;
-                        for( cpos = unstemmed.begin(); cpos != unstemmed.end(); ++cpos ){
-                            if( cpos->first != "__count" ){
-                                lookup.insert( make_pair( cpos->second, cpos->first ) );
-                            }
-                        }
-                        RevMap::iterator spos;
-                        unsigned int i = lookup.size();
-                        for( spos = lookup.begin(); spos != lookup.end(); ++spos ){
-                            if( i-- > max ){
-                                to_delete.insert( make_pair( stemmed, spos->second ) );
-                            }
-                        }
-                    }
-                }
-                std::map<std::string,std::string>::iterator dpos;
-                for( dpos = to_delete.begin(); dpos != to_delete.end(); ++dpos ){
-                    wordlist[dpos->first].erase(dpos->second);
-                }
-            }
 
             std::string get_mime_type_from_filename( const std::string& filename )
             {

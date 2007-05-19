@@ -2,6 +2,6 @@ TYPEMAP
 SQLiteSubgraph*		O_OBJECT
 SQLiteSearchEngine*   O_OBJECT
 SQLiteIndexer*        O_OBJECT
-Subgraph*		O_OBJECT
-SearchEngine*   O_OBJECT
-Indexer*        O_OBJECT
+MySQLSubgraph*		O_OBJECT
+MySQLSearchEngine*   O_OBJECT
+MySQLIndexer*        O_OBJECT

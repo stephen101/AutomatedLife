@@ -326,6 +326,7 @@ MySQLSearchEngine::_keyword_search(SVquery)
 	OUTPUT:
 		RETVAL
 
+
 AV*
 MySQLSearchEngine::_better_semantic_search(SVquery)
 	SV*		SVquery
@@ -412,11 +413,13 @@ MySQLIndexer::new(...)
 	PREINIT:
 		MySQLGraph* g;
 		MySQLIndexer *index;
-		std::string collection, host, user, pass, db, lexicon, home, parser, min, max, doc_min, encoding, store, stemming;
+		std::string collection, host, user, pass, db, lexicon, min, max, doc_min, store, stemming;
 		std::ifstream file;
 		
 	CODE:
 		// parse the options
+		lexicon = LEXICON_INSTALL_LOCATION;
+		
 		for(int i = 1; i < items; i++) {
 			std::string key = std::string(SvPV_nolen(ST(i)));
 			std::string val = std::string(SvPV_nolen(ST(i+1)));
@@ -434,8 +437,6 @@ MySQLIndexer::new(...)
 				db = val;
 			else if (key == "lexicon")
 				lexicon = val;
-			else if (key == "term_type")
-				parser = val;
 			else if (key == "collection_miniumum")
 				min = val;
 			else if (key == "collection_maximum")
@@ -444,8 +445,6 @@ MySQLIndexer::new(...)
 				doc_min = val;
 			else if (key == "stemming")
 				stemming = val;
-			else if ( key == "encoding")
-				encoding = val;
 			else if ( key == "store_text")
 				store = val;
 		}
@@ -477,8 +476,6 @@ MySQLIndexer::new(...)
 		g->set_mirror_changes_to_storage(true);
 		
 		index = new MySQLIndexer(*g, lexicon);
-		if( !parser.empty() )
-			index->set_parsing_method(parser);
 		
 		if( !min.empty() )
 			index->set_collection_value("min",min);
@@ -545,7 +542,7 @@ void
 MySQLIndexer::add_word_filters(...)
 	PREINIT:
 		AV* array_tmp;
-		std::string key;
+		std::string key, characters;
 		int val;
 		std::set<std::string> list;
 	CODE:
@@ -553,7 +550,9 @@ MySQLIndexer::add_word_filters(...)
 		val = 1;
 		for(int i = 1; i < items; i++) {
 			key = SvPV_nolen(ST(i));
-			if( key != "blacklist" && key != "whitelist"){
+			if( key == "illegal_characters" || key == "allowable_characters"){
+				characters = SvPV_nolen(ST(i+1));
+			} else if( key != "blacklist" && key != "whitelist"){
 				val = SvIV(ST(i+1));
 			} else if( SvROK(ST(i+1))) {
 				array_tmp = (AV*)SvRV(ST(i+1));
@@ -580,6 +579,10 @@ MySQLIndexer::add_word_filters(...)
 				THIS->add_word_filter(blacklist_filter(list));
 			else if (key == "whitelist")
 				THIS->add_word_filter(whitelist_filter(list));
+			else if (key == "allowable_characters")
+				THIS->add_word_filter(allowable_characters_filter(characters));
+			else if (key == "illegal_characters")
+				THIS->add_word_filter(illegal_characters_filter(characters));
 		}
 		
 		
@@ -653,11 +656,12 @@ SQLiteIndexer::new(...)
 	PREINIT:
 		SQLiteGraph* g;
 		SQLiteIndexer *index;
-		std::string collection, db, lexicon, home, parser, min, max;
+		std::string collection, db, lexicon, min, max, doc_min, stemming, store;
 		std::ifstream file;
 
 	CODE:
 		// parse the options
+		lexicon = LEXICON_INSTALL_LOCATION;
 		for(int i = 1; i < items; i++) {
 			std::string key = std::string(SvPV_nolen(ST(i)));
 			std::string val = std::string(SvPV_nolen(ST(i+1)));
@@ -669,12 +673,16 @@ SQLiteIndexer::new(...)
 				db = val;
 			else if (key == "lexicon")
 				lexicon = val;
-			else if ( key == "node_minimum")
+			else if ( key == "collection_minimum")
 				min = val;
-			else if ( key == "node_maximum")
+			else if ( key == "collection_maximum")
 				max = val;
-			else if ( key == "parser")
-				parser = val;
+			else if (key == "document_minimum")
+				doc_min = val;
+			else if (key == "stemming")
+				stemming = val;
+			else if ( key == "store_text")
+				store = val;
 		}
 
 		if( db.empty() ){
@@ -693,14 +701,21 @@ SQLiteIndexer::new(...)
 		g->set_mirror_changes_to_storage(true);
 
 		index = new SQLiteIndexer(*g, lexicon);
-		if( !parser.empty() )
-			index->set_parsing_method(parser);
 		
 		if( !min.empty() )
 			index->set_collection_value("min",min);
 		
 		if( !max.empty() )
 			index->set_collection_value("max",max);
+		
+		if( !doc_min.empty() )
+			index->set_collection_value("doc_min",doc_min);
+		
+		if( !store.empty() && store == "0" )
+			index->store_text(false);
+			
+		if( !stemming.empty() && stemming == "0" )
+			index->set_stemming(false);
 		
 		RETVAL = index;
 
@@ -743,7 +758,7 @@ void
 SQLiteIndexer::add_word_filters(...)
 	PREINIT:
 		AV* array_tmp;
-		std::string key;
+		std::string key, characters;
 		int i, j, val;
 		std::set<std::string> list;
 	CODE:
@@ -751,7 +766,9 @@ SQLiteIndexer::add_word_filters(...)
 		val = 1;
 		for(i = 1; i < items; i++) {
 			key = SvPV_nolen(ST(i));
-			if( key != "blacklist" && key != "whitelist"){
+			if( key == "illegal_characters" || key == "allowable_characters"){
+				characters = SvPV_nolen(ST(i+1));
+			} else if( key != "blacklist" && key != "whitelist"){
 				val = SvIV(ST(i+1));
 			} else if( SvROK(ST(i+1))) {
 				array_tmp = (AV*)SvRV(ST(i+1));
@@ -778,6 +795,11 @@ SQLiteIndexer::add_word_filters(...)
 				THIS->add_word_filter(blacklist_filter(list));
 			else if (key == "whitelist")
 				THIS->add_word_filter(whitelist_filter(list));
+			else if (key == "allowable_characters")
+				THIS->add_word_filter(allowable_characters_filter(characters));
+			else if (key == "illegal_characters")
+				THIS->add_word_filter(illegal_characters_filter(characters));
+				
 		}
 		
 
