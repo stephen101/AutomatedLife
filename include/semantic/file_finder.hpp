@@ -34,6 +34,7 @@ namespace semantic {
 			
 			std::vector<std::string> get_filenames()
 			{
+				
 				boost::filesystem::path full_path(starting_node,boost::filesystem::native);
 				bool exists, is_dir;
 				try {

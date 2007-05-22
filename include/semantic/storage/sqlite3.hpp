@@ -533,7 +533,19 @@ namespace semantic {
 				m_connected=false;
 			}
 			
+			void reset_all_collections() {
+				query("DELETE FROM edge_query");
+				query("DELETE FROM edge");
+				query("DELETE FROM content");
+				query("DELETE FROM degree");
+				query("DELETE FROM node_meta");
+				query("DELETE FROM node");
+				query("DELETE FROM node_count");
+				query("DELETE FROM collection_meta");
+			}
+
 			void reset_collection() {
+
 				query("DELETE FROM node WHERE fk_collection="+to_string(get_collection_id()));
 				query("DELETE FROM node_count WHERE fk_collection="+to_string(get_collection_id()));
 				query("DELETE FROM collection_meta WHERE fk_collection="+to_string(get_collection_id()));

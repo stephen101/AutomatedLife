@@ -20,7 +20,7 @@ IndexingThread::IndexingThread(Graph *g, QStringList dirs, QObject *parent)
 void IndexingThread::run(){
 	/* emit */ startedIndexing();
 	/* emit */ status(QString(tr("Clearing index")));
-	m_graph->reset_collection();
+	m_graph->reset_all_collections();
 	
 	
 	std::vector<std::string> filenames;

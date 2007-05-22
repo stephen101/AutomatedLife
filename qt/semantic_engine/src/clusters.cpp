@@ -370,7 +370,7 @@ void ClusterWidget::clusteringCompleted() {
 	        clusterTree->addTopLevelItem(item);
 		}
     }
-    
+    clusterProgress->reset();
     clusterProgress->setEnabled(false);
 	
 }

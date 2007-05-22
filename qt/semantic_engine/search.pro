@@ -87,7 +87,7 @@ win32 {
                    C:/Semantic/msword-reader \
                    C:/Semantic/pdf-reader 
 
-    LIBS += -LC:/Boost/lib -lboost_filesystem-vc80-mt \
+    LIBS += C:/Boost/lib/libboost_filesystem-vc80-mt-1_33_1.lib \
             C:/Progra~1/GnuWin32/lib/libiconv.lib \
             C:/Semantic/msword-reader/MSWordReader.lib \
             C:/Semantic/pdf-reader/PDFReader.lib 

@@ -457,6 +457,20 @@ namespace semantic {
 			    query("delete from collection where name = '" + escape(name) + "'");
 			}
 			
+			// quicker way to remove all collectionss
+			void reset_all_collections() {
+				query("DELETE FROM edge_query");
+				query("DELETE FROM edge");
+				query("DELETE FROM content");
+				query("DELETE FROM dirty_node");
+				query("DELETE FROM degree");
+				query("DELETE FROM node_meta");
+				query("DELETE FROM node");
+				query("DELETE FROM node_count");
+				query("DELETE FROM collection_meta");
+			}
+
+
 			// reset the current collection
 			void reset_collection(){
 				query("DELETE FROM node WHERE fk_collection="+to_string(get_collection_id()));

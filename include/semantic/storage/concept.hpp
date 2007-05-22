@@ -64,6 +64,7 @@ namespace semantic {
 				p.rename_collection(s, s);
 				p.remove_collection(s);
 				p.reset_collection();
+				p.reset_all_collections();
 				
 				p.mark_as_dirty(e1);
 				p.mark_as_dirty(u);
