@@ -114,7 +114,7 @@ void ClusterWidget::displayItem(QTreeWidgetItem *item,int){
 	// allow double clicking only on child items
 	if( !(item->flags() &= Qt::ItemIsUserCheckable | Qt::ItemIsDropEnabled) ){
 		if( QFile::exists( title ) ){
-			QDesktopServices::openUrl(QUrl(title));
+			QDesktopServices::openUrl(QUrl::fromLocalFile(title));
 		} else {
 			/* emit */ displaySingleResultWindow(title);
 		}
@@ -176,7 +176,7 @@ ClusterTreeWidget::ClusterTreeWidget(QTreeWidget *parent)
 		QStringList labels;
 		labels << tr("Document Count") << tr("Cluster");
 		setHeaderLabels(labels);
-		setTextElideMode(Qt::ElideRight);	
+		setTextElideMode(Qt::ElideMiddle);	
 	}
 
 Qt::DropActions ClusterTreeWidget::supportedDropActions() const {

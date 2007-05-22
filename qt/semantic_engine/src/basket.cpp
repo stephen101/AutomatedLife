@@ -11,8 +11,8 @@ BasketWidget::BasketWidget(QWidget *parent)
 	setDragDropMode(QAbstractItemView::DropOnly);
 	setSelectionMode(QAbstractItemView::ExtendedSelection);
 	setAlternatingRowColors(true);
-	setTextElideMode(Qt::ElideMiddle);
-	setMaximumWidth(200);
+	setTextElideMode(Qt::ElideLeft);
+	//setMaximumWidth(200);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
