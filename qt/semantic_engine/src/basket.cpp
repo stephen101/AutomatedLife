@@ -12,7 +12,7 @@ BasketWidget::BasketWidget(QWidget *parent)
 	setSelectionMode(QAbstractItemView::ExtendedSelection);
 	setAlternatingRowColors(true);
 	setTextElideMode(Qt::ElideLeft);
-	//setMaximumWidth(200);
+	setMaximumWidth(250);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 

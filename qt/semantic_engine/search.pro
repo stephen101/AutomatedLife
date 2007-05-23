@@ -19,6 +19,7 @@ debug {
     CONFIG += no_warn
 }
 
+
 # define storage engine
 contains( STORAGE, mysql ) {
     message( "Building with MySQL storage" )

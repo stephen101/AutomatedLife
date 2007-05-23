@@ -364,6 +364,7 @@ void CollectionWidget::setupLayout(){
 	indexButton = new QPushButton(tr("Index"));
 	indexButton->setToolTip(tr("Index or re-index the documents in the selected collection"));
 	indexButton->setVisible(false);
+	//indexButton->setEnabled(false);
 	
 	QHBoxLayout *toolLayout = new QHBoxLayout;
 	toolLayout->addWidget(closeButton);
