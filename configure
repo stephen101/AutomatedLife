@@ -1560,7 +1560,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=Semantic-Engine
- VERSION=2.04
+ VERSION=2.05
 
 
 cat >>confdefs.h <<_ACEOF

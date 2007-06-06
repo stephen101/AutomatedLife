@@ -38,6 +38,8 @@ extern "C" {
 
 using namespace semantic;
 
+typedef tagger SemTagger;
+
 #if SEMANTIC_HAVE_MYSQL
 
 typedef SEGraph<MySQL5StoragePolicy> MySQLGraph;
@@ -89,6 +91,123 @@ stoplist_location()
 		RETVAL
 
 
+MODULE = Semantic::API		PACKAGE = Semantic::API::Parser
+
+SemTagger*
+SemTagger::new()
+	PREINIT:
+		SemTagger *p;
+	CODE:
+		p = new SemTagger(LEXICON_INSTALL_LOCATION);
+		RETVAL = p;
+
+	OUTPUT:
+		RETVAL
+		
+
+SV*
+SemTagger::parse(SVtext)
+		SV* SVtext;
+	PREINIT:
+		std::string tagged, text;
+	CODE:
+		text = SvPV_nolen(SVtext);
+		tagged = THIS->add_tags(text);
+		RETVAL = newSVpv(tagged.c_str(),tagged.length());
+		
+	OUTPUT:
+		RETVAL
+		
+
+HV*
+SemTagger::get_proper_nouns(SVtext)
+		SV* SVtext;
+	PREINIT:
+		std::string text, key;
+		HV* HVterms;
+	CODE:
+		text = SvPV_nolen(SVtext);
+		std::map<std::string,int> terms = THIS->remove_tags(THIS->get_proper_nouns(text));
+		
+		HVterms = newHV();
+		sv_2mortal((SV*)HVterms);
+		for( std::map<std::string,int>::iterator i = terms.begin(); i != terms.end(); ++i){
+			key = i->first;
+			hv_store(HVterms, key.c_str(), key.length(), newSViv(i->second),0);
+		}
+		
+		RETVAL = HVterms;
+
+	OUTPUT:
+		RETVAL
+
+HV*
+SemTagger::get_proper_noun_phrases(SVtext)
+		SV* SVtext;
+	PREINIT:
+		std::string text, key;
+		HV* HVterms;
+	CODE:
+		text = SvPV_nolen(SVtext);
+		std::map<std::string,int> terms = THIS->remove_tags(THIS->get_proper_noun_phrases(text));
+
+		HVterms = newHV();
+		sv_2mortal((SV*)HVterms);
+		for( std::map<std::string,int>::iterator i = terms.begin(); i != terms.end(); ++i){
+			key = i->first;
+			hv_store(HVterms, key.c_str(), key.length(), newSViv(i->second),0);
+		}
+
+		RETVAL = HVterms;
+
+	OUTPUT:
+		RETVAL
+
+HV*
+SemTagger::get_noun_phrases(SVtext)
+		SV* SVtext;
+	PREINIT:
+		std::string text, key;
+		HV* HVterms;
+	CODE:
+		text = SvPV_nolen(SVtext);
+		std::map<std::string,int> terms = THIS->remove_tags(THIS->get_noun_phrases(text));
+
+		HVterms = newHV();
+		sv_2mortal((SV*)HVterms);
+		for( std::map<std::string,int>::iterator i = terms.begin(); i != terms.end(); ++i){
+			key = i->first;
+			hv_store(HVterms, key.c_str(), key.length(), newSViv(i->second),0);
+		}
+
+		RETVAL = HVterms;
+
+	OUTPUT:
+		RETVAL
+
+HV*
+SemTagger::get_nouns(SVtext)
+		SV* SVtext;
+	PREINIT:
+		std::string text, key;
+		HV* HVterms;
+	CODE:
+		text = SvPV_nolen(SVtext);
+		std::map<std::string,int> terms = THIS->remove_tags(THIS->get_nouns(text));
+
+		HVterms = newHV();
+		sv_2mortal((SV*)HVterms);
+		for( std::map<std::string,int>::iterator i = terms.begin(); i != terms.end(); ++i){
+			key = i->first;
+			hv_store(HVterms, key.c_str(), key.length(), newSViv(i->second),0);
+		}
+
+		RETVAL = HVterms;
+
+	OUTPUT:
+		RETVAL
+
+	
 
 MODULE = Semantic::API		PACKAGE = Semantic::API::MySQLSearch
 
@@ -505,10 +624,10 @@ new()
 		std::cerr << "Semantic::API was not compiled with MySQL support!" << std::endl;
 		exit(EXIT_FAILURE);
 
-
-#endif
+#endif 
 
 #if SEMANTIC_HAVE_MYSQL
+
 
 void
 MySQLIndexer::set_parsing_method(SVmethod)
@@ -617,6 +736,8 @@ void
 MySQLIndexer::DESTROY()
 	CODE:
 		delete THIS;
+
+
 
 SV*
 MySQLIndexer::_index_file(SVfilename, Iweight)

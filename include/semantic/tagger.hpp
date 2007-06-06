@@ -215,25 +215,24 @@ namespace semantic {
 /* **********************************************************************
  *        Get the proper noun phrases from the given text string
  * ********************************************************************** */
-            std::map<std::string,int> get_proper_nouns( const std::string& text ){
-                std::map<std::string,int> phrases = get_noun_phrases(text);
+            std::map<std::string,int> get_proper_noun_phrases( const std::string& text ){
+				std::map<std::string,int> phrases = get_noun_phrases(text);
                 std::map<std::string,int>::iterator pos;
                 std::set<std::string> to_erase;
-                for( pos = phrases.begin(); pos != phrases.end(); ++pos){
-                    std::pair<
+				for( pos = phrases.begin(); pos != phrases.end(); ++pos){
+					std::pair<
                         std::vector<std::string>,
                         std::vector<std::string>
                         > phrase = vectorize_tagged_text(pos->first);
                     std::vector<std::string> words = phrase.first;
                     std::vector<std::string> tags = phrase.second;
-
-                    // erase any noun phrases that have lower case nouns and adjectives
-                    for( std::vector<std::string>::size_type i = words.size();
-                             i > 0; --i ){
-                        std::string t = simplify_tag(tags[i-1]);
-                        if( ( t == "N" || t == "M" ) && is_lower(words[i-1]) ){
+					
+					// erase any noun phrases that have lower case nouns and adjectives
+					for( std::vector<std::string>::size_type i = 0; i < words.size(); ++i ){
+                        std::string t = simplify_tag(tags[i]);
+                        if( ( t == "N" || t == "M" ) && is_lower(words[i]) ){
                             to_erase.insert(pos->first);
-                            i = 0; // short circuit
+                            i = words.size(); // short circuit
                         }
                     }
                 }
@@ -244,6 +243,53 @@ namespace semantic {
 
                 return phrases;
             }
+
+			std::map<std::string,int> get_proper_nouns(const std::string& text){
+				std::map<std::string,int> phrases = get_maximal_noun_phrases( text );
+				std::map<std::string,int> named_entities;
+				std::map<std::string,int>::iterator pos;
+				for( pos = phrases.begin(); pos != phrases.end(); ++pos ){
+					std::vector<std::string> words, tags;
+					boost::tie(words,tags) = vectorize_tagged_text(pos->first);
+					
+					bool valid = false;
+					int start = -1;
+					int end = start;
+					
+					for( unsigned i = 0; i < words.size(); ++i){
+						std::string t = simplify_tag(tags[i]);
+						if( is_upper(words[i])){ 
+							if( start == -1 ){ start = i; }
+							if( t == "N" || t == "M" ){ end = i; }
+							if( t == "N" ){ valid = true; } 
+						} else {
+							if( ( t == "N" || t == "M" ) ){
+								if( valid ){
+									// save everything, reset valid, start
+									std::string term;
+									for( unsigned j = start; j <= end; ++j){
+										term.append( words[j] + "/" + tags[j]);
+										if( j < end ) {term.append(" ");}
+									}
+									named_entities.insert(std::make_pair( term, pos->second));
+								} 
+								valid = false;
+								start = -1;
+								end = -1;
+							}
+						}
+					}
+					if( valid ){
+						std::string term;
+						for( unsigned j = start; j <= end; ++j){
+							term.append( words[j] + "/" + tags[j]);
+							if( j < end ) {term.append(" ");}
+						}
+						named_entities.insert(std::make_pair( term, pos->second));
+					}
+				}
+				return named_entities;
+			}
 
 /* **********************************************************************
  *        Get the maximal noun phrases from the given text string
@@ -821,22 +867,36 @@ namespace semantic {
  * ********************************************************************** */
             std::pair<std::vector<std::string>,
                       std::vector<std::string>
-                      > vectorize_tagged_text(const std::string tagged){
+                      > vectorize_tagged_text(const std::string t){
+				std::string tagged = t;
+				boost::algorithm::trim(tagged);
+	
                 std::vector<std::string> words;
                 std::vector<std::string> tags;
                 std::string::size_type word_start = 0;
                 std::string::size_type tag_end = tagged.find_first_of(" ",0);
                 std::string::size_type divider;
                 while( tag_end != std::string::npos ){
-                    divider = tagged.find_last_of("/",tag_end);
-                    words.push_back(tagged.substr(word_start,divider-word_start));
-                    tags.push_back(tagged.substr(divider+1,tag_end-divider-1));
+					try {
+	                    divider = tagged.find_last_of("/",tag_end);
+	                    words.push_back(tagged.substr(word_start,divider-word_start));
+	                    tags.push_back(tagged.substr(divider+1,tag_end-divider-1));
+					} catch ( std::exception &e){
+						std::cerr << e.what() << std::endl;
+						continue;
+					}
                     word_start = tagged.find_first_not_of(" ",tag_end);
-                    tag_end = tagged.find_first_of(" ",word_start);
+					if( word_start == std::string::npos ){
+						tag_end = std::string::npos;
+					} else {
+	                    tag_end = tagged.find_first_of(" ",word_start);
+					}
                 }
                 divider = tagged.find_last_of("/",tagged.size());
-                words.push_back(tagged.substr(word_start,divider-word_start));
-                tags.push_back(tagged.substr(divider+1,tagged.size()-divider-1));
+				if( divider != std::string::npos ){
+	                words.push_back(tagged.substr(word_start,divider-word_start));
+	                tags.push_back(tagged.substr(divider+1,tagged.size()-divider-1));
+				}
                 return std::make_pair(words,tags);
             }
 

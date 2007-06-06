@@ -4,8 +4,8 @@
 #include <semantic/config.hpp>
 #include <iostream>
 
-#define SEMANTIC_VERSION_STRING "2.0.4"
-#define SEMANTIC_VERSION_NUMBER 20004 // format Mmmrr (M = Major, m = minor, r = revision)
+#define SEMANTIC_VERSION_STRING "2.0.5"
+#define SEMANTIC_VERSION_NUMBER 20005 // format Mmmrr (M = Major, m = minor, r = revision)
 #define SEMANTIC_PACKAGE_NAME "Semantic Engine"
 #define SEMANTIC_SVN_REVISION "$Revision$"
 
