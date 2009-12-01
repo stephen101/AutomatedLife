@@ -4512,7 +4512,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   OLD_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$BOOST_CPPFLAGS"
   OLD_LIBS="$LIBS"
-  LIBS="-boost_program_options-$boost_libsuff"
+  LIBS="-lboost_program_options-$boost_libsuff"
     cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4565,7 +4565,7 @@ else
 sed 's/^/| /' conftest.$ac_ext >&5
 
 
-        LIBS="-boost_program_options"
+        LIBS="-lboost_program_options-mt"
 	    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4662,7 +4662,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   OLD_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$BOOST_CPPFLAGS"
   OLD_LIBS="$LIBS"
-  LIBS="-boost_filesystem-$boost_libsuff"
+  LIBS="-lboost_filesystem-$boost_libsuff"
     cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4715,7 +4715,7 @@ else
 sed 's/^/| /' conftest.$ac_ext >&5
 
 
-        LIBS="-boost_filesystem"
+        LIBS="-lboost_filesystem-mt"
 	    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
