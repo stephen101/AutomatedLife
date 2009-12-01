@@ -76,13 +76,15 @@ AC_DEFUN([AC_CHECK_SQLITE], [
       AC_FIND_FILE($sqlite_libs_static, $sqlite_libdirs, ac_sqlite_libdir)
       if test "$ac_sqlite_libdir" = "no"; then
 		  AC_FIND_FILE($sqlite_libs, $sqlite_libdirs, ac_sqlite_libdir)
+		  echo "-- $ac_sqlite_libdir --"
 	      if test "$ac_sqlite_libdir" = "no"; then
 	          AC_MSG_ERROR([Invalid SQLite directory - libraries not found.])
 		  else
 	      	  test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-L$ac_sqlite_libdir -lsqlite3"
 		  fi
 	  else
-		  test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="$ac_sqlite_libdir/libsqlite3.a"
+dnl		test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="$ac_sqlite_libdir/libsqlite3.a"
+		  test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-lsqlite3"
       fi
 
       AC_FIND_FILE(sqlite3.h, $sqlite_incdirs, ac_sqlite_incdir)

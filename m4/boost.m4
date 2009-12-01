@@ -80,15 +80,17 @@ dnl Extract the path name from a --with-boost=PATH argument
     if test "$target_os" = "mingw32"; then
        boost_libsuff=mgw
     else
-       boost_libsuff=gcc
+       boost_libsuff=gcc41
     fi
     boost_libsuff_r=$boost_libsuff-mt;
     if test "x$enable_debug" = xyes ; then
         boost_libsuff=$boost_libsuff-d;
         boost_libsuff_r=$boost_libsuff_r-d;
     fi
-    boost_libsuff=$boost_libsuff-${WANT_BOOST_MAJOR}_${WANT_BOOST_MINOR}_$WANT_BOOST_SUB_MINOR
-    boost_libsuff_r=$boost_libsuff_r-${WANT_BOOST_MAJOR}_${WANT_BOOST_MINOR}_$WANT_BOOST_SUB_MINOR
+dnl    boost_libsuff=$boost_libsuff-${WANT_BOOST_MAJOR}_${WANT_BOOST_MINOR}_$WANT_BOOST_SUB_MINOR
+dnl    boost_libsuff_r=$boost_libsuff_r-${WANT_BOOST_MAJOR}_${WANT_BOOST_MINOR}_$WANT_BOOST_SUB_MINOR
+    boost_libsuff=$boost_libsuff-1_34
+    boost_libsuff_r=$boost_libsuff_r-1_34
         ifelse([$2], , :, [$2])
       ],
       [

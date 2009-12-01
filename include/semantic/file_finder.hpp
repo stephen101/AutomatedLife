@@ -89,12 +89,12 @@ namespace semantic {
 						try {
 							recurse_directory( *dir_itr );
 						} catch (boost::filesystem::filesystem_error &e) {
-							std::cerr << "Error recursing directory: " << (*dir_itr).native_file_string() << " (" << e.what() << ")" << std::endl;
+							std::cerr << "Error recursing directory: " << (*dir_itr).path().string() << " (" << e.what() << ")" << std::endl;
 							continue;
 						}
 					} else 
 					{
-						add_file( (*dir_itr).native_file_string() );
+						add_file( (*dir_itr).path().string() );
 					}
 				}
 			}
